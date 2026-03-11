@@ -106,6 +106,7 @@ hypertrader/
 │       ├── hooks/                  # useWebSocket, useApi (SWR-based)
 │       ├── lib/                    # API client, formatters, constants
 │       └── types/                  # TypeScript interfaces
+├── install.sh                       # Full installation script
 └── start.sh                        # Launch both servers
 ```
 
@@ -118,16 +119,39 @@ hypertrader/
 - Python 3.10+
 - Node.js 18+
 
-### 1. Clone & Configure
+### One-Command Install
 
 ```bash
 git clone https://github.com/hpombo1337/hypertrader.git
 cd hypertrader
-cp backend/.env.example backend/.env
-# Edit backend/.env with your webhook secret
+chmod +x install.sh start.sh
+./install.sh
 ```
 
-### 2. Backend
+The install script handles everything:
+- Checks prerequisites (Python, Node.js, pip)
+- Creates Python virtual environment and installs dependencies
+- Installs frontend Node.js packages
+- Generates `.env` with a secure webhook secret
+- Initializes the SQLite database with all tables
+- Verifies the installation
+
+### Launch
+
+```bash
+./start.sh
+```
+
+- Dashboard: `http://localhost:3000`
+- API: `http://localhost:8000`
+- Webhook: `http://localhost:8000/api/webhook`
+
+### Manual Setup
+
+<details>
+<summary>Click to expand manual installation steps</summary>
+
+**Backend:**
 
 ```bash
 cd backend
@@ -135,12 +159,11 @@ python -m venv venv
 source venv/Scripts/activate    # Windows
 # source venv/bin/activate      # macOS/Linux
 pip install -r requirements.txt
+cp .env.example .env            # Edit with your webhook secret
 uvicorn app.main:app --reload
 ```
 
-Backend runs at `http://localhost:8000`
-
-### 3. Frontend
+**Frontend:**
 
 ```bash
 cd frontend
@@ -148,14 +171,7 @@ npm install
 npm run dev
 ```
 
-Dashboard runs at `http://localhost:3000`
-
-### 4. Or use the start script
-
-```bash
-chmod +x start.sh
-./start.sh
-```
+</details>
 
 ---
 
