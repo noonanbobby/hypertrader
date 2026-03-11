@@ -1,0 +1,12 @@
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+export const WS_URL =
+  process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000/ws";
+
+export const NAV_ITEMS = [
+  { label: "Dashboard", href: "/", icon: "LayoutDashboard" },
+  { label: "Strategies", href: "/strategies", icon: "Target" },
+  { label: "Trades", href: "/trades", icon: "ArrowLeftRight" },
+  { label: "Analytics", href: "/analytics", icon: "BarChart3" },
+  { label: "Settings", href: "/settings", icon: "Settings" },
+] as const;
