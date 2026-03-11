@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState, useCallback } from "react";
 import { formatCurrency, formatPrice, formatDate } from "@/lib/utils";
 import type { Trade } from "@/types";
 import { ArrowUpRight, ArrowDownRight } from "lucide-react";
@@ -9,7 +10,50 @@ interface TradesTableProps {
   onSelect?: (trade: Trade) => void;
 }
 
+function normalizeSymbol(symbol: string): string {
+  let coin = symbol.toUpperCase().replace("-PERP", "").replace("/USD", "");
+  for (const suffix of ["USDC", "USDT", "USD", "PERP"]) {
+    if (coin.endsWith(suffix) && coin.length > suffix.length) {
+      return coin.slice(0, -suffix.length);
+    }
+  }
+  return coin;
+}
+
+function calcPnl(trade: Trade, currentPrice: number): number {
+  const direction = trade.side === "long" ? 1 : -1;
+  return direction * (currentPrice - trade.entry_price) * trade.quantity;
+}
+
 export function TradesTable({ trades, onSelect }: TradesTableProps) {
+  const [livePrices, setLivePrices] = useState<Record<string, number>>({});
+
+  const openTrades = trades.filter((t) => t.status === "open");
+
+  const fetchPrices = useCallback(async () => {
+    if (openTrades.length === 0) return;
+    try {
+      const res = await fetch("https://api.hyperliquid.xyz/info", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "allMids" }),
+      });
+      if (!res.ok) return;
+      const data: Record<string, string> = await res.json();
+      const prices: Record<string, number> = {};
+      for (const [k, v] of Object.entries(data)) {
+        prices[k] = parseFloat(v);
+      }
+      setLivePrices(prices);
+    } catch {}
+  }, [openTrades.length]);
+
+  useEffect(() => {
+    fetchPrices();
+    const interval = setInterval(fetchPrices, 5000);
+    return () => clearInterval(interval);
+  }, [fetchPrices]);
+
   if (trades.length === 0) {
     return (
       <div className="text-center py-16 text-white/30">
@@ -18,16 +62,19 @@ export function TradesTable({ trades, onSelect }: TradesTableProps) {
     );
   }
 
+  const headers = ["Time", "Symbol", "Side", "Lev", "Qty", "Entry", "Margin", "Notional", "Mark", "Exit", "P&L", "P&L %", "Fees", "Status"];
+  const rightAligned = ["Qty", "Entry", "Margin", "Notional", "Mark", "Exit", "P&L", "P&L %", "Fees"];
+
   return (
     <div className="overflow-x-auto rounded-2xl gradient-border backdrop-blur-xl bg-white/[0.02]">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-white/[0.06]">
-            {["Time", "Symbol", "Side", "Lev", "Qty", "Entry", "Margin", "Notional", "Exit", "P&L", "P&L %", "Fees", "Status"].map((h) => (
+            {headers.map((h) => (
               <th
                 key={h}
                 className={`px-4 py-3.5 text-[10px] font-semibold uppercase tracking-wider text-white/25 ${
-                  ["Qty", "Entry", "Margin", "Notional", "Exit", "P&L", "P&L %", "Fees"].includes(h) ? "text-right" : "text-left"
+                  rightAligned.includes(h) ? "text-right" : "text-left"
                 }`}
               >
                 {h}
@@ -38,6 +85,13 @@ export function TradesTable({ trades, onSelect }: TradesTableProps) {
         <tbody>
           {trades.map((t) => {
             const isLong = t.side === "long";
+            const isOpen = t.status === "open";
+            const coin = normalizeSymbol(t.symbol);
+            const markPrice = livePrices[coin];
+            const pnl = isOpen && markPrice ? calcPnl(t, markPrice) : t.realized_pnl;
+            const pnlPct = t.margin_used > 0 ? (pnl / t.margin_used) * 100 : 0;
+            const hasPnl = isOpen ? !!markPrice : t.status === "closed";
+
             return (
               <tr
                 key={t.id}
@@ -77,26 +131,33 @@ export function TradesTable({ trades, onSelect }: TradesTableProps) {
                 <td className="px-4 py-3.5 text-right font-mono text-white/30">
                   {formatCurrency(t.notional_value)}
                 </td>
+                <td className="px-4 py-3.5 text-right font-mono">
+                  {isOpen && markPrice ? (
+                    <span className="text-blue-400">{formatPrice(markPrice)}</span>
+                  ) : (
+                    <span className="text-white/20">—</span>
+                  )}
+                </td>
                 <td className="px-4 py-3.5 text-right font-mono text-white/40">
                   {t.exit_price ? formatPrice(t.exit_price) : "—"}
                 </td>
                 <td className="px-4 py-3.5 text-right">
-                  {t.status === "closed" ? (
+                  {hasPnl ? (
                     <span className={`font-bold ${
-                      t.realized_pnl >= 0 ? "text-emerald-400" : "text-red-400"
+                      pnl >= 0 ? "text-emerald-400" : "text-red-400"
                     }`}>
-                      {t.realized_pnl >= 0 ? "+" : ""}{formatCurrency(t.realized_pnl)}
+                      {pnl >= 0 ? "+" : ""}{formatCurrency(pnl)}
                     </span>
                   ) : (
                     <span className="text-white/20">—</span>
                   )}
                 </td>
                 <td className="px-4 py-3.5 text-right">
-                  {t.status === "closed" && t.margin_used > 0 ? (
+                  {hasPnl && t.margin_used > 0 ? (
                     <span className={`font-bold text-xs ${
-                      t.realized_pnl >= 0 ? "text-emerald-400" : "text-red-400"
+                      pnl >= 0 ? "text-emerald-400" : "text-red-400"
                     }`}>
-                      {t.realized_pnl >= 0 ? "+" : ""}{((t.realized_pnl / t.margin_used) * 100).toFixed(2)}%
+                      {pnl >= 0 ? "+" : ""}{pnlPct.toFixed(2)}%
                     </span>
                   ) : (
                     <span className="text-white/20">—</span>
