@@ -23,11 +23,11 @@ export function TradesTable({ trades, onSelect }: TradesTableProps) {
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-white/[0.06]">
-            {["Time", "Symbol", "Side", "Lev", "Qty", "Entry", "Margin", "Notional", "Exit", "P&L", "Fees", "Status"].map((h) => (
+            {["Time", "Symbol", "Side", "Lev", "Qty", "Entry", "Margin", "Notional", "Exit", "P&L", "P&L %", "Fees", "Status"].map((h) => (
               <th
                 key={h}
                 className={`px-4 py-3.5 text-[10px] font-semibold uppercase tracking-wider text-white/25 ${
-                  ["Qty", "Entry", "Margin", "Notional", "Exit", "P&L", "Fees"].includes(h) ? "text-right" : "text-left"
+                  ["Qty", "Entry", "Margin", "Notional", "Exit", "P&L", "P&L %", "Fees"].includes(h) ? "text-right" : "text-left"
                 }`}
               >
                 {h}
@@ -86,6 +86,17 @@ export function TradesTable({ trades, onSelect }: TradesTableProps) {
                       t.realized_pnl >= 0 ? "text-emerald-400" : "text-red-400"
                     }`}>
                       {t.realized_pnl >= 0 ? "+" : ""}{formatCurrency(t.realized_pnl)}
+                    </span>
+                  ) : (
+                    <span className="text-white/20">—</span>
+                  )}
+                </td>
+                <td className="px-4 py-3.5 text-right">
+                  {t.status === "closed" && t.margin_used > 0 ? (
+                    <span className={`font-bold text-xs ${
+                      t.realized_pnl >= 0 ? "text-emerald-400" : "text-red-400"
+                    }`}>
+                      {t.realized_pnl >= 0 ? "+" : ""}{((t.realized_pnl / t.margin_used) * 100).toFixed(2)}%
                     </span>
                   ) : (
                     <span className="text-white/20">—</span>
