@@ -74,6 +74,7 @@ async def list_trades(
             entry_time=t.entry_time,
             exit_time=t.exit_time,
             message=t.message,
+            fill_type=t.fill_type,
         )
         for t in trades
     ]
@@ -102,7 +103,7 @@ async def close_trade(trade_id: int, db: AsyncSession = Depends(get_db)):
     close_action = "sell" if position.side == "long" else "buy"
 
     try:
-        order_result = await engine.execute_order(trade.symbol, close_action, position.quantity)
+        order_result = await engine.execute_order_with_fallback(trade.symbol, close_action, position.quantity)
         if not order_result.success:
             raise ValueError(order_result.message)
 

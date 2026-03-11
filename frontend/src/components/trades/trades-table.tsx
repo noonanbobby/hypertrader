@@ -80,7 +80,7 @@ export function TradesTable({ trades, onSelect, onTradesClosed }: TradesTablePro
     );
   }
 
-  const headers = ["Time", "Symbol", "Side", "Lev", "Qty", "Entry", "Margin", "Notional", "Mark", "Exit", "P&L", "P&L %", "Fees", "Status", ""];
+  const headers = ["Time", "Symbol", "Side", "Lev", "Qty", "Entry", "Margin", "Notional", "Mark", "Exit", "P&L", "P&L %", "Fees", "Fill", "Status", ""];
   const rightAligned = ["Qty", "Entry", "Margin", "Notional", "Mark", "Exit", "P&L", "P&L %", "Fees"];
 
   return (
@@ -183,6 +183,15 @@ export function TradesTable({ trades, onSelect, onTradesClosed }: TradesTablePro
                 </td>
                 <td className="px-4 py-3.5 text-right font-mono text-white/25">
                   {formatCurrency(t.fees)}
+                </td>
+                <td className="px-4 py-3.5">
+                  <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                    t.fill_type === "maker"
+                      ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                      : "bg-white/5 text-white/30 border border-white/5"
+                  }`}>
+                    {t.fill_type ?? "taker"}
+                  </span>
                 </td>
                 <td className="px-4 py-3.5">
                   <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${

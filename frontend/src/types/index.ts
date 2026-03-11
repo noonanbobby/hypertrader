@@ -35,6 +35,7 @@ export interface Trade {
   entry_time: string;
   exit_time: string | null;
   message: string;
+  fill_type: "maker" | "taker";
 }
 
 export interface Position {
@@ -101,6 +102,9 @@ export interface AppSettings {
   slippage_pct: number;
   maker_fee_pct: number;
   taker_fee_pct: number;
+  use_limit_orders: boolean;
+  limit_order_timeout_sec: number;
+  limit_order_offset_pct: number;
   default_max_position_pct: number;
   default_max_drawdown_pct: number;
   default_daily_loss_limit: number;

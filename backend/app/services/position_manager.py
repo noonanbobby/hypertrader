@@ -18,6 +18,7 @@ class PositionManager:
         quantity: float,
         fees: float,
         message: str = "",
+        fill_type: str = "taker",
     ) -> tuple[Position, Trade]:
         """Open a new position and record the entry trade."""
         # Check for existing position in same symbol/strategy
@@ -53,6 +54,7 @@ class PositionManager:
             fees=fees,
             status=TradeStatus.open.value,
             message=message,
+            fill_type=fill_type,
         )
         db.add(trade)
 

@@ -409,6 +409,79 @@ export default function SettingsPage() {
         </div>
       </div>
 
+      {/* Limit Orders */}
+      <div className="gradient-border rounded-2xl backdrop-blur-xl bg-white/[0.02] p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <Zap className="h-4 w-4 text-white/25" />
+          <span className="text-xs font-semibold uppercase tracking-wider text-white/25">
+            Limit Orders
+          </span>
+        </div>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-white/60">Use Limit Orders</p>
+              <p className="text-[10px] text-white/25 mt-0.5">
+                Try limit order first (maker fee), fall back to market on timeout
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                const current = form.use_limit_orders ?? appSettings?.use_limit_orders ?? true;
+                setField("use_limit_orders", !current);
+              }}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                (form.use_limit_orders ?? appSettings?.use_limit_orders ?? true)
+                  ? "bg-[#00ff88]/20 border border-[#00ff88]/30"
+                  : "bg-white/[0.06] border border-white/[0.08]"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 rounded-full transition-transform ${
+                  (form.use_limit_orders ?? appSettings?.use_limit_orders ?? true)
+                    ? "translate-x-6 bg-[#00ff88]"
+                    : "translate-x-1 bg-white/30"
+                }`}
+              />
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-[10px] font-semibold uppercase tracking-wider text-white/20 mb-1.5 block">
+                Timeout (seconds)
+              </label>
+              <Input
+                type="number"
+                step="1"
+                min="1"
+                max="300"
+                value={val("limit_order_timeout_sec")}
+                onChange={(e) =>
+                  setField("limit_order_timeout_sec", parseFloat(e.target.value) || 30)
+                }
+                className="font-mono text-xs"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-semibold uppercase tracking-wider text-white/20 mb-1.5 block">
+                Price Offset (%)
+              </label>
+              <Input
+                type="number"
+                step="0.01"
+                min="0"
+                max="5"
+                value={val("limit_order_offset_pct")}
+                onChange={(e) =>
+                  setField("limit_order_offset_pct", parseFloat(e.target.value) || 0)
+                }
+                className="font-mono text-xs"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Risk Defaults */}
       <div className="gradient-border rounded-2xl backdrop-blur-xl bg-white/[0.02] p-5">
         <div className="flex items-center gap-2 mb-4">

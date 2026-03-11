@@ -56,7 +56,7 @@ async def receive_webhook(payload: WebhookPayload, db: AsyncSession = Depends(ge
             existing = await _get_existing_position(db, strategy.id, symbol)
             if existing:
                 # Close the existing position regardless of side
-                close_result = await engine.execute_order(
+                close_result = await engine.execute_order_with_fallback(
                     symbol,
                     "sell" if existing.side == "long" else "buy",
                     existing.quantity,
@@ -86,7 +86,7 @@ async def receive_webhook(payload: WebhookPayload, db: AsyncSession = Depends(ge
                 raise ValueError("Calculated quantity is zero")
 
             # Execute new position
-            result = await engine.execute_order(symbol, action, quantity)
+            result = await engine.execute_order_with_fallback(symbol, action, quantity)
             if not result.success:
                 raise ValueError(result.message)
 
@@ -100,6 +100,7 @@ async def receive_webhook(payload: WebhookPayload, db: AsyncSession = Depends(ge
                 quantity=result.quantity,
                 fees=result.fees,
                 message=payload.message,
+                fill_type=result.fill_type,
             )
 
             msg = f"{close_msg}{result.message}"
@@ -131,7 +132,7 @@ async def receive_webhook(payload: WebhookPayload, db: AsyncSession = Depends(ge
                 await db.commit()
                 return WebhookResponse(success=False, message="No position to close")
 
-            result = await engine.execute_order(
+            result = await engine.execute_order_with_fallback(
                 symbol,
                 "sell" if existing.side == "long" else "buy",
                 existing.quantity,

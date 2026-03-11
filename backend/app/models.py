@@ -1,5 +1,5 @@
 import datetime as dt
-from sqlalchemy import String, Float, Integer, DateTime, ForeignKey, Text, Enum as SAEnum
+from sqlalchemy import String, Float, Integer, DateTime, ForeignKey, Text, Boolean, Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 import enum
 
@@ -73,6 +73,7 @@ class Trade(Base):
     entry_time: Mapped[dt.datetime] = mapped_column(DateTime, default=dt.datetime.utcnow)
     exit_time: Mapped[dt.datetime | None] = mapped_column(DateTime, nullable=True)
     message: Mapped[str] = mapped_column(Text, default="")
+    fill_type: Mapped[str] = mapped_column(String(10), default="taker")
 
     strategy: Mapped["Strategy"] = relationship(back_populates="trades")
 
@@ -138,6 +139,9 @@ class AppSettings(Base):
     default_max_position_pct: Mapped[float] = mapped_column(Float, default=25.0)
     default_max_drawdown_pct: Mapped[float] = mapped_column(Float, default=10.0)
     default_daily_loss_limit: Mapped[float] = mapped_column(Float, default=500.0)
+    use_limit_orders: Mapped[bool] = mapped_column(Boolean, default=True)
+    limit_order_timeout_sec: Mapped[float] = mapped_column(Float, default=30.0)
+    limit_order_offset_pct: Mapped[float] = mapped_column(Float, default=0.0)
     hl_api_key: Mapped[str] = mapped_column(String(255), default="")
     hl_api_secret: Mapped[str] = mapped_column(String(255), default="")
     hl_vault_address: Mapped[str] = mapped_column(String(255), default="")
