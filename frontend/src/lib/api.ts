@@ -5,6 +5,8 @@ import type {
   Trade,
   Position,
   Analytics,
+  AppSettings,
+  AppSettingsUpdate,
 } from "@/types";
 
 async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
@@ -57,6 +59,14 @@ export const getAnalytics = (strategyId?: number) => {
   const qs = strategyId ? `?strategy_id=${strategyId}` : "";
   return fetchApi<Analytics>(`/api/analytics${qs}`);
 };
+
+// Settings
+export const getSettings = () => fetchApi<AppSettings>("/api/settings");
+export const updateSettings = (data: AppSettingsUpdate) =>
+  fetchApi<AppSettings>("/api/settings", {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
 
 // Health
 export const getHealth = () =>

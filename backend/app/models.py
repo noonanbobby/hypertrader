@@ -124,6 +124,26 @@ class EquitySnapshot(Base):
     strategy: Mapped["Strategy"] = relationship(back_populates="equity_snapshots")
 
 
+class AppSettings(Base):
+    __tablename__ = "app_settings"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, default=1)
+    trading_mode: Mapped[str] = mapped_column(String(10), default="paper")
+    webhook_secret: Mapped[str] = mapped_column(String(255), default="change-me")
+    leverage: Mapped[float] = mapped_column(Float, default=10.0)
+    initial_balance: Mapped[float] = mapped_column(Float, default=10000.0)
+    slippage_pct: Mapped[float] = mapped_column(Float, default=0.05)
+    maker_fee_pct: Mapped[float] = mapped_column(Float, default=0.02)
+    taker_fee_pct: Mapped[float] = mapped_column(Float, default=0.05)
+    default_max_position_pct: Mapped[float] = mapped_column(Float, default=25.0)
+    default_max_drawdown_pct: Mapped[float] = mapped_column(Float, default=10.0)
+    default_daily_loss_limit: Mapped[float] = mapped_column(Float, default=500.0)
+    hl_api_key: Mapped[str] = mapped_column(String(255), default="")
+    hl_api_secret: Mapped[str] = mapped_column(String(255), default="")
+    hl_vault_address: Mapped[str] = mapped_column(String(255), default="")
+    updated_at: Mapped[dt.datetime] = mapped_column(DateTime, default=dt.datetime.utcnow, onupdate=dt.datetime.utcnow)
+
+
 class WebhookLog(Base):
     __tablename__ = "webhook_logs"
 

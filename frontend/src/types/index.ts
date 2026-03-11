@@ -92,3 +92,22 @@ export interface WSEvent {
   event: string;
   data: Record<string, unknown>;
 }
+
+export interface AppSettings {
+  trading_mode: "paper" | "live";
+  webhook_secret: string;
+  leverage: number;
+  initial_balance: number;
+  slippage_pct: number;
+  maker_fee_pct: number;
+  taker_fee_pct: number;
+  default_max_position_pct: number;
+  default_max_drawdown_pct: number;
+  default_daily_loss_limit: number;
+  hl_api_key: string;
+  hl_api_secret: string;
+  hl_vault_address: string;
+  updated_at: string;
+}
+
+export type AppSettingsUpdate = Partial<Omit<AppSettings, "updated_at">>;

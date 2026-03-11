@@ -2,7 +2,7 @@
 
 import useSWR from "swr";
 import { fetcher } from "@/lib/api";
-import type { DashboardStats, Strategy, Trade, Position, Analytics } from "@/types";
+import type { DashboardStats, Strategy, Trade, Position, Analytics, AppSettings } from "@/types";
 
 export function useDashboard() {
   return useSWR<DashboardStats>("/api/dashboard", fetcher, {
@@ -34,5 +34,12 @@ export function useAnalytics(strategyId?: number) {
   const qs = strategyId ? `?strategy_id=${strategyId}` : "";
   return useSWR<Analytics>(`/api/analytics${qs}`, fetcher, {
     refreshInterval: 30000,
+  });
+}
+
+export function useSettings() {
+  return useSWR<AppSettings>("/api/settings", fetcher, {
+    refreshInterval: 0,
+    revalidateOnFocus: true,
   });
 }
