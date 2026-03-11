@@ -48,6 +48,15 @@ export function TradePriceChart({ trade }: TradePriceChartProps) {
         else if (durationMs > 6 * 60 * 60 * 1000) interval = "15m";
         else interval = "5m";
 
+        // Normalize symbol to Hyperliquid format (e.g. BTCUSDC -> BTC)
+        let coin = trade.symbol.toUpperCase().replace("-PERP", "").replace("/USD", "");
+        for (const suffix of ["USDC", "USDT", "USD", "PERP"]) {
+          if (coin.endsWith(suffix) && coin.length > suffix.length) {
+            coin = coin.slice(0, -suffix.length);
+            break;
+          }
+        }
+
         // Fetch candle data from Hyperliquid
         const res = await fetch("https://api.hyperliquid.xyz/info", {
           method: "POST",
@@ -55,7 +64,7 @@ export function TradePriceChart({ trade }: TradePriceChartProps) {
           body: JSON.stringify({
             type: "candleSnapshot",
             req: {
-              coin: trade.symbol,
+              coin,
               interval,
               startTime,
               endTime,
