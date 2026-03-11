@@ -48,6 +48,13 @@ export const getTrades = (params?: Record<string, string>) => {
   return fetchApi<Trade[]>(`/api/trades${qs}`);
 };
 
+// Close trade
+export const closeTrade = (tradeId: number) =>
+  fetchApi<{ success: boolean; message: string; trade_id: number | null }>(
+    `/api/trades/${tradeId}/close`,
+    { method: "POST" }
+  );
+
 // Positions
 export const getPositions = (strategyId?: number) => {
   const qs = strategyId ? `?strategy_id=${strategyId}` : "";

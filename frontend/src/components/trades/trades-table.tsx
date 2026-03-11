@@ -2,12 +2,14 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { formatCurrency, formatPrice, formatDate } from "@/lib/utils";
+import { closeTrade } from "@/lib/api";
 import type { Trade } from "@/types";
-import { ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, X } from "lucide-react";
 
 interface TradesTableProps {
   trades: Trade[];
   onSelect?: (trade: Trade) => void;
+  onTradesClosed?: () => void;
 }
 
 function normalizeSymbol(symbol: string): string {
@@ -25,8 +27,9 @@ function calcPnl(trade: Trade, currentPrice: number): number {
   return direction * (currentPrice - trade.entry_price) * trade.quantity;
 }
 
-export function TradesTable({ trades, onSelect }: TradesTableProps) {
+export function TradesTable({ trades, onSelect, onTradesClosed }: TradesTableProps) {
   const [livePrices, setLivePrices] = useState<Record<string, number>>({});
+  const [closingId, setClosingId] = useState<number | null>(null);
 
   const openTrades = trades.filter((t) => t.status === "open");
 
@@ -54,6 +57,21 @@ export function TradesTable({ trades, onSelect }: TradesTableProps) {
     return () => clearInterval(interval);
   }, [fetchPrices]);
 
+  const handleClose = async (e: React.MouseEvent, trade: Trade) => {
+    e.stopPropagation();
+    if (closingId) return;
+    if (!confirm(`Close ${trade.side} ${trade.symbol} position?`)) return;
+    setClosingId(trade.id);
+    try {
+      await closeTrade(trade.id);
+      onTradesClosed?.();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to close trade");
+    } finally {
+      setClosingId(null);
+    }
+  };
+
   if (trades.length === 0) {
     return (
       <div className="text-center py-16 text-white/30">
@@ -62,7 +80,7 @@ export function TradesTable({ trades, onSelect }: TradesTableProps) {
     );
   }
 
-  const headers = ["Time", "Symbol", "Side", "Lev", "Qty", "Entry", "Margin", "Notional", "Mark", "Exit", "P&L", "P&L %", "Fees", "Status"];
+  const headers = ["Time", "Symbol", "Side", "Lev", "Qty", "Entry", "Margin", "Notional", "Mark", "Exit", "P&L", "P&L %", "Fees", "Status", ""];
   const rightAligned = ["Qty", "Entry", "Margin", "Notional", "Mark", "Exit", "P&L", "P&L %", "Fees"];
 
   return (
@@ -175,6 +193,22 @@ export function TradesTable({ trades, onSelect }: TradesTableProps) {
                     {t.status === "open" && <div className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />}
                     {t.status}
                   </span>
+                </td>
+                <td className="px-4 py-3.5">
+                  {isOpen && (
+                    <button
+                      onClick={(e) => handleClose(e, t)}
+                      disabled={closingId === t.id}
+                      className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wider bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-colors disabled:opacity-50"
+                    >
+                      {closingId === t.id ? (
+                        <div className="h-2.5 w-2.5 border-2 border-red-400/30 border-t-red-400 rounded-full animate-spin" />
+                      ) : (
+                        <X className="h-2.5 w-2.5" />
+                      )}
+                      Close
+                    </button>
+                  )}
                 </td>
               </tr>
             );

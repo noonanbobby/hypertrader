@@ -11,7 +11,7 @@ import { Download, ArrowLeftRight } from "lucide-react";
 
 export default function TradesPage() {
   const [filters, setFilters] = useState<Record<string, string>>({});
-  const { data: trades } = useTrades(filters);
+  const { data: trades, mutate } = useTrades(filters);
   const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
 
   const handleExportCSV = () => {
@@ -57,7 +57,7 @@ export default function TradesPage() {
       </div>
 
       <TradesFilters filters={filters} onChange={setFilters} />
-      <TradesTable trades={trades ?? []} onSelect={setSelectedTrade} />
+      <TradesTable trades={trades ?? []} onSelect={setSelectedTrade} onTradesClosed={() => mutate()} />
       <TradeDetailDialog
         trade={selectedTrade}
         onClose={() => setSelectedTrade(null)}
