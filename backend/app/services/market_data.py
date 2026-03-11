@@ -33,8 +33,12 @@ class MarketDataService:
 
     async def get_mid_price(self, symbol: str) -> Optional[float]:
         """Get current mid price for a symbol."""
-        # Normalize symbol (remove -PERP suffix if present)
-        clean_symbol = symbol.replace("-PERP", "").replace("/USD", "").upper()
+        # Normalize symbol to Hyperliquid format (e.g. BTCUSDC -> BTC)
+        clean_symbol = symbol.upper().replace("-PERP", "").replace("/USD", "")
+        for suffix in ("USDC", "USDT", "USD", "PERP"):
+            if clean_symbol.endswith(suffix) and len(clean_symbol) > len(suffix):
+                clean_symbol = clean_symbol[: -len(suffix)]
+                break
 
         # Try cache first, then fetch
         if clean_symbol not in self._price_cache:
