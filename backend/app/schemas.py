@@ -181,6 +181,7 @@ class SettingsResponse(BaseModel):
     use_limit_orders: bool
     limit_order_timeout_sec: float
     limit_order_offset_pct: float
+    default_size_pct: float
     default_max_position_pct: float
     default_max_drawdown_pct: float
     default_daily_loss_limit: float
@@ -209,6 +210,7 @@ class SettingsResponse(BaseModel):
             use_limit_orders=row.use_limit_orders,
             limit_order_timeout_sec=row.limit_order_timeout_sec,
             limit_order_offset_pct=row.limit_order_offset_pct,
+            default_size_pct=row.default_size_pct,
             default_max_position_pct=row.default_max_position_pct,
             default_max_drawdown_pct=row.default_max_drawdown_pct,
             default_daily_loss_limit=row.default_daily_loss_limit,
@@ -253,6 +255,7 @@ class SettingsUpdate(BaseModel):
     use_limit_orders: Optional[bool] = None
     limit_order_timeout_sec: Optional[float] = Field(default=None, gt=0, le=300)
     limit_order_offset_pct: Optional[float] = Field(default=None, ge=0, le=5)
+    default_size_pct: Optional[float] = Field(default=None, gt=0, le=100)
     default_max_position_pct: Optional[float] = Field(default=None, gt=0, le=100)
     default_max_drawdown_pct: Optional[float] = Field(default=None, gt=0, le=100)
     default_daily_loss_limit: Optional[float] = Field(default=None, gt=0)

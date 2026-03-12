@@ -349,27 +349,46 @@ export default function SettingsPage() {
         )}
       </div>
 
-      {/* Leverage */}
+      {/* Leverage & Position Sizing */}
       <div className="gradient-border rounded-2xl backdrop-blur-xl bg-white/[0.02] p-5">
         <div className="flex items-center gap-2 mb-4">
           <Zap className="h-4 w-4 text-white/25" />
           <span className="text-xs font-semibold uppercase tracking-wider text-white/25">
-            Leverage
+            Leverage & Position Sizing
           </span>
         </div>
-        <div className="max-w-xs">
-          <label className="text-[10px] font-semibold uppercase tracking-wider text-white/20 mb-1.5 block">
-            Leverage Multiplier
-          </label>
-          <Input
-            type="number"
-            step="1"
-            min="1"
-            max="100"
-            value={val("leverage")}
-            onChange={(e) => setField("leverage", parseFloat(e.target.value) || 1)}
-            className="font-mono text-xs"
-          />
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="text-[10px] font-semibold uppercase tracking-wider text-white/20 mb-1.5 block">
+              Leverage Multiplier
+            </label>
+            <Input
+              type="number"
+              step="1"
+              min="1"
+              max="100"
+              value={val("leverage")}
+              onChange={(e) => setField("leverage", parseFloat(e.target.value) || 1)}
+              className="font-mono text-xs"
+            />
+          </div>
+          <div>
+            <label className="text-[10px] font-semibold uppercase tracking-wider text-white/20 mb-1.5 block">
+              Default Trade Size (%)
+            </label>
+            <Input
+              type="number"
+              step="1"
+              min="1"
+              max="100"
+              value={val("default_size_pct")}
+              onChange={(e) => setField("default_size_pct", parseFloat(e.target.value) || 10)}
+              className="font-mono text-xs"
+            />
+            <p className="text-[10px] text-white/20 mt-1">
+              % of strategy equity per trade (overridden by payload size_pct)
+            </p>
+          </div>
         </div>
       </div>
 
@@ -759,8 +778,8 @@ export default function SettingsPage() {
         </div>
         <div className="grid grid-cols-2 gap-2">
           {[
-            { action: "buy", desc: "Close any position, open long" },
-            { action: "sell", desc: "Close any position, open short" },
+            { action: "buy", desc: "Close short if open, or open long" },
+            { action: "sell", desc: "Close long if open, or open short" },
             { action: "close_long", desc: "Close a long position" },
             { action: "close_short", desc: "Close a short position" },
             { action: "close_all", desc: "Close all positions for strategy" },

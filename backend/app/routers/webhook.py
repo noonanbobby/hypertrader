@@ -96,10 +96,52 @@ async def _process_webhook(
 
         # --- Check for existing position (flip detection) ---
         existing = await _get_existing_position(db, strategy.id, symbol)
-        is_flip = existing is not None and existing.side != new_side
 
-        # --- Calculate new position quantity ---
-        size_pct = payload.size_pct or 10.0  # default 10%
+        # Same-side signal = duplicate (e.g. TradingView fires twice) → no-op
+        if existing is not None and existing.side == new_side:
+            msg = f"Already {existing.side} {symbol} — duplicate signal ignored"
+            log.result = msg
+            log.success = 1
+            db.add(log)
+            await db.commit()
+            return WebhookResponse(success=True, message=msg)
+
+        # --- Opposite-side signal = close existing position only ---
+        # TradingView sends close + open as two separate signals.
+        # First signal closes; the follow-up signal opens the new direction.
+        if existing is not None:
+            close_action = "sell" if existing.side == "long" else "buy"
+            close_result = await engine.execute_order_with_fallback(
+                symbol, close_action, existing.quantity,
+            )
+            if not close_result.success:
+                raise ValueError(f"Close failed: {close_result.message}")
+
+            pnl, _ = await position_manager.close_position(
+                db=db,
+                strategy_id=strategy.id,
+                symbol=symbol,
+                exit_price=close_result.filled_price,
+                fees=close_result.fees,
+                message=f"Closed for {action} signal",
+            )
+            asyncio.create_task(notifier.notify_trade_close(
+                symbol=symbol, side=existing.side,
+                quantity=existing.quantity, entry_price=existing.entry_price,
+                exit_price=close_result.filled_price, pnl=pnl,
+                strategy_name=payload.strategy, leverage=leverage,
+            ))
+
+            msg = f"Closed {existing.side} {symbol} P&L: ${pnl:.2f}"
+            log.result = msg
+            log.success = 1
+            db.add(log)
+            await db.commit()
+            return WebhookResponse(success=True, message=msg)
+
+        # --- NEW POSITION (no existing position) ---
+        # Calculate quantity
+        size_pct = payload.size_pct or settings.default_size_pct
         quantity = payload.quantity or 0.0
         if quantity <= 0:
             margin = strategy.current_equity * (size_pct / 100)
@@ -116,95 +158,6 @@ async def _process_webhook(
             raise ValueError(
                 f"Order notional ${quantity * price:.2f} below Hyperliquid minimum of $10"
             )
-
-        # --- FLIP PATH: use engine.execute_flip for atomic netting ---
-        if is_flip:
-            close_qty = existing.quantity
-
-            # Risk check on the new open portion
-            allowed, reason = await risk_manager.check_trade(
-                db, strategy, symbol, quantity, price
-            )
-            if not allowed:
-                asyncio.create_task(notifier.notify_risk_breach(
-                    strategy_name=payload.strategy, symbol=symbol, reason=reason,
-                ))
-                raise ValueError(f"Risk check failed: {reason}")
-
-            flip_result = await engine.execute_flip(
-                symbol, action, close_qty, quantity
-            )
-            if not flip_result.success:
-                raise ValueError(flip_result.message)
-
-            # Record the close
-            pnl, _ = await position_manager.close_position(
-                db=db,
-                strategy_id=strategy.id,
-                symbol=symbol,
-                exit_price=flip_result.close_price,
-                fees=flip_result.close_fees,
-                message=f"Auto-closed for {action} signal",
-            )
-            asyncio.create_task(notifier.notify_trade_close(
-                symbol=symbol, side=existing.side,
-                quantity=existing.quantity, entry_price=existing.entry_price,
-                exit_price=flip_result.close_price, pnl=pnl,
-                strategy_name=payload.strategy, leverage=leverage,
-            ))
-            await db.refresh(strategy)
-
-            # Record the open
-            pos, trade = await position_manager.open_position(
-                db=db,
-                strategy_id=strategy.id,
-                symbol=symbol,
-                side=new_side,
-                entry_price=flip_result.open_price,
-                quantity=flip_result.open_qty,
-                fees=flip_result.open_fees,
-                message=payload.message,
-                fill_type=flip_result.fill_type,
-            )
-            asyncio.create_task(notifier.notify_trade_open(
-                symbol=symbol, side=new_side, quantity=flip_result.open_qty,
-                price=flip_result.open_price, strategy_name=payload.strategy,
-                fill_type=flip_result.fill_type, leverage=leverage,
-            ))
-
-            msg = f"Closed {existing.side} P&L: ${pnl:.2f} | {flip_result.message}"
-            log.result = msg
-            log.success = 1
-            db.add(log)
-            await db.commit()
-            return WebhookResponse(success=True, message=msg, trade_id=trade.id)
-
-        # --- SAME-SIDE or NEW POSITION PATH ---
-        close_msg = ""
-        if existing:
-            # Same side — close first, then re-open with new size
-            close_result = await engine.execute_order_with_fallback(
-                symbol,
-                "sell" if existing.side == "long" else "buy",
-                existing.quantity,
-            )
-            if close_result.success:
-                pnl, _ = await position_manager.close_position(
-                    db=db,
-                    strategy_id=strategy.id,
-                    symbol=symbol,
-                    exit_price=close_result.filled_price,
-                    fees=close_result.fees,
-                    message=f"Auto-closed for {action} signal",
-                )
-                asyncio.create_task(notifier.notify_trade_close(
-                    symbol=symbol, side=existing.side,
-                    quantity=existing.quantity, entry_price=existing.entry_price,
-                    exit_price=close_result.filled_price, pnl=pnl,
-                    strategy_name=payload.strategy, leverage=leverage,
-                ))
-                close_msg = f"Closed {existing.side} P&L: ${pnl:.2f} | "
-                await db.refresh(strategy)
 
         # Risk check before executing
         allowed, reason = await risk_manager.check_trade(
@@ -241,7 +194,7 @@ async def _process_webhook(
             fill_type=result.fill_type, leverage=leverage,
         ))
 
-        msg = f"{close_msg}{result.message}"
+        msg = result.message
         log.result = msg
         log.success = 1
         db.add(log)

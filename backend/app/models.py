@@ -142,6 +142,7 @@ class AppSettings(Base):
     use_limit_orders: Mapped[bool] = mapped_column(Boolean, default=True)
     limit_order_timeout_sec: Mapped[float] = mapped_column(Float, default=30.0)
     limit_order_offset_pct: Mapped[float] = mapped_column(Float, default=0.0)
+    default_size_pct: Mapped[float] = mapped_column(Float, default=10.0)
     hl_api_key: Mapped[str] = mapped_column(String(255), default="")
     hl_api_secret: Mapped[str] = mapped_column(String(255), default="")
     hl_vault_address: Mapped[str] = mapped_column(String(255), default="")

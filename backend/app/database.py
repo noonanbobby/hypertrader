@@ -27,6 +27,7 @@ async def _migrate_columns(conn):
         ("app_settings", "telegram_bot_token", "VARCHAR(255) DEFAULT ''"),
         ("app_settings", "telegram_chat_id", "VARCHAR(255) DEFAULT ''"),
         ("app_settings", "telegram_chat_id_2", "VARCHAR(255) DEFAULT ''"),
+        ("app_settings", "default_size_pct", "FLOAT DEFAULT 10.0"),
         ("app_settings", "notify_trade_open", "BOOLEAN DEFAULT 1"),
         ("app_settings", "notify_trade_close", "BOOLEAN DEFAULT 1"),
         ("app_settings", "notify_risk_breach", "BOOLEAN DEFAULT 1"),
