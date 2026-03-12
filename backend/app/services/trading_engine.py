@@ -63,11 +63,10 @@ class TradingEngine(ABC):
         Default implementation uses two separate orders (close then open).
         LiveTrader overrides with single-order netting for Hyperliquid.
         """
-        close_side = "sell" if new_side in ("buy", "long") else "buy"
-
-        # Close existing position
+        # When flipping, close direction = new signal direction:
+        # sell to close long (when going short), buy to close short (when going long)
         close_result = await self.execute_order_with_fallback(
-            symbol, close_side, close_qty
+            symbol, new_side, close_qty
         )
         if not close_result.success:
             return FlipResult(success=False, message=f"Close failed: {close_result.message}")
