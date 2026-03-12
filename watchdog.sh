@@ -170,6 +170,72 @@ build_status_message() {
 "🔗 Webhook: ${NGROK_URL}/api/webhook"
 }
 
+build_trades_message() {
+  python -c "
+import urllib.request, json, sys
+positions = None
+try:
+    resp = urllib.request.urlopen('http://localhost:8000/api/positions', timeout=5)
+    positions = json.loads(resp.read())
+except:
+    pass
+
+if positions is None:
+    sys.stdout.write('Backend unavailable')
+elif not positions:
+    sys.stdout.write('No open positions')
+else:
+    lines = []
+    total_pnl = 0.0
+    total_notional = 0.0
+    for p in positions:
+        symbol = p.get('symbol', '?')
+        side = p.get('side', '?').upper()
+        entry = p.get('entry_price', 0)
+        current = p.get('current_price', 0)
+        qty = p.get('quantity', 0)
+        pnl = p.get('unrealized_pnl', 0)
+        pnl_pct = p.get('pnl_pct', 0)
+        notional = p.get('notional_value', 0)
+        leverage = p.get('leverage', 1)
+        emoji = '🟢' if pnl >= 0 else '🔴'
+        side_emoji = '📈' if side == 'LONG' else '📉'
+        pnl_sign = '+' if pnl >= 0 else ''
+        pct_sign = '+' if pnl_pct >= 0 else ''
+        lines.append(f'{side_emoji} <b>{symbol}</b> {side} {leverage}x')
+        lines.append(f'   Entry: \${entry:,.2f}  |  Now: \${current:,.2f}')
+        lines.append(f'   Size: {qty:.4f} (\${notional:,.2f})')
+        lines.append(f'   {emoji} P&L: {pnl_sign}\${pnl:,.2f} ({pct_sign}{pnl_pct:.2f}%)')
+        lines.append('')
+        total_pnl += pnl
+        total_notional += notional
+    total_emoji = '🟢' if total_pnl >= 0 else '🔴'
+    total_sign = '+' if total_pnl >= 0 else ''
+    lines.append('━━━━━━━━━━━━━━━━━━')
+    lines.append(f'{total_emoji} <b>Total P&L: {total_sign}\${total_pnl:,.2f}</b>')
+    lines.append(f'💰 Total Notional: \${total_notional:,.2f}')
+    lines.append(f'📊 Positions: {len(positions)}')
+    sys.stdout.write('\n'.join(lines))
+sys.stdout.flush()
+" 2>/dev/null
+}
+
+send_trades_telegram() {
+  local body="$1"
+  if [ -z "$body" ]; then
+    body="Error fetching positions"
+  fi
+  python -c "
+import urllib.request, json
+body = '''$body'''
+text = '📋 <b>HyperTrader Trades</b>\n\n' + body
+data = json.dumps({'chat_id': '$TELEGRAM_CHAT_ID', 'text': text, 'parse_mode': 'HTML'}).encode('utf-8')
+req = urllib.request.Request('https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage', data=data, headers={'Content-Type': 'application/json'})
+try: urllib.request.urlopen(req, timeout=10)
+except: pass
+" > /dev/null 2>&1 &
+}
+
 restart_all_services() {
   log INFO "Telegram /restart — restarting all services..."
 
@@ -207,9 +273,15 @@ handle_telegram_command() {
       restart_all_services
       send_telegram "✅ <b>HyperTrader Watchdog</b>%0A%0AAll services restarted%0AWebhook: ${NGROK_URL}/api/webhook"
       ;;
+    /trades)
+      log INFO "Telegram command: /trades from $chat_id"
+      local trades_body
+      trades_body=$(build_trades_message)
+      send_trades_telegram "$trades_body"
+      ;;
     /help)
       log INFO "Telegram command: /help from $chat_id"
-      send_telegram "🤖 <b>HyperTrader Commands</b>%0A%0A/status — Service status & uptime%0A/restart — Restart all services%0A/stop — Stop watchdog & all services%0A/help — Show this message"
+      send_telegram "🤖 <b>HyperTrader Commands</b>%0A%0A/status — Service status & uptime%0A/trades — Open positions & P&L%0A/restart — Restart all services%0A/stop — Stop watchdog & all services%0A/help — Show this message"
       ;;
     *)
       # Ignore unknown commands silently
