@@ -263,7 +263,8 @@ for f in \
     "frontend/src/app/page.tsx" \
     "frontend/src/app/layout.tsx" \
     "frontend/src/components/dashboard/service-status.tsx" \
-    "start.sh"
+    "start.sh" \
+    "watchdog.sh"
 do
     if [ -f "$SCRIPT_DIR/$f" ]; then
         ok "$f"
@@ -310,7 +311,8 @@ if [ "$ALL_GOOD" = true ]; then
     echo -e "${NC}"
     echo -e "  ${BOLD}To start HyperTrader:${NC}"
     echo ""
-    echo -e "    ${CYAN}./start.sh${NC}"
+    echo -e "    ${CYAN}./watchdog.sh${NC}     ${DIM}(recommended — auto-restart + Telegram commands)${NC}"
+    echo -e "    ${CYAN}./start.sh${NC}        ${DIM}(simple launch, no monitoring)${NC}"
     echo ""
     echo -e "  ${BOLD}Or start manually:${NC}"
     echo ""
@@ -328,7 +330,7 @@ if [ "$ALL_GOOD" = true ]; then
     echo ""
     echo -e "  ${BOLD}Next steps:${NC}"
     echo -e "    1. Edit ${CYAN}backend/.env${NC} to set your webhook secret"
-    echo -e "    2. Set up ngrok: ${CYAN}ngrok http 8000${NC}"
+    echo -e "    2. Configure Telegram in the ${CYAN}Settings${NC} page for alerts & remote commands"
     echo -e "    3. Add the ngrok URL as webhook in TradingView alerts"
     echo ""
 else
