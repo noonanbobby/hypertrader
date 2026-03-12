@@ -14,6 +14,20 @@ class OrderResult:
     fill_type: str = "taker"
 
 
+@dataclass
+class FlipResult:
+    """Result of a position flip (close existing + open new)."""
+    success: bool
+    close_price: Optional[float] = None
+    close_qty: Optional[float] = None
+    close_fees: float = 0.0
+    open_price: Optional[float] = None
+    open_qty: Optional[float] = None
+    open_fees: float = 0.0
+    fill_type: str = "taker"
+    message: str = ""
+
+
 class TradingEngine(ABC):
     @abstractmethod
     async def execute_order(
@@ -36,6 +50,53 @@ class TradingEngine(ABC):
     async def get_current_price(self, symbol: str) -> Optional[float]:
         """Get current price for a symbol."""
         pass
+
+    async def execute_flip(
+        self,
+        symbol: str,
+        new_side: str,
+        close_qty: float,
+        open_qty: float,
+    ) -> FlipResult:
+        """Flip a position: close existing + open new.
+
+        Default implementation uses two separate orders (close then open).
+        LiveTrader overrides with single-order netting for Hyperliquid.
+        """
+        close_side = "sell" if new_side in ("buy", "long") else "buy"
+
+        # Close existing position
+        close_result = await self.execute_order_with_fallback(
+            symbol, close_side, close_qty
+        )
+        if not close_result.success:
+            return FlipResult(success=False, message=f"Close failed: {close_result.message}")
+
+        # Open new position
+        open_result = await self.execute_order_with_fallback(
+            symbol, new_side, open_qty
+        )
+        if not open_result.success:
+            return FlipResult(
+                success=False,
+                close_price=close_result.filled_price,
+                close_qty=close_result.quantity,
+                close_fees=close_result.fees,
+                message=f"Closed but open failed: {open_result.message}",
+            )
+
+        return FlipResult(
+            success=True,
+            close_price=close_result.filled_price,
+            close_qty=close_result.quantity,
+            close_fees=close_result.fees,
+            open_price=open_result.filled_price,
+            open_qty=open_result.quantity,
+            open_fees=open_result.fees,
+            fill_type=open_result.fill_type,
+            message=f"Flip: closed {close_qty} @ {close_result.filled_price:.4f}, "
+                    f"opened {open_result.quantity} @ {open_result.filled_price:.4f}",
+        )
 
     async def execute_order_with_fallback(
         self,

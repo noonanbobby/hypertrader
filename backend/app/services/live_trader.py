@@ -8,7 +8,7 @@ from hyperliquid.info import Info
 from hyperliquid.utils import constants
 
 from app.config import settings
-from app.services.trading_engine import TradingEngine, OrderResult
+from app.services.trading_engine import TradingEngine, OrderResult, FlipResult
 from app.services.market_data import market_data
 
 logger = logging.getLogger(__name__)
@@ -67,16 +67,8 @@ class LiveTrader(TradingEngine):
         return coin
 
     async def _get_sz_decimals(self, coin: str) -> int:
-        """Fetch and cache szDecimals for a coin from exchange meta."""
-        if coin in self._sz_decimals:
-            return self._sz_decimals[coin]
-
-        meta = await market_data.get_meta()
-        if meta and "universe" in meta:
-            for asset in meta["universe"]:
-                self._sz_decimals[asset["name"]] = asset.get("szDecimals", 5)
-
-        return self._sz_decimals.get(coin, 5)
+        """Fetch and cache szDecimals via centralized market data service."""
+        return await market_data.get_sz_decimals(coin)
 
     def _round_sz(self, sz: float, decimals: int) -> float:
         """Round size to allowed decimals."""
@@ -287,6 +279,72 @@ class LiveTrader(TradingEngine):
         except Exception as e:
             logger.exception("Failed to parse order response")
             return OrderResult(success=False, message=f"Parse error: {e}")
+
+    async def execute_flip(
+        self,
+        symbol: str,
+        new_side: str,
+        close_qty: float,
+        open_qty: float,
+    ) -> FlipResult:
+        """Flip position with a single order using Hyperliquid's netting model.
+
+        Hyperliquid doesn't allow opposing positions — a BUY while short
+        automatically closes the short and opens the remainder as long.
+        So we send one order for close_qty + open_qty in the new direction.
+        """
+        try:
+            exchange, info = self._get_clients()
+            coin = self._normalize_coin(symbol)
+            is_buy = new_side in ("buy", "long")
+            total_qty = close_qty + open_qty
+
+            sz_dec = await self._get_sz_decimals(coin)
+            sz = self._round_sz(total_qty, sz_dec)
+            if sz <= 0:
+                return FlipResult(success=False, message="Flip quantity rounds to zero")
+
+            # Set leverage (must be integer for Hyperliquid)
+            leverage = int(round(settings.leverage))
+            await asyncio.to_thread(
+                exchange.update_leverage, leverage, coin, is_cross=True
+            )
+
+            # Single atomic market order — exchange nets the position
+            response = await asyncio.to_thread(
+                exchange.market_open, coin, is_buy, sz, None, 0.01
+            )
+            logger.info("Flip order response: %s", response)
+
+            result = self._parse_order_response(response, coin, new_side, sz)
+            if not result.success:
+                return FlipResult(success=False, message=f"Flip order failed: {result.message}")
+
+            fill_price = result.filled_price
+            total_filled = result.quantity or sz
+
+            # Split the fill into close and open portions for bookkeeping
+            filled_close = min(close_qty, total_filled)
+            filled_open = total_filled - filled_close
+
+            close_fees = fill_price * filled_close * (settings.taker_fee_pct / 100)
+            open_fees = fill_price * filled_open * (settings.taker_fee_pct / 100)
+
+            return FlipResult(
+                success=True,
+                close_price=fill_price,
+                close_qty=filled_close,
+                close_fees=round(close_fees, 6),
+                open_price=fill_price,
+                open_qty=filled_open,
+                open_fees=round(open_fees, 6),
+                fill_type=result.fill_type,
+                message=f"Flip (netting): {new_side} {total_filled} {coin} @ {fill_price:.4f}",
+            )
+
+        except Exception as e:
+            logger.exception("Flip order failed for %s", symbol)
+            return FlipResult(success=False, message=str(e))
 
     async def get_balance(self) -> float:
         """Get account equity from Hyperliquid."""

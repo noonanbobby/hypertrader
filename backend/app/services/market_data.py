@@ -9,6 +9,7 @@ class MarketDataService:
     def __init__(self):
         self._client: Optional[httpx.AsyncClient] = None
         self._price_cache: dict[str, float] = {}
+        self._sz_decimals: dict[str, int] = {}
 
     async def _get_client(self) -> httpx.AsyncClient:
         if self._client is None or self._client.is_closed:
@@ -45,6 +46,27 @@ class MarketDataService:
             await self.get_all_mids()
 
         return self._price_cache.get(clean_symbol)
+
+    async def get_sz_decimals(self, coin: str) -> int:
+        """Get szDecimals for a coin, fetching and caching from meta endpoint."""
+        if coin in self._sz_decimals:
+            return self._sz_decimals[coin]
+
+        meta = await self.get_meta()
+        if meta and "universe" in meta:
+            for asset in meta["universe"]:
+                self._sz_decimals[asset["name"]] = asset.get("szDecimals", 5)
+
+        return self._sz_decimals.get(coin, 5)
+
+    def normalize_coin(self, symbol: str) -> str:
+        """Normalize symbol to Hyperliquid coin format (e.g. BTCUSDT -> BTC)."""
+        coin = symbol.upper().replace("-PERP", "").replace("/USD", "")
+        for suffix in ("USDC", "USDT", "USD", "PERP"):
+            if coin.endswith(suffix) and len(coin) > len(suffix):
+                coin = coin[: -len(suffix)]
+                break
+        return coin
 
     async def get_meta(self) -> dict:
         """Fetch exchange metadata (available assets, etc)."""

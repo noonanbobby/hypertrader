@@ -11,6 +11,7 @@ from app.database import get_db, async_session
 from app.schemas import WebhookPayload, WebhookResponse
 from app.models import WebhookLog, Position
 from app.services.trading_engine import create_engine
+from app.services.market_data import market_data
 from app.services.strategy_manager import strategy_manager
 from app.services.position_manager import position_manager
 from app.services.risk_manager import risk_manager
@@ -86,11 +87,102 @@ async def _process_webhook(
         if not price:
             raise ValueError(f"Cannot get price for {symbol}")
 
-        # --- FLIP LOGIC: close any existing position first ---
-        close_msg = ""
+        # Resolve szDecimals for quantity rounding
+        coin = market_data.normalize_coin(symbol)
+        sz_decimals = await market_data.get_sz_decimals(coin)
+
+        # Use integer leverage for Hyperliquid compatibility
+        leverage = int(round(settings.leverage))
+
+        # --- Check for existing position (flip detection) ---
         existing = await _get_existing_position(db, strategy.id, symbol)
+        is_flip = existing is not None and existing.side != new_side
+
+        # --- Calculate new position quantity ---
+        size_pct = payload.size_pct or 10.0  # default 10%
+        quantity = payload.quantity or 0.0
+        if quantity <= 0:
+            margin = strategy.current_equity * (size_pct / 100)
+            notional = margin * leverage
+            quantity = notional / price
+
+        # Round to szDecimals
+        quantity = round(quantity, sz_decimals)
+        if quantity <= 0:
+            raise ValueError("Calculated quantity is zero after rounding to szDecimals")
+
+        # Minimum $10 notional check (Hyperliquid rejects below this)
+        if quantity * price < 10.0:
+            raise ValueError(
+                f"Order notional ${quantity * price:.2f} below Hyperliquid minimum of $10"
+            )
+
+        # --- FLIP PATH: use engine.execute_flip for atomic netting ---
+        if is_flip:
+            close_qty = existing.quantity
+
+            # Risk check on the new open portion
+            allowed, reason = await risk_manager.check_trade(
+                db, strategy, symbol, quantity, price
+            )
+            if not allowed:
+                asyncio.create_task(notifier.notify_risk_breach(
+                    strategy_name=payload.strategy, symbol=symbol, reason=reason,
+                ))
+                raise ValueError(f"Risk check failed: {reason}")
+
+            flip_result = await engine.execute_flip(
+                symbol, action, close_qty, quantity
+            )
+            if not flip_result.success:
+                raise ValueError(flip_result.message)
+
+            # Record the close
+            pnl, _ = await position_manager.close_position(
+                db=db,
+                strategy_id=strategy.id,
+                symbol=symbol,
+                exit_price=flip_result.close_price,
+                fees=flip_result.close_fees,
+                message=f"Auto-closed for {action} signal",
+            )
+            asyncio.create_task(notifier.notify_trade_close(
+                symbol=symbol, side=existing.side,
+                quantity=existing.quantity, entry_price=existing.entry_price,
+                exit_price=flip_result.close_price, pnl=pnl,
+                strategy_name=payload.strategy, leverage=leverage,
+            ))
+            await db.refresh(strategy)
+
+            # Record the open
+            pos, trade = await position_manager.open_position(
+                db=db,
+                strategy_id=strategy.id,
+                symbol=symbol,
+                side=new_side,
+                entry_price=flip_result.open_price,
+                quantity=flip_result.open_qty,
+                fees=flip_result.open_fees,
+                message=payload.message,
+                fill_type=flip_result.fill_type,
+            )
+            asyncio.create_task(notifier.notify_trade_open(
+                symbol=symbol, side=new_side, quantity=flip_result.open_qty,
+                price=flip_result.open_price, strategy_name=payload.strategy,
+                fill_type=flip_result.fill_type, leverage=leverage,
+            ))
+
+            msg = f"Closed {existing.side} P&L: ${pnl:.2f} | {flip_result.message}"
+            log.result = msg
+            log.success = 1
+            db.add(log)
+            await db.commit()
+            return WebhookResponse(success=True, message=msg, trade_id=trade.id)
+
+        # --- SAME-SIDE or NEW POSITION PATH ---
+        close_msg = ""
         if existing:
-            # Close the existing position regardless of side
+            # Same side — close first, then re-open with new size
             close_result = await engine.execute_order_with_fallback(
                 symbol,
                 "sell" if existing.side == "long" else "buy",
@@ -109,22 +201,10 @@ async def _process_webhook(
                     symbol=symbol, side=existing.side,
                     quantity=existing.quantity, entry_price=existing.entry_price,
                     exit_price=close_result.filled_price, pnl=pnl,
-                    strategy_name=payload.strategy, leverage=settings.leverage,
+                    strategy_name=payload.strategy, leverage=leverage,
                 ))
                 close_msg = f"Closed {existing.side} P&L: ${pnl:.2f} | "
-                # Refresh strategy to get updated equity
                 await db.refresh(strategy)
-
-        # --- Open new position with size_pct of current equity (leveraged) ---
-        size_pct = payload.size_pct or 10.0  # default 10%
-        leverage = settings.leverage  # default 10x
-        quantity = payload.quantity or 0.0
-        if quantity <= 0:
-            margin = strategy.current_equity * (size_pct / 100)
-            notional = margin * leverage  # 10x leverage
-            quantity = round(notional / price, 6)
-        if quantity <= 0:
-            raise ValueError("Calculated quantity is zero")
 
         # Risk check before executing
         allowed, reason = await risk_manager.check_trade(
