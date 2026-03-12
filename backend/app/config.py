@@ -25,6 +25,15 @@ class Settings(BaseSettings):
     limit_order_timeout_sec: float = 30.0
     limit_order_offset_pct: float = 0.0
 
+    # Telegram Notifications
+    telegram_enabled: bool = False
+    telegram_bot_token: str = ""
+    telegram_chat_id: str = ""
+    telegram_chat_id_2: str = ""
+    notify_trade_open: bool = True
+    notify_trade_close: bool = True
+    notify_risk_breach: bool = True
+
     # Hyperliquid
     hl_api_key: str = ""
     hl_api_secret: str = ""
@@ -47,6 +56,8 @@ RUNTIME_FIELDS = [
     "use_limit_orders", "limit_order_timeout_sec", "limit_order_offset_pct",
     "default_max_position_pct", "default_max_drawdown_pct", "default_daily_loss_limit",
     "hl_api_key", "hl_api_secret", "hl_vault_address",
+    "telegram_enabled", "telegram_bot_token", "telegram_chat_id", "telegram_chat_id_2",
+    "notify_trade_open", "notify_trade_close", "notify_risk_breach",
 ]
 
 

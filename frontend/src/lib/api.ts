@@ -75,6 +75,12 @@ export const updateSettings = (data: AppSettingsUpdate) =>
     body: JSON.stringify(data),
   });
 
+// Telegram
+export const testTelegram = () =>
+  fetchApi<{ success: boolean; message: string }>("/api/settings/test-telegram", {
+    method: "POST",
+  });
+
 // Health
 export const getHealth = () =>
   fetchApi<{ status: string; mode: string; version: string }>("/api/health");

@@ -7,31 +7,43 @@ from app.config import settings
 from app.database import get_db
 from app.models import Strategy, Trade, Position, TradeStatus
 from app.schemas import DashboardStats
+from app.services.position_manager import position_manager
 
 router = APIRouter()
 
 
 @router.get("/dashboard", response_model=DashboardStats)
 async def get_dashboard(db: AsyncSession = Depends(get_db)):
-    # Total equity across all strategies
+    # Update unrealized P&L with live prices before computing stats
+    await position_manager.update_unrealized_pnl(db)
+
+    # Total equity across all strategies (realized only)
     stmt = select(func.coalesce(func.sum(Strategy.current_equity), 0.0))
     result = await db.execute(stmt)
     total_equity = float(result.scalar())
 
-    # Total P&L
+    # Total realized P&L
     stmt = select(func.coalesce(func.sum(Strategy.total_pnl), 0.0))
     result = await db.execute(stmt)
     total_pnl = float(result.scalar())
 
-    # Period P&L calculations
+    # Add unrealized P&L from open positions
+    stmt = select(func.coalesce(func.sum(Position.unrealized_pnl), 0.0))
+    result = await db.execute(stmt)
+    total_unrealized = float(result.scalar())
+
+    total_equity += total_unrealized
+    total_pnl += total_unrealized
+
+    # Period P&L calculations (realized)
     now = dt.datetime.utcnow()
     today = now.replace(hour=0, minute=0, second=0, microsecond=0)
     week_ago = today - dt.timedelta(days=7)
     month_ago = today - dt.timedelta(days=30)
 
-    daily_pnl = await _period_pnl(db, today)
-    weekly_pnl = await _period_pnl(db, week_ago)
-    monthly_pnl = await _period_pnl(db, month_ago)
+    daily_pnl = await _period_pnl(db, today) + total_unrealized
+    weekly_pnl = await _period_pnl(db, week_ago) + total_unrealized
+    monthly_pnl = await _period_pnl(db, month_ago) + total_unrealized
 
     # Open positions count
     stmt = select(func.count(Position.id))

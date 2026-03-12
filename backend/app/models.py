@@ -145,6 +145,13 @@ class AppSettings(Base):
     hl_api_key: Mapped[str] = mapped_column(String(255), default="")
     hl_api_secret: Mapped[str] = mapped_column(String(255), default="")
     hl_vault_address: Mapped[str] = mapped_column(String(255), default="")
+    telegram_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
+    telegram_bot_token: Mapped[str] = mapped_column(String(255), default="")
+    telegram_chat_id: Mapped[str] = mapped_column(String(255), default="")
+    telegram_chat_id_2: Mapped[str] = mapped_column(String(255), default="")
+    notify_trade_open: Mapped[bool] = mapped_column(Boolean, default=True)
+    notify_trade_close: Mapped[bool] = mapped_column(Boolean, default=True)
+    notify_risk_breach: Mapped[bool] = mapped_column(Boolean, default=True)
     updated_at: Mapped[dt.datetime] = mapped_column(DateTime, default=dt.datetime.utcnow, onupdate=dt.datetime.utcnow)
 
 

@@ -1,3 +1,4 @@
+import asyncio
 import json
 import datetime as dt
 from fastapi import APIRouter, Depends
@@ -11,6 +12,8 @@ from app.models import WebhookLog, Position
 from app.services.trading_engine import create_engine
 from app.services.strategy_manager import strategy_manager
 from app.services.position_manager import position_manager
+from app.services.risk_manager import risk_manager
+from app.services.notification_service import notifier
 
 router = APIRouter()
 
@@ -70,6 +73,12 @@ async def receive_webhook(payload: WebhookPayload, db: AsyncSession = Depends(ge
                         fees=close_result.fees,
                         message=f"Auto-closed for {action} signal",
                     )
+                    asyncio.create_task(notifier.notify_trade_close(
+                        symbol=symbol, side=existing.side,
+                        quantity=existing.quantity, entry_price=existing.entry_price,
+                        exit_price=close_result.filled_price, pnl=pnl,
+                        strategy_name=payload.strategy, leverage=settings.leverage,
+                    ))
                     close_msg = f"Closed {existing.side} P&L: ${pnl:.2f} | "
                     # Refresh strategy to get updated equity
                     await db.refresh(strategy)
@@ -84,6 +93,16 @@ async def receive_webhook(payload: WebhookPayload, db: AsyncSession = Depends(ge
                 quantity = round(notional / price, 6)
             if quantity <= 0:
                 raise ValueError("Calculated quantity is zero")
+
+            # Risk check before executing
+            allowed, reason = await risk_manager.check_trade(
+                db, strategy, symbol, quantity, price
+            )
+            if not allowed:
+                asyncio.create_task(notifier.notify_risk_breach(
+                    strategy_name=payload.strategy, symbol=symbol, reason=reason,
+                ))
+                raise ValueError(f"Risk check failed: {reason}")
 
             # Execute new position
             result = await engine.execute_order_with_fallback(symbol, action, quantity)
@@ -102,6 +121,13 @@ async def receive_webhook(payload: WebhookPayload, db: AsyncSession = Depends(ge
                 message=payload.message,
                 fill_type=result.fill_type,
             )
+
+            # Fire-and-forget Telegram notification
+            asyncio.create_task(notifier.notify_trade_open(
+                symbol=symbol, side=new_side, quantity=result.quantity,
+                price=result.filled_price, strategy_name=payload.strategy,
+                fill_type=result.fill_type, leverage=leverage,
+            ))
 
             msg = f"{close_msg}{result.message}"
             log.result = msg
@@ -148,6 +174,13 @@ async def receive_webhook(payload: WebhookPayload, db: AsyncSession = Depends(ge
                 fees=result.fees,
                 message=payload.message,
             )
+
+            asyncio.create_task(notifier.notify_trade_close(
+                symbol=symbol, side=existing.side,
+                quantity=existing.quantity, entry_price=existing.entry_price,
+                exit_price=result.filled_price, pnl=pnl,
+                strategy_name=payload.strategy, leverage=settings.leverage,
+            ))
 
             log.result = f"Closed position. P&L: {pnl:.4f}"
             log.success = 1

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
 import { useDashboard, useSettings } from "@/hooks/use-api";
-import { getHealth, updateSettings } from "@/lib/api";
+import { getHealth, updateSettings, testTelegram } from "@/lib/api";
 import { API_BASE_URL } from "@/lib/constants";
 import type { AppSettingsUpdate } from "@/types";
 import {
@@ -25,6 +25,8 @@ import {
   X,
   Eye,
   EyeOff,
+  Send,
+  Bell,
 } from "lucide-react";
 
 type FormState = AppSettingsUpdate;
@@ -40,6 +42,7 @@ export default function SettingsPage() {
   } | null>(null);
   const [form, setForm] = useState<FormState>({});
   const [saving, setSaving] = useState(false);
+  const [sendingTest, setSendingTest] = useState(false);
   const [liveConfirmOpen, setLiveConfirmOpen] = useState(false);
   const [editingSecrets, setEditingSecrets] = useState<Record<string, boolean>>({});
 
@@ -98,6 +101,22 @@ export default function SettingsPage() {
     setLiveConfirmOpen(false);
   };
 
+  const handleTestTelegram = async () => {
+    setSendingTest(true);
+    try {
+      const res = await testTelegram();
+      if (res.success) {
+        addToast("Test message sent to Telegram!", "success");
+      } else {
+        addToast(`Telegram test failed: ${res.message}`, "error");
+      }
+    } catch {
+      addToast("Failed to send test message", "error");
+    } finally {
+      setSendingTest(false);
+    }
+  };
+
   const copyWebhookUrl = () => {
     navigator.clipboard.writeText(webhookUrl);
     addToast("Webhook URL copied to clipboard", "success");
@@ -143,8 +162,9 @@ export default function SettingsPage() {
     key: "webhook_secret" | "hl_api_key" | "hl_api_secret",
     label: string
   ) => {
-    const isEditing = editingSecrets[key];
-    const displayValue = form[key] ?? appSettings?.[key] ?? "";
+    const savedValue = appSettings?.[key] ?? "";
+    const hasValue = savedValue.length > 0 && savedValue !== "****";
+    const isEditing = editingSecrets[key] || !hasValue;
 
     return (
       <div>
@@ -159,32 +179,34 @@ export default function SettingsPage() {
               value={form[key] ?? ""}
               onChange={(e) => setField(key, e.target.value)}
               className="font-mono text-xs"
-              autoFocus
+              autoFocus={editingSecrets[key]}
             />
           ) : (
             <Input
               type="text"
-              value={displayValue}
+              value={form[key] ?? savedValue}
               readOnly
               className="font-mono text-xs text-white/30"
             />
           )}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              if (isEditing) {
-                // Cancel editing — remove from form if user hasn't typed
-                setEditingSecrets((p) => ({ ...p, [key]: false }));
-                const { [key]: _, ...rest } = form;
-                setForm(rest as FormState);
-              } else {
-                setEditingSecrets((p) => ({ ...p, [key]: true }));
-              }
-            }}
-          >
-            {isEditing ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-          </Button>
+          {hasValue && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                if (editingSecrets[key]) {
+                  // Cancel editing — remove from form if user hasn't typed
+                  setEditingSecrets((p) => ({ ...p, [key]: false }));
+                  const { [key]: _, ...rest } = form;
+                  setForm(rest as FormState);
+                } else {
+                  setEditingSecrets((p) => ({ ...p, [key]: true }));
+                }
+              }}
+            >
+              {editingSecrets[key] ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+            </Button>
+          )}
         </div>
       </div>
     );
@@ -556,6 +578,124 @@ export default function SettingsPage() {
               className="font-mono text-xs"
             />
           </div>
+        </div>
+      </div>
+
+      {/* Telegram Notifications */}
+      <div className="gradient-border rounded-2xl backdrop-blur-xl bg-white/[0.02] p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <Bell className="h-4 w-4 text-white/25" />
+          <span className="text-xs font-semibold uppercase tracking-wider text-white/25">
+            Telegram Notifications
+          </span>
+        </div>
+        <div className="space-y-4">
+          {/* Enable toggle */}
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-white/60">Enable Telegram</p>
+              <p className="text-[10px] text-white/25 mt-0.5">
+                Send alerts to a Telegram chat when trades open, close, or get blocked
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                const current = form.telegram_enabled ?? appSettings?.telegram_enabled ?? false;
+                setField("telegram_enabled", !current);
+              }}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                (form.telegram_enabled ?? appSettings?.telegram_enabled ?? false)
+                  ? "bg-[#00ff88]/20 border border-[#00ff88]/30"
+                  : "bg-white/[0.06] border border-white/[0.08]"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 rounded-full transition-transform ${
+                  (form.telegram_enabled ?? appSettings?.telegram_enabled ?? false)
+                    ? "translate-x-6 bg-[#00ff88]"
+                    : "translate-x-1 bg-white/30"
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Bot Token + Chat ID */}
+          <div>
+            <label className="text-[10px] font-semibold uppercase tracking-wider text-white/20 mb-1.5 block">
+              Bot Token
+            </label>
+            <Input
+              type="text"
+              placeholder="e.g. 123456789:ABCdef..."
+              value={form.telegram_bot_token ?? ""}
+              onChange={(e) => setField("telegram_bot_token", e.target.value)}
+              className="font-mono text-xs"
+            />
+            {appSettings?.telegram_bot_token && !form.telegram_bot_token && (
+              <p className="text-[10px] text-white/20 mt-1">
+                Current: {appSettings.telegram_bot_token} — type above to replace
+              </p>
+            )}
+          </div>
+          <div>
+            <label className="text-[10px] font-semibold uppercase tracking-wider text-white/20 mb-1.5 block">
+              Chat ID
+            </label>
+            <Input
+              type="text"
+              placeholder="e.g. 123456789"
+              value={form.telegram_chat_id ?? appSettings?.telegram_chat_id ?? ""}
+              onChange={(e) => setField("telegram_chat_id", e.target.value)}
+              className="font-mono text-xs"
+            />
+          </div>
+          <div>
+            <label className="text-[10px] font-semibold uppercase tracking-wider text-white/20 mb-1.5 block">
+              Chat ID 2 <span className="text-white/10">(optional)</span>
+            </label>
+            <Input
+              type="text"
+              placeholder="e.g. 987654321"
+              value={form.telegram_chat_id_2 ?? appSettings?.telegram_chat_id_2 ?? ""}
+              onChange={(e) => setField("telegram_chat_id_2", e.target.value)}
+              className="font-mono text-xs"
+            />
+          </div>
+
+          {/* Per-event toggles */}
+          <div>
+            <label className="text-[10px] font-semibold uppercase tracking-wider text-white/20 mb-2 block">
+              Notify On
+            </label>
+            <div className="grid grid-cols-3 gap-3">
+              {([
+                { key: "notify_trade_open" as const, label: "Trade Open" },
+                { key: "notify_trade_close" as const, label: "Trade Close" },
+                { key: "notify_risk_breach" as const, label: "Risk Breach" },
+              ]).map((item) => (
+                <button
+                  key={item.key}
+                  onClick={() => {
+                    const current = form[item.key] ?? appSettings?.[item.key] ?? true;
+                    setField(item.key, !current);
+                  }}
+                  className={`rounded-xl px-3 py-2 text-[11px] font-semibold transition-all ${
+                    (form[item.key] ?? appSettings?.[item.key] ?? true)
+                      ? "bg-[#00ff88]/10 text-[#00ff88] border border-[#00ff88]/20"
+                      : "bg-white/[0.03] text-white/20 border border-white/[0.06] hover:border-white/10"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Test button */}
+          <Button variant="outline" onClick={handleTestTelegram} disabled={sendingTest}>
+            <Send className="h-3.5 w-3.5" />
+            {sendingTest ? "Sending..." : "Send Test Message"}
+          </Button>
         </div>
       </div>
 
