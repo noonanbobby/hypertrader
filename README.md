@@ -26,6 +26,8 @@ A professional-grade automated trading system that receives **TradingView webhoo
 
 **Dashboard**
 - Real-time WebSocket-powered updates for positions, P&L, and trade fills
+- **Service status monitor** — live health indicators for backend, ngrok, WebSocket, and Telegram with auto-refresh every 10s
+- One-click copy of the ngrok webhook URL directly from the dashboard
 - Live market ticker with Hyperliquid price feeds
 - Portfolio value with animated counters and trend indicators
 - Daily / weekly / monthly P&L breakdown
@@ -82,7 +84,9 @@ hypertrader/
 │   │   │   ├── trades.py           # GET /api/trades (history + filters)
 │   │   │   ├── positions.py        # GET /api/positions (live unrealized P&L)
 │   │   │   ├── dashboard.py        # GET /api/dashboard (aggregated stats)
-│   │   │   └── analytics.py        # GET /api/analytics (performance data)
+│   │   │   ├── analytics.py        # GET /api/analytics (performance data)
+│   │   │   ├── settings.py         # GET/PATCH /api/settings
+│   │   │   └── status.py           # GET /api/status — service health monitor
 │   │   └── services/
 │   │       ├── trading_engine.py   # Abstract base + engine factory
 │   │       ├── paper_trader.py     # Paper trading with slippage + fees
@@ -90,14 +94,15 @@ hypertrader/
 │   │       ├── position_manager.py # Position tracking, P&L calculation
 │   │       ├── risk_manager.py     # Pre-trade risk checks
 │   │       ├── market_data.py      # Hyperliquid price feed client
-│   │       └── strategy_manager.py # Strategy lifecycle management
+│   │       ├── strategy_manager.py # Strategy lifecycle management
+│   │       └── notification_service.py # Telegram notifications
 │   ├── requirements.txt
 │   └── .env.example
 ├── frontend/
 │   └── src/
 │       ├── app/                    # Pages: dashboard, strategies, trades, analytics, settings
 │       ├── components/
-│       │   ├── dashboard/          # Portfolio value, P&L cards, positions, recent trades
+│       │   ├── dashboard/          # Portfolio value, P&L cards, positions, service status
 │       │   ├── charts/             # Equity curve, drawdown, histogram, calendar, trade chart
 │       │   ├── strategies/         # Strategy cards, create/edit dialogs, metrics
 │       │   ├── trades/             # Trades table, filters, trade detail dialog
@@ -185,10 +190,21 @@ WEBHOOK_SECRET=your-secret-here # Must match TradingView alert payload
 LEVERAGE=10.0                   # Position leverage (default 10x)
 INITIAL_BALANCE=10000.0         # Starting paper balance
 SLIPPAGE_PCT=0.05               # Simulated slippage %
+MAKER_FEE_PCT=0.02              # Simulated maker fee %
 TAKER_FEE_PCT=0.05              # Simulated taker fee %
 DEFAULT_MAX_POSITION_PCT=25.0   # Max position size as % of equity
 DEFAULT_MAX_DRAWDOWN_PCT=10.0   # Max drawdown before pausing
 DEFAULT_DAILY_LOSS_LIMIT=500.0  # Daily loss limit in USD
+
+# Limit Orders
+USE_LIMIT_ORDERS=true           # Use limit orders with taker fallback
+LIMIT_ORDER_TIMEOUT_SEC=30.0    # Seconds before falling back to taker
+LIMIT_ORDER_OFFSET_PCT=0.0      # Price offset for limit orders
+
+# Telegram Notifications
+TELEGRAM_ENABLED=false          # Enable Telegram trade alerts
+TELEGRAM_BOT_TOKEN=             # Bot token from @BotFather
+TELEGRAM_CHAT_ID=               # Chat ID for notifications
 ```
 
 ---
@@ -251,6 +267,9 @@ This ensures the bot always follows the latest signal direction. P&L is recorded
 | `GET` | `/api/trades` | Trade history with filters |
 | `GET` | `/api/positions` | Open positions with live unrealized P&L |
 | `GET` | `/api/analytics` | Performance metrics + equity curve data |
+| `GET` | `/api/settings` | Current app settings (secrets masked) |
+| `PATCH` | `/api/settings` | Update app settings |
+| `GET` | `/api/status` | Service health: backend, ngrok, WebSocket, Telegram |
 | `WS` | `/ws` | WebSocket for real-time events |
 
 ### Trade Filters

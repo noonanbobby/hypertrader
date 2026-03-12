@@ -255,12 +255,14 @@ for f in \
     "backend/app/config.py" \
     "backend/app/models.py" \
     "backend/app/routers/webhook.py" \
+    "backend/app/routers/status.py" \
     "backend/app/services/paper_trader.py" \
     "backend/requirements.txt" \
     "backend/.env" \
     "frontend/package.json" \
     "frontend/src/app/page.tsx" \
     "frontend/src/app/layout.tsx" \
+    "frontend/src/components/dashboard/service-status.tsx" \
     "start.sh"
 do
     if [ -f "$SCRIPT_DIR/$f" ]; then
