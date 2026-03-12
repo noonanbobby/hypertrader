@@ -4,6 +4,7 @@
 # Usage: bash watchdog.sh
 
 set -euo pipefail
+export PYTHONIOENCODING=utf-8
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
 PIDS_DIR="$DIR/.pids"
@@ -170,24 +171,105 @@ build_status_message() {
 "🔗 Webhook: ${NGROK_URL}/api/webhook"
 }
 
-build_trades_message() {
+send_trades_snapshot() {
   python -c "
-import urllib.request, json, sys
-positions = None
-try:
-    resp = urllib.request.urlopen('http://localhost:8000/api/positions', timeout=5)
-    positions = json.loads(resp.read())
-except:
-    pass
+import urllib.request, json
+from datetime import datetime, timedelta, timezone
 
-if positions is None:
-    sys.stdout.write('Backend unavailable')
-elif not positions:
-    sys.stdout.write('No open positions')
-else:
-    lines = []
-    total_pnl = 0.0
-    total_notional = 0.0
+API = 'http://localhost:8000/api'
+TOKEN = '$TELEGRAM_BOT_TOKEN'
+CHAT = '$TELEGRAM_CHAT_ID'
+
+def fetch(path):
+    try:
+        resp = urllib.request.urlopen(f'{API}{path}', timeout=10)
+        return json.loads(resp.read())
+    except:
+        return None
+
+def sign(v):
+    return '+' if v >= 0 else ''
+
+def fmt(v):
+    return f'{sign(v)}\${v:,.2f}'
+
+def send(text):
+    data = json.dumps({'chat_id': CHAT, 'text': text, 'parse_mode': 'HTML'}).encode('utf-8')
+    req = urllib.request.Request(f'https://api.telegram.org/bot{TOKEN}/sendMessage', data=data, headers={'Content-Type': 'application/json'})
+    try: urllib.request.urlopen(req, timeout=10)
+    except: pass
+
+# Fetch all data
+dash = fetch('/dashboard')
+if dash is None:
+    send('📋 <b>HyperTrader Snapshot</b>\n\n⚠️ Backend unavailable')
+    exit()
+
+now = datetime.now(timezone.utc)
+start_24h = (now - timedelta(hours=24)).strftime('%Y-%m-%dT%H:%M:%S')
+closed = fetch(f'/trades?status=closed&start_date={start_24h}&limit=1000') or []
+positions = fetch('/positions') or []
+analytics = fetch('/analytics')
+
+lines = ['📋 <b>HyperTrader 24h Snapshot</b>']
+lines.append(f'🕐 {now.strftime(\"%b %d, %H:%M\")} UTC')
+lines.append('')
+
+# ── Wallet Overview ──
+mode = dash.get('trading_mode', 'paper').upper()
+equity = dash.get('total_equity', 0)
+total_pnl = dash.get('total_pnl', 0)
+daily_pnl = dash.get('daily_pnl', 0)
+weekly_pnl = dash.get('weekly_pnl', 0)
+
+lines.append(f'💼 <b>Wallet</b> ({mode})')
+lines.append(f'   Equity: \${equity:,.2f}')
+lines.append(f'   Total P&L: {fmt(total_pnl)}')
+lines.append(f'   24h P&L: {fmt(daily_pnl)}')
+lines.append(f'   7d P&L: {fmt(weekly_pnl)}')
+lines.append('')
+
+# ── 24h Trading Activity ──
+wins_24h = sum(1 for t in closed if t.get('realized_pnl', 0) > 0)
+losses_24h = len(closed) - wins_24h
+realized_24h = sum(t.get('realized_pnl', 0) for t in closed)
+fees_24h = sum(t.get('fees', 0) for t in closed)
+wr_24h = (wins_24h / len(closed) * 100) if closed else 0
+
+lines.append(f'📊 <b>24h Activity</b>')
+lines.append(f'   Trades: {len(closed)} ({wins_24h}W / {losses_24h}L)')
+if closed:
+    lines.append(f'   Win Rate: {wr_24h:.1f}%')
+    lines.append(f'   Realized: {fmt(realized_24h)}')
+    lines.append(f'   Fees: \${fees_24h:,.2f}')
+    best = max(closed, key=lambda t: t.get('realized_pnl', 0))
+    worst = min(closed, key=lambda t: t.get('realized_pnl', 0))
+    lines.append(f'   Best: {best[\"symbol\"]} {fmt(best[\"realized_pnl\"])}')
+    lines.append(f'   Worst: {worst[\"symbol\"]} {fmt(worst[\"realized_pnl\"])}')
+lines.append('')
+
+# ── Performance Metrics ──
+if analytics:
+    pf = analytics.get('profit_factor', 0)
+    md = analytics.get('max_drawdown', 0)
+    sr = analytics.get('sharpe_ratio', 0)
+    aw = analytics.get('avg_win', 0)
+    al = analytics.get('avg_loss', 0)
+    wr = analytics.get('win_rate', 0)
+    lines.append(f'📈 <b>Performance</b>')
+    lines.append(f'   Win Rate: {wr:.1f}% | PF: {pf:.2f}')
+    lines.append(f'   Avg Win: {fmt(aw)} | Avg Loss: {fmt(al)}')
+    lines.append(f'   Max DD: {md:.2f}% | Sharpe: {sr:.2f}')
+    lines.append('')
+
+# ── Open Positions ──
+if positions:
+    total_unrealized = sum(p.get('unrealized_pnl', 0) for p in positions)
+    total_notional = sum(p.get('notional_value', 0) for p in positions)
+
+    lines.append(f'🔓 <b>Open Positions</b> ({len(positions)})')
+    lines.append('')
+
     for p in positions:
         symbol = p.get('symbol', '?')
         side = p.get('side', '?').upper()
@@ -197,42 +279,29 @@ else:
         pnl = p.get('unrealized_pnl', 0)
         pnl_pct = p.get('pnl_pct', 0)
         notional = p.get('notional_value', 0)
+        margin = p.get('margin_used', 0)
         leverage = p.get('leverage', 1)
+        strategy = p.get('strategy_name', '')
+
         emoji = '🟢' if pnl >= 0 else '🔴'
         side_emoji = '📈' if side == 'LONG' else '📉'
-        pnl_sign = '+' if pnl >= 0 else ''
-        pct_sign = '+' if pnl_pct >= 0 else ''
-        lines.append(f'{side_emoji} <b>{symbol}</b> {side} {leverage}x')
-        lines.append(f'   Entry: \${entry:,.2f}  |  Now: \${current:,.2f}')
-        lines.append(f'   Size: {qty:.4f} (\${notional:,.2f})')
-        lines.append(f'   {emoji} P&L: {pnl_sign}\${pnl:,.2f} ({pct_sign}{pnl_pct:.2f}%)')
-        lines.append('')
-        total_pnl += pnl
-        total_notional += notional
-    total_emoji = '🟢' if total_pnl >= 0 else '🔴'
-    total_sign = '+' if total_pnl >= 0 else ''
-    lines.append('━━━━━━━━━━━━━━━━━━')
-    lines.append(f'{total_emoji} <b>Total P&L: {total_sign}\${total_pnl:,.2f}</b>')
-    lines.append(f'💰 Total Notional: \${total_notional:,.2f}')
-    lines.append(f'📊 Positions: {len(positions)}')
-    sys.stdout.write('\n'.join(lines))
-sys.stdout.flush()
-" 2>/dev/null
-}
 
-send_trades_telegram() {
-  local body="$1"
-  if [ -z "$body" ]; then
-    body="Error fetching positions"
-  fi
-  python -c "
-import urllib.request, json
-body = '''$body'''
-text = '📋 <b>HyperTrader Trades</b>\n\n' + body
-data = json.dumps({'chat_id': '$TELEGRAM_CHAT_ID', 'text': text, 'parse_mode': 'HTML'}).encode('utf-8')
-req = urllib.request.Request('https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage', data=data, headers={'Content-Type': 'application/json'})
-try: urllib.request.urlopen(req, timeout=10)
-except: pass
+        lines.append(f'{side_emoji} <b>{symbol}</b> {side} {leverage}x')
+        lines.append(f'   Entry: \${entry:,.2f} → Now: \${current:,.2f}')
+        lines.append(f'   Qty: {qty:.4f} | Margin: \${margin:,.2f}')
+        lines.append(f'   {emoji} P&L: {fmt(pnl)} ({sign(pnl_pct)}{pnl_pct:.2f}%)')
+        if strategy:
+            lines.append(f'   Strategy: {strategy}')
+        lines.append('')
+
+    u_emoji = '🟢' if total_unrealized >= 0 else '🔴'
+    lines.append(f'━━━━━━━━━━━━━━━━━━━━')
+    lines.append(f'{u_emoji} <b>Unrealized: {fmt(total_unrealized)}</b>')
+    lines.append(f'💰 Notional: \${total_notional:,.2f}')
+else:
+    lines.append('🔓 <b>Open Positions</b>: None')
+
+send('\n'.join(lines))
 " > /dev/null 2>&1 &
 }
 
@@ -275,9 +344,7 @@ handle_telegram_command() {
       ;;
     /trades)
       log INFO "Telegram command: /trades from $chat_id"
-      local trades_body
-      trades_body=$(build_trades_message)
-      send_trades_telegram "$trades_body"
+      send_trades_snapshot
       ;;
     /help)
       log INFO "Telegram command: /help from $chat_id"
