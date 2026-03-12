@@ -111,7 +111,29 @@ export interface AppSettings {
   hl_api_key: string;
   hl_api_secret: string;
   hl_vault_address: string;
+  telegram_enabled: boolean;
+  telegram_bot_token: string;
+  telegram_chat_id: string;
+  telegram_chat_id_2: string;
+  notify_trade_open: boolean;
+  notify_trade_close: boolean;
+  notify_risk_breach: boolean;
   updated_at: string;
 }
 
 export type AppSettingsUpdate = Partial<Omit<AppSettings, "updated_at">>;
+
+export interface ServiceCheck {
+  name: string;
+  status: "ok" | "degraded" | "down";
+  message: string;
+  url?: string;
+}
+
+export interface SystemStatus {
+  backend: ServiceCheck;
+  ngrok: ServiceCheck;
+  websocket: ServiceCheck;
+  telegram: ServiceCheck;
+  checked_at: string;
+}

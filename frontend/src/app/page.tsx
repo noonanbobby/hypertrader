@@ -7,6 +7,7 @@ import { PositionsTable } from "@/components/dashboard/positions-table";
 import { RecentTrades } from "@/components/dashboard/recent-trades";
 import { StrategyCards } from "@/components/dashboard/strategy-cards";
 import { MarketTicker } from "@/components/dashboard/market-ticker";
+import { ServiceStatus } from "@/components/dashboard/service-status";
 import { Card, CardTitle } from "@/components/ui/card";
 import {
   Activity,
@@ -54,6 +55,9 @@ export default function DashboardPage() {
 
   return (
     <div className="relative z-10 space-y-6">
+      {/* Service Status */}
+      <ServiceStatus />
+
       {/* Market Ticker */}
       <MarketTicker />
 

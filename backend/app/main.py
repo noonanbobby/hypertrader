@@ -8,7 +8,7 @@ from app.version import __version__
 from app.database import init_db, async_session
 from app.models import AppSettings
 from app.websocket_manager import ws_manager
-from app.routers import webhook, strategies, trades, positions, dashboard, analytics, settings as settings_router
+from app.routers import webhook, strategies, trades, positions, dashboard, analytics, settings as settings_router, status
 
 import datetime as dt
 
@@ -60,6 +60,7 @@ app.include_router(positions.router, prefix="/api", tags=["positions"])
 app.include_router(dashboard.router, prefix="/api", tags=["dashboard"])
 app.include_router(analytics.router, prefix="/api", tags=["analytics"])
 app.include_router(settings_router.router, prefix="/api", tags=["settings"])
+app.include_router(status.router, prefix="/api", tags=["status"])
 
 
 @app.get("/api/health")

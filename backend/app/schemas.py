@@ -187,6 +187,13 @@ class SettingsResponse(BaseModel):
     hl_api_key: str
     hl_api_secret: str
     hl_vault_address: str
+    telegram_enabled: bool
+    telegram_bot_token: str
+    telegram_chat_id: str
+    telegram_chat_id_2: str
+    notify_trade_open: bool
+    notify_trade_close: bool
+    notify_risk_breach: bool
     updated_at: datetime
 
     @classmethod
@@ -208,8 +215,31 @@ class SettingsResponse(BaseModel):
             hl_api_key=_mask_secret(row.hl_api_key),
             hl_api_secret=_mask_secret(row.hl_api_secret),
             hl_vault_address=row.hl_vault_address,
+            telegram_enabled=row.telegram_enabled,
+            telegram_bot_token=row.telegram_bot_token,
+            telegram_chat_id=row.telegram_chat_id,
+            telegram_chat_id_2=row.telegram_chat_id_2,
+            notify_trade_open=row.notify_trade_open,
+            notify_trade_close=row.notify_trade_close,
+            notify_risk_breach=row.notify_risk_breach,
             updated_at=row.updated_at,
         )
+
+
+# --- System Status ---
+class ServiceCheck(BaseModel):
+    name: str
+    status: Literal["ok", "degraded", "down"]
+    message: str = ""
+    url: Optional[str] = None
+
+
+class SystemStatus(BaseModel):
+    backend: ServiceCheck
+    ngrok: ServiceCheck
+    websocket: ServiceCheck
+    telegram: ServiceCheck
+    checked_at: datetime
 
 
 class SettingsUpdate(BaseModel):
@@ -229,3 +259,10 @@ class SettingsUpdate(BaseModel):
     hl_api_key: Optional[str] = None
     hl_api_secret: Optional[str] = None
     hl_vault_address: Optional[str] = None
+    telegram_enabled: Optional[bool] = None
+    telegram_bot_token: Optional[str] = None
+    telegram_chat_id: Optional[str] = None
+    telegram_chat_id_2: Optional[str] = None
+    notify_trade_open: Optional[bool] = None
+    notify_trade_close: Optional[bool] = None
+    notify_risk_breach: Optional[bool] = None

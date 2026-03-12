@@ -2,11 +2,11 @@
 
 import useSWR from "swr";
 import { fetcher } from "@/lib/api";
-import type { DashboardStats, Strategy, Trade, Position, Analytics, AppSettings } from "@/types";
+import type { DashboardStats, Strategy, Trade, Position, Analytics, AppSettings, SystemStatus } from "@/types";
 
 export function useDashboard() {
   return useSWR<DashboardStats>("/api/dashboard", fetcher, {
-    refreshInterval: 10000,
+    refreshInterval: 5000,
   });
 }
 
@@ -34,6 +34,12 @@ export function useAnalytics(strategyId?: number) {
   const qs = strategyId ? `?strategy_id=${strategyId}` : "";
   return useSWR<Analytics>(`/api/analytics${qs}`, fetcher, {
     refreshInterval: 30000,
+  });
+}
+
+export function useSystemStatus() {
+  return useSWR<SystemStatus>("/api/status", fetcher, {
+    refreshInterval: 10000,
   });
 }
 
