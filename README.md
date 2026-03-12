@@ -112,7 +112,8 @@ hypertrader/
 │       ├── lib/                    # API client, formatters, constants
 │       └── types/                  # TypeScript interfaces
 ├── install.sh                       # Full installation script
-└── start.sh                        # Launch both servers
+├── start.sh                        # Simple launch (no monitoring)
+└── watchdog.sh                     # Launch with auto-restart watchdog
 ```
 
 ---
@@ -129,7 +130,7 @@ hypertrader/
 ```bash
 git clone https://github.com/hpombo1337/hypertrader.git
 cd hypertrader
-chmod +x install.sh start.sh
+chmod +x install.sh start.sh watchdog.sh
 ./install.sh
 ```
 
@@ -144,12 +145,21 @@ The install script handles everything:
 ### Launch
 
 ```bash
-./start.sh
+./watchdog.sh
 ```
+
+This starts all services (backend, frontend, ngrok) with a **watchdog** that:
+- Health-checks every 20s and auto-restarts any service that goes down
+- Sends **Telegram alerts** on service failures and restarts (configure in dashboard Settings)
+- Supports **remote commands** via Telegram (`/status`, `/restart`, `/stop`, `/help`)
+- Logs all events to `watchdog.log` with automatic rotation at 10MB
+- Clean shutdown of all services on Ctrl+C
+
+For a simple launch without monitoring, use `./start.sh` instead.
 
 - Dashboard: `http://localhost:3000`
 - API: `http://localhost:8000`
-- Webhook: `http://localhost:8000/api/webhook`
+- Webhook: printed in the startup banner (ngrok URL)
 
 ### Manual Setup
 
