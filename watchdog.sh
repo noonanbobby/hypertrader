@@ -106,12 +106,14 @@ except:
 send_telegram() {
   local msg="$1"
   if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
-    curl -s -X POST \
-      "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-      -d "chat_id=${TELEGRAM_CHAT_ID}" \
-      -d "text=${msg}" \
-      -d "parse_mode=HTML" \
-      > /dev/null 2>&1 &
+    python -c "
+import urllib.request, json
+text = '''$msg'''.replace('%0A', '\n')
+data = json.dumps({'chat_id': '$TELEGRAM_CHAT_ID', 'text': text, 'parse_mode': 'HTML'}).encode('utf-8')
+req = urllib.request.Request('https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage', data=data, headers={'Content-Type': 'application/json'})
+try: urllib.request.urlopen(req, timeout=10)
+except: pass
+" > /dev/null 2>&1 &
   fi
 }
 
@@ -207,11 +209,7 @@ handle_telegram_command() {
       ;;
     /help)
       log INFO "Telegram command: /help from $chat_id"
-      send_telegram "🤖 <b>HyperTrader Commands</b>%0A%0A"\
-"/status — Service status %26 uptime%0A"\
-"/restart — Restart all services%0A"\
-"/stop — Stop watchdog %26 all services%0A"\
-"/help — Show this message"
+      send_telegram "🤖 <b>HyperTrader Commands</b>%0A%0A/status — Service status & uptime%0A/restart — Restart all services%0A/stop — Stop watchdog & all services%0A/help — Show this message"
       ;;
     *)
       # Ignore unknown commands silently
