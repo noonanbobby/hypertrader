@@ -12,7 +12,7 @@ LOG_FILE="$DIR/watchdog.log"
 DB_FILE="$DIR/backend/hypertrader.db"
 CHECK_INTERVAL=20
 FAIL_THRESHOLD=2
-GRACE_PERIOD=10
+GRACE_PERIOD=30
 LOG_MAX_BYTES=10485760  # 10MB
 
 # Colors
@@ -479,14 +479,21 @@ kill_pid() {
 
 kill_port() {
   local port="$1"
-  local pid
-  pid=$(lsof -ti :"$port" 2>/dev/null || true)
-  if [ -n "$pid" ]; then
-    kill $pid 2>/dev/null || true
-    sleep 1
-    kill -9 $pid 2>/dev/null || true
-    log INFO "Killed process on port $port (PID: $pid)"
+  local pids=""
+  # Use netstat on Windows (lsof unreliable under MSYS2)
+  pids=$(netstat -ano 2>/dev/null | grep ":${port} " | grep LISTEN | awk '{print $5}' | sort -u || true)
+  if [ -z "$pids" ]; then
+    # Fallback to lsof for non-Windows
+    pids=$(lsof -ti :"$port" 2>/dev/null || true)
   fi
+  if [ -n "$pids" ]; then
+    for pid in $pids; do
+      (taskkill //PID "$pid" //F > /dev/null 2>&1 || kill -9 "$pid" 2>/dev/null) || true
+      log INFO "Killed process on port $port (PID: $pid)"
+    done
+    sleep 1
+  fi
+  return 0
 }
 
 # ─── Service Start Functions ────────────────────────────────────────────────────
