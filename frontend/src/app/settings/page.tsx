@@ -778,8 +778,8 @@ export default function SettingsPage() {
         </div>
         <div className="grid grid-cols-2 gap-2">
           {[
-            { action: "buy", desc: "Close short if open, or open long" },
-            { action: "sell", desc: "Close long if open, or open short" },
+            { action: "buy", desc: "Close short if open, then open long" },
+            { action: "sell", desc: "Close long if open, then open short" },
             { action: "close_long", desc: "Close a long position" },
             { action: "close_short", desc: "Close a short position" },
             { action: "close_all", desc: "Close all positions for strategy" },

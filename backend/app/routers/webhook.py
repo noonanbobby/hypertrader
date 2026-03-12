@@ -106,9 +106,7 @@ async def _process_webhook(
             await db.commit()
             return WebhookResponse(success=True, message=msg)
 
-        # --- Opposite-side signal = close existing position only ---
-        # TradingView sends close + open as two separate signals.
-        # First signal closes; the follow-up signal opens the new direction.
+        # --- Opposite-side signal = close existing, then open new ---
         if existing is not None:
             close_action = "sell" if existing.side == "long" else "buy"
             close_result = await engine.execute_order_with_fallback(
@@ -132,14 +130,10 @@ async def _process_webhook(
                 strategy_name=payload.strategy, leverage=leverage,
             ))
 
-            msg = f"Closed {existing.side} {symbol} P&L: ${pnl:.2f}"
-            log.result = msg
-            log.success = 1
-            db.add(log)
-            await db.commit()
-            return WebhookResponse(success=True, message=msg)
+            # Refresh strategy equity after close (P&L applied)
+            await db.refresh(strategy)
 
-        # --- NEW POSITION (no existing position) ---
+        # --- OPEN NEW POSITION ---
         # Calculate quantity
         size_pct = payload.size_pct or settings.default_size_pct
         quantity = payload.quantity or 0.0
@@ -195,6 +189,8 @@ async def _process_webhook(
         ))
 
         msg = result.message
+        if existing is not None:
+            msg = f"Flipped {existing.side}→{new_side} {symbol} (P&L: ${pnl:.2f}) | {msg}"
         log.result = msg
         log.success = 1
         db.add(log)
