@@ -660,29 +660,23 @@ check_ngrok() {
 
 restart_backend() {
   log ERROR "Backend is DOWN — restarting..."
-  send_telegram "⚠️ <b>HyperTrader Watchdog</b>%0A%0ABackend is DOWN — auto-restarting..."
   kill_pid "backend"
   sleep 2
   start_backend
-  send_telegram "✅ <b>HyperTrader Watchdog</b>%0A%0ABackend restarted successfully"
 }
 
 restart_frontend() {
   log ERROR "Frontend is DOWN — restarting..."
-  send_telegram "⚠️ <b>HyperTrader Watchdog</b>%0A%0AFrontend is DOWN — auto-restarting..."
   kill_pid "frontend"
   sleep 2
   start_frontend
-  send_telegram "✅ <b>HyperTrader Watchdog</b>%0A%0AFrontend restarted successfully"
 }
 
 restart_ngrok() {
   log ERROR "ngrok is DOWN — restarting..."
-  send_telegram "⚠️ <b>HyperTrader Watchdog</b>%0A%0Angrok is DOWN — auto-restarting..."
   kill_pid "ngrok"
   sleep 2
   start_ngrok
-  send_telegram "✅ <b>HyperTrader Watchdog</b>%0A%0Angrok restarted — new URL: $NGROK_URL"
 }
 
 # ─── Shutdown ────────────────────────────────────────────────────────────────────
@@ -758,17 +752,28 @@ main() {
     sleep "$CHECK_INTERVAL"
     rotate_log
 
-    # Check and restart each service
+    # Check and restart services, collect results for a single alert
+    local restarted=""
+
     if ! check_backend; then
       restart_backend
+      restarted="${restarted}Backend "
     fi
 
     if ! check_frontend; then
       restart_frontend
+      restarted="${restarted}Frontend "
     fi
 
     if ! check_ngrok; then
       restart_ngrok
+      fetch_ngrok_url
+      restarted="${restarted}ngrok "
+    fi
+
+    # Send one combined alert if anything restarted
+    if [ -n "$restarted" ]; then
+      send_telegram "🔄 <b>HyperTrader Watchdog</b>%0A%0ARestarted: ${restarted}%0AWebhook: ${NGROK_URL}/api/webhook"
     fi
 
     # Poll for Telegram bot commands
