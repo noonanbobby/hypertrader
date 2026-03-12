@@ -22,7 +22,8 @@ class RiskManager:
         # 2. Check position size limit
         notional = quantity * price
         max_notional = strategy.current_equity * (strategy.max_position_pct / 100)
-        if notional > max_notional:
+        # 0.5% tolerance to avoid rejection from price/quantity rounding
+        if notional > max_notional * 1.005:
             return False, (
                 f"Position size ${notional:.2f} exceeds "
                 f"{strategy.max_position_pct}% limit (${max_notional:.2f})"
