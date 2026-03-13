@@ -131,6 +131,7 @@ class AppSettings(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, default=1)
     trading_mode: Mapped[str] = mapped_column(String(10), default="paper")
     webhook_secret: Mapped[str] = mapped_column(String(255), default="change-me")
+    webhook_url: Mapped[str] = mapped_column(String(500), default="")
     leverage: Mapped[float] = mapped_column(Float, default=10.0)
     initial_balance: Mapped[float] = mapped_column(Float, default=10000.0)
     slippage_pct: Mapped[float] = mapped_column(Float, default=0.05)

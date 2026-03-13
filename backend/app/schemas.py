@@ -173,6 +173,7 @@ def _mask_secret(value: str) -> str:
 class SettingsResponse(BaseModel):
     trading_mode: str
     webhook_secret: str
+    webhook_url: str
     leverage: float
     initial_balance: float
     slippage_pct: float
@@ -204,6 +205,7 @@ class SettingsResponse(BaseModel):
         return cls(
             trading_mode=row.trading_mode,
             webhook_secret=_mask_secret(row.webhook_secret),
+            webhook_url=row.webhook_url,
             leverage=row.leverage,
             initial_balance=row.initial_balance,
             slippage_pct=row.slippage_pct,
@@ -288,6 +290,7 @@ class HLStatus(BaseModel):
 class SettingsUpdate(BaseModel):
     trading_mode: Optional[Literal["paper", "live"]] = None
     webhook_secret: Optional[str] = None
+    webhook_url: Optional[str] = None
     leverage: Optional[float] = Field(default=None, gt=0, le=100)
     initial_balance: Optional[float] = Field(default=None, gt=0)
     slippage_pct: Optional[float] = Field(default=None, ge=0, le=10)

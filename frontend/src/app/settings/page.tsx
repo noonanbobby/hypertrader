@@ -46,7 +46,6 @@ export default function SettingsPage() {
   const [liveConfirmOpen, setLiveConfirmOpen] = useState(false);
   const [editingSecrets, setEditingSecrets] = useState<Record<string, boolean>>({});
 
-  const [webhookUrl, setWebhookUrl] = useState(`${API_BASE_URL}/api/webhook`);
   const isDirty = Object.keys(form).length > 0;
   const frontendVersion = process.env.NEXT_PUBLIC_APP_VERSION ?? "—";
 
@@ -117,8 +116,10 @@ export default function SettingsPage() {
     }
   };
 
+  const resolvedWebhookUrl = (form.webhook_url ?? appSettings?.webhook_url) || `${API_BASE_URL}/api/webhook`;
+
   const copyWebhookUrl = () => {
-    navigator.clipboard.writeText(webhookUrl);
+    navigator.clipboard.writeText(resolvedWebhookUrl);
     addToast("Webhook URL copied to clipboard", "success");
   };
 
@@ -768,8 +769,8 @@ export default function SettingsPage() {
             <div className="flex gap-2">
               <Input
                 type="text"
-                value={webhookUrl}
-                onChange={(e) => setWebhookUrl(e.target.value)}
+                value={resolvedWebhookUrl}
+                onChange={(e) => setField("webhook_url", e.target.value)}
                 placeholder="https://your-ngrok-url.ngrok-free.app/api/webhook"
                 className="font-mono text-xs"
               />

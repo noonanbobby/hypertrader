@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     """Loads from .env — used for infrastructure + initial seed values."""
     trading_mode: Literal["paper", "live"] = "paper"
     webhook_secret: str = "change-me"
+    webhook_url: str = ""
     database_url: str = "sqlite+aiosqlite:///./hypertrader.db"
 
     # Paper Trading
@@ -58,7 +59,7 @@ _env_settings = Settings()
 
 # Fields that live in the DB (runtime-configurable)
 RUNTIME_FIELDS = [
-    "trading_mode", "webhook_secret", "leverage",
+    "trading_mode", "webhook_secret", "webhook_url", "leverage",
     "initial_balance", "slippage_pct", "maker_fee_pct", "taker_fee_pct",
     "use_limit_orders", "limit_order_timeout_sec", "limit_order_offset_pct",
     "default_size_pct", "use_max_size",

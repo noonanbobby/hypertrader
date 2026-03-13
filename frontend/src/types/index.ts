@@ -134,6 +134,7 @@ export interface WSEvent {
 export interface AppSettings {
   trading_mode: "paper" | "live";
   webhook_secret: string;
+  webhook_url: string;
   leverage: number;
   initial_balance: number;
   slippage_pct: number;
