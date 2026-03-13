@@ -17,6 +17,7 @@ class Settings(BaseSettings):
 
     # Position Sizing
     default_size_pct: float = 10.0
+    use_max_size: bool = False
 
     # Risk Defaults
     default_max_position_pct: float = 25.0
@@ -60,7 +61,7 @@ RUNTIME_FIELDS = [
     "trading_mode", "webhook_secret", "leverage",
     "initial_balance", "slippage_pct", "maker_fee_pct", "taker_fee_pct",
     "use_limit_orders", "limit_order_timeout_sec", "limit_order_offset_pct",
-    "default_size_pct",
+    "default_size_pct", "use_max_size",
     "default_max_position_pct", "default_max_drawdown_pct", "default_daily_loss_limit",
     "hl_api_key", "hl_api_secret", "hl_vault_address",
     "telegram_enabled", "telegram_bot_token", "telegram_chat_id", "telegram_chat_id_2",

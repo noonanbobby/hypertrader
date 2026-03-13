@@ -357,37 +357,69 @@ export default function SettingsPage() {
             Leverage & Position Sizing
           </span>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-[10px] font-semibold uppercase tracking-wider text-white/20 mb-1.5 block">
-              Leverage Multiplier
-            </label>
-            <Input
-              type="number"
-              step="1"
-              min="1"
-              max="100"
-              value={val("leverage")}
-              onChange={(e) => setField("leverage", parseFloat(e.target.value) || 1)}
-              className="font-mono text-xs"
-            />
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-[10px] font-semibold uppercase tracking-wider text-white/20 mb-1.5 block">
+                Leverage Multiplier
+              </label>
+              <Input
+                type="number"
+                step="1"
+                min="1"
+                max="100"
+                value={val("leverage")}
+                onChange={(e) => setField("leverage", parseFloat(e.target.value) || 1)}
+                className="font-mono text-xs"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-semibold uppercase tracking-wider text-white/20 mb-1.5 block">
+                Default Trade Size (%)
+              </label>
+              <Input
+                type="number"
+                step="1"
+                min="1"
+                max="100"
+                value={val("default_size_pct")}
+                onChange={(e) => setField("default_size_pct", parseFloat(e.target.value) || 10)}
+                className={`font-mono text-xs ${(form.use_max_size ?? appSettings?.use_max_size ?? false) ? "opacity-30 pointer-events-none" : ""}`}
+                disabled={form.use_max_size ?? appSettings?.use_max_size ?? false}
+              />
+              <p className="text-[10px] text-white/20 mt-1">
+                {(form.use_max_size ?? appSettings?.use_max_size ?? false)
+                  ? "Trades sized to strategy's max position limit"
+                  : "% of strategy equity per trade (overridden by payload size_pct)"}
+              </p>
+            </div>
           </div>
-          <div>
-            <label className="text-[10px] font-semibold uppercase tracking-wider text-white/20 mb-1.5 block">
-              Default Trade Size (%)
-            </label>
-            <Input
-              type="number"
-              step="1"
-              min="1"
-              max="100"
-              value={val("default_size_pct")}
-              onChange={(e) => setField("default_size_pct", parseFloat(e.target.value) || 10)}
-              className="font-mono text-xs"
-            />
-            <p className="text-[10px] text-white/20 mt-1">
-              % of strategy equity per trade (overridden by payload size_pct)
-            </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-white/60">Max Size Mode</p>
+              <p className="text-[10px] text-white/25 mt-0.5">
+                Auto-size each trade to the strategy&apos;s max position limit
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                const current = form.use_max_size ?? appSettings?.use_max_size ?? false;
+                setField("use_max_size", !current);
+              }}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                (form.use_max_size ?? appSettings?.use_max_size ?? false)
+                  ? "bg-[#00ff88]/20 border border-[#00ff88]/30"
+                  : "bg-white/[0.06] border border-white/[0.08]"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 rounded-full transition-transform ${
+                  (form.use_max_size ?? appSettings?.use_max_size ?? false)
+                    ? "translate-x-6 bg-[#00ff88]"
+                    : "translate-x-1 bg-white/30"
+                }`}
+              />
+            </button>
           </div>
         </div>
       </div>

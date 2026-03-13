@@ -146,8 +146,12 @@ async def _process_webhook(
         size_pct = payload.size_pct or settings.default_size_pct
         quantity = payload.quantity or 0.0
         if quantity <= 0:
-            margin = strategy.current_equity * (size_pct / 100)
-            notional = margin * leverage
+            if settings.use_max_size and not payload.size_pct:
+                # Max size mode: size up to strategy's max_position_pct
+                notional = strategy.current_equity * (strategy.max_position_pct / 100)
+            else:
+                margin = strategy.current_equity * (size_pct / 100)
+                notional = margin * leverage
             quantity = notional / price
 
         # Round to szDecimals

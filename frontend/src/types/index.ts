@@ -106,6 +106,7 @@ export interface AppSettings {
   limit_order_timeout_sec: number;
   limit_order_offset_pct: number;
   default_size_pct: number;
+  use_max_size: boolean;
   default_max_position_pct: number;
   default_max_drawdown_pct: number;
   default_daily_loss_limit: number;

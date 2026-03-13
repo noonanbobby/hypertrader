@@ -32,6 +32,7 @@ async def _migrate_columns(conn):
         ("app_settings", "notify_trade_close", "BOOLEAN DEFAULT 1"),
         ("app_settings", "notify_risk_breach", "BOOLEAN DEFAULT 1"),
         ("app_settings", "trading_paused", "BOOLEAN DEFAULT 0"),
+        ("app_settings", "use_max_size", "BOOLEAN DEFAULT 0"),
     ]
     for table, column, col_type in migrations:
         try:
