@@ -37,6 +37,9 @@ class Settings(BaseSettings):
     notify_trade_close: bool = True
     notify_risk_breach: bool = True
 
+    # Emergency Pause
+    trading_paused: bool = False
+
     # Hyperliquid
     hl_api_key: str = ""
     hl_api_secret: str = ""
@@ -62,6 +65,7 @@ RUNTIME_FIELDS = [
     "hl_api_key", "hl_api_secret", "hl_vault_address",
     "telegram_enabled", "telegram_bot_token", "telegram_chat_id", "telegram_chat_id_2",
     "notify_trade_open", "notify_trade_close", "notify_risk_breach",
+    "trading_paused",
 ]
 
 

@@ -153,6 +153,7 @@ class AppSettings(Base):
     notify_trade_open: Mapped[bool] = mapped_column(Boolean, default=True)
     notify_trade_close: Mapped[bool] = mapped_column(Boolean, default=True)
     notify_risk_breach: Mapped[bool] = mapped_column(Boolean, default=True)
+    trading_paused: Mapped[bool] = mapped_column(Boolean, default=False)
     updated_at: Mapped[dt.datetime] = mapped_column(DateTime, default=dt.datetime.utcnow, onupdate=dt.datetime.utcnow)
 
 

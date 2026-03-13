@@ -119,6 +119,7 @@ export interface AppSettings {
   notify_trade_open: boolean;
   notify_trade_close: boolean;
   notify_risk_breach: boolean;
+  trading_paused: boolean;
   updated_at: string;
 }
 

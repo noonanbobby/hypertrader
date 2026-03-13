@@ -42,6 +42,14 @@ async def receive_webhook(payload: WebhookPayload, db: AsyncSession = Depends(ge
         await db.commit()
         return WebhookResponse(success=False, message="Invalid webhook secret")
 
+    # Check if trading is paused
+    if settings.trading_paused:
+        log.result = "Trading paused — signal ignored"
+        log.success = 0
+        db.add(log)
+        await db.commit()
+        return WebhookResponse(success=False, message="Trading is paused")
+
     # Get trading engine
     engine = create_engine(settings.trading_mode)
 

@@ -195,6 +195,7 @@ class SettingsResponse(BaseModel):
     notify_trade_open: bool
     notify_trade_close: bool
     notify_risk_breach: bool
+    trading_paused: bool
     updated_at: datetime
 
     @classmethod
@@ -224,6 +225,7 @@ class SettingsResponse(BaseModel):
             notify_trade_open=row.notify_trade_open,
             notify_trade_close=row.notify_trade_close,
             notify_risk_breach=row.notify_risk_breach,
+            trading_paused=row.trading_paused,
             updated_at=row.updated_at,
         )
 
@@ -269,3 +271,4 @@ class SettingsUpdate(BaseModel):
     notify_trade_open: Optional[bool] = None
     notify_trade_close: Optional[bool] = None
     notify_risk_breach: Optional[bool] = None
+    trading_paused: Optional[bool] = None

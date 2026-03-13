@@ -160,13 +160,33 @@ build_status_message() {
   # Refresh ngrok URL
   fetch_ngrok_url
 
+  # Check trading pause state
+  local pause_status="▶️ TRADING"
+  local db_win_path
+  db_win_path=$(cygpath -w "$DB_FILE" 2>/dev/null || echo "$DB_FILE")
+  local paused_val
+  paused_val=$(python -c "
+import sqlite3
+try:
+    conn = sqlite3.connect(r'$db_win_path')
+    row = conn.execute('SELECT trading_paused FROM app_settings WHERE id=1').fetchone()
+    conn.close()
+    print(row[0] if row else 0)
+except:
+    print(0)
+" 2>/dev/null || echo "0")
+  if [ "$paused_val" = "1" ] || [ "$paused_val" = "True" ]; then
+    pause_status="⏸ PAUSED"
+  fi
+
   local uptime_str
   uptime_str=$(format_uptime "$uptime")
 
   echo "📊 <b>HyperTrader Status</b>%0A%0A"\
 "Backend:  ${be_status}%0A"\
 "Frontend: ${fe_status}%0A"\
-"ngrok:    ${ng_status}%0A%0A"\
+"ngrok:    ${ng_status}%0A"\
+"Trading:  ${pause_status}%0A%0A"\
 "⏱ Uptime: ${uptime_str}%0A"\
 "🔗 Webhook: ${NGROK_URL}/api/webhook"
 }
@@ -346,9 +366,33 @@ handle_telegram_command() {
       log INFO "Telegram command: /trades from $chat_id"
       send_trades_snapshot
       ;;
+    /pause)
+      log INFO "Telegram command: /pause from $chat_id"
+      local pause_result
+      pause_result=$(curl -s -X PATCH http://localhost:8000/api/settings \
+        -H "Content-Type: application/json" \
+        -d '{"trading_paused": true}' 2>/dev/null || echo "")
+      if [ -n "$pause_result" ]; then
+        send_telegram "⏸ <b>Trading PAUSED</b>%0A%0AAll incoming webhook signals will be blocked until you /unpause"
+      else
+        send_telegram "⚠️ Failed to pause — backend may be down"
+      fi
+      ;;
+    /unpause)
+      log INFO "Telegram command: /unpause from $chat_id"
+      local unpause_result
+      unpause_result=$(curl -s -X PATCH http://localhost:8000/api/settings \
+        -H "Content-Type: application/json" \
+        -d '{"trading_paused": false}' 2>/dev/null || echo "")
+      if [ -n "$unpause_result" ]; then
+        send_telegram "▶️ <b>Trading RESUMED</b>%0A%0AWebhook signals will be processed normally"
+      else
+        send_telegram "⚠️ Failed to unpause — backend may be down"
+      fi
+      ;;
     /help)
       log INFO "Telegram command: /help from $chat_id"
-      send_telegram "🤖 <b>HyperTrader Commands</b>%0A%0A/status — Service status & uptime%0A/trades — Open positions & P&L%0A/restart — Restart all services%0A/stop — Stop watchdog & all services%0A/help — Show this message"
+      send_telegram "🤖 <b>HyperTrader Commands</b>%0A%0A/status — Service status & uptime%0A/trades — Open positions & P&L%0A/pause — Pause all trading (block webhooks)%0A/unpause — Resume trading%0A/restart — Restart all services%0A/stop — Stop watchdog & all services%0A/help — Show this message"
       ;;
     *)
       # Ignore unknown commands silently
