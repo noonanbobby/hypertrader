@@ -53,10 +53,52 @@ class RiskManager:
 
         return True, "OK"
 
+    async def check_trade_live(
+        self,
+        db: AsyncSession,
+        symbol: str,
+        quantity: float,
+        price: float,
+        account_balance: float,
+    ) -> tuple[bool, str]:
+        """Run pre-trade risk checks for live mode (no strategy). Returns (allowed, reason)."""
+        from app.config import settings
+
+        # 1. Position size check: notional vs account_balance * default_max_position_pct
+        notional = quantity * price
+        max_notional = account_balance * (settings.default_max_position_pct / 100)
+        if notional > max_notional * 1.005:
+            return False, (
+                f"Position size ${notional:.2f} exceeds "
+                f"{settings.default_max_position_pct}% limit (${max_notional:.2f})"
+            )
+
+        # 2. Daily loss limit check against webhook_logs for today
+        daily_pnl = await self._get_daily_pnl_live(db)
+        if daily_pnl <= -settings.default_daily_loss_limit:
+            return False, (
+                f"Daily loss ${abs(daily_pnl):.2f} exceeds "
+                f"limit ${settings.default_daily_loss_limit:.2f}"
+            )
+
+        return True, "OK"
+
     async def _get_daily_pnl(self, db: AsyncSession, strategy_id: int) -> float:
         today = dt.datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
         stmt = select(func.coalesce(func.sum(Trade.realized_pnl), 0.0)).where(
             Trade.strategy_id == strategy_id,
+            Trade.status == TradeStatus.closed.value,
+            Trade.exit_time >= today,
+        )
+        result = await db.execute(stmt)
+        return float(result.scalar())
+
+    async def _get_daily_pnl_live(self, db: AsyncSession) -> float:
+        """Get today's realized PNL from webhook_logs for live mode."""
+        today = dt.datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        # For live mode, we check trades table for strategy_name='__live__'
+        stmt = select(func.coalesce(func.sum(Trade.realized_pnl), 0.0)).where(
+            Trade.strategy_id == 0,
             Trade.status == TradeStatus.closed.value,
             Trade.exit_time >= today,
         )

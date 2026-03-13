@@ -7,6 +7,10 @@ import type {
   Analytics,
   AppSettings,
   AppSettingsUpdate,
+  HLPortfolio,
+  HLPosition,
+  HLFill,
+  HLStatus,
 } from "@/types";
 
 async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
@@ -84,6 +88,12 @@ export const testTelegram = () =>
 // Health
 export const getHealth = () =>
   fetchApi<{ status: string; mode: string; version: string }>("/api/health");
+
+// Live (Hyperliquid)
+export const getLivePortfolio = () => fetchApi<HLPortfolio>("/api/live/portfolio");
+export const getLivePositions = () => fetchApi<HLPosition[]>("/api/live/positions");
+export const getLiveFills = () => fetchApi<HLFill[]>("/api/live/fills");
+export const getLiveStatus = () => fetchApi<HLStatus>("/api/live/status");
 
 // SWR fetcher
 export const fetcher = (url: string) =>

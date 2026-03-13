@@ -89,6 +89,43 @@ export interface Analytics {
   avg_trade_duration_hours: number;
 }
 
+// --- Hyperliquid Live ---
+export interface HLPortfolio {
+  account_value: number;
+  total_margin_used: number;
+  total_unrealized_pnl: number;
+  available_balance: number;
+}
+
+export interface HLPosition {
+  symbol: string;
+  side: string;
+  size: number;
+  entry_price: number;
+  mark_price: number;
+  unrealized_pnl: number;
+  leverage: number;
+  liquidation_price: number | null;
+  margin_used: number;
+  notional: number;
+}
+
+export interface HLFill {
+  symbol: string;
+  side: string;
+  size: number;
+  price: number;
+  fee: number;
+  time: number;
+  closed_pnl: number;
+}
+
+export interface HLStatus {
+  configured: boolean;
+  connected: boolean;
+  account_value: number | null;
+}
+
 export interface WSEvent {
   event: string;
   data: Record<string, unknown>;

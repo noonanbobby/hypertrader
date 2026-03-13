@@ -2,7 +2,7 @@
 
 import useSWR from "swr";
 import { fetcher } from "@/lib/api";
-import type { DashboardStats, Strategy, Trade, Position, Analytics, AppSettings, SystemStatus } from "@/types";
+import type { DashboardStats, Strategy, Trade, Position, Analytics, AppSettings, SystemStatus, HLPortfolio, HLPosition, HLFill, HLStatus } from "@/types";
 
 export function useDashboard() {
   return useSWR<DashboardStats>("/api/dashboard", fetcher, {
@@ -47,5 +47,30 @@ export function useSettings() {
   return useSWR<AppSettings>("/api/settings", fetcher, {
     refreshInterval: 0,
     revalidateOnFocus: true,
+  });
+}
+
+// --- Hyperliquid Live ---
+export function useLivePortfolio() {
+  return useSWR<HLPortfolio>("/api/live/portfolio", fetcher, {
+    refreshInterval: 5000,
+  });
+}
+
+export function useLivePositions() {
+  return useSWR<HLPosition[]>("/api/live/positions", fetcher, {
+    refreshInterval: 5000,
+  });
+}
+
+export function useLiveFills() {
+  return useSWR<HLFill[]>("/api/live/fills", fetcher, {
+    refreshInterval: 10000,
+  });
+}
+
+export function useLiveStatus() {
+  return useSWR<HLStatus>("/api/live/status", fetcher, {
+    refreshInterval: 30000,
   });
 }

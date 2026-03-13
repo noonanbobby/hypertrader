@@ -6,7 +6,7 @@ from typing import Optional, Literal
 # --- Webhook ---
 class WebhookPayload(BaseModel):
     secret: str
-    strategy: str
+    strategy: Optional[str] = None  # required for paper, ignored for live
     action: str  # buy, sell, close_long, close_short, close_all
     symbol: str
     quantity: Optional[float] = None
@@ -246,6 +246,43 @@ class SystemStatus(BaseModel):
     websocket: ServiceCheck
     telegram: ServiceCheck
     checked_at: datetime
+
+
+# --- Hyperliquid Live ---
+class HLPortfolio(BaseModel):
+    account_value: float
+    total_margin_used: float
+    total_unrealized_pnl: float
+    available_balance: float
+
+
+class HLPosition(BaseModel):
+    symbol: str
+    side: str
+    size: float
+    entry_price: float
+    mark_price: float
+    unrealized_pnl: float
+    leverage: float
+    liquidation_price: Optional[float] = None
+    margin_used: float
+    notional: float
+
+
+class HLFill(BaseModel):
+    symbol: str
+    side: str
+    size: float
+    price: float
+    fee: float
+    time: int  # epoch ms from HL
+    closed_pnl: float
+
+
+class HLStatus(BaseModel):
+    configured: bool
+    connected: bool
+    account_value: Optional[float] = None
 
 
 class SettingsUpdate(BaseModel):

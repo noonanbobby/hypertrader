@@ -30,7 +30,7 @@ async def receive_webhook(payload: WebhookPayload, db: AsyncSession = Depends(ge
     log = WebhookLog(
         raw_payload=json.dumps(payload.model_dump(), default=str),
         parsed_action=payload.action,
-        strategy_name=payload.strategy,
+        strategy_name=payload.strategy or "__live__",
         symbol=payload.symbol,
     )
 
@@ -50,30 +50,57 @@ async def receive_webhook(payload: WebhookPayload, db: AsyncSession = Depends(ge
         await db.commit()
         return WebhookResponse(success=False, message="Trading is paused")
 
-    # Get trading engine
-    engine = create_engine(settings.trading_mode)
+    # Get trading engine — live mode always uses live engine
+    if settings.trading_mode == "live":
+        engine = create_engine("live")
+    else:
+        engine = create_engine(settings.trading_mode)
 
     action = payload.action.lower()
     symbol = payload.symbol.upper()
 
-    # Acquire per-(strategy, symbol) lock to prevent race conditions
-    # when concurrent webhooks arrive for the same position.
-    lock = _webhook_locks[(payload.strategy, symbol)]
-    async with lock:
-        # Use a fresh session inside the lock to guarantee we see the
-        # latest committed state (no stale objects from before the lock).
-        async with async_session() as sdb:
-            try:
-                result = await _process_webhook(
-                    sdb, engine, payload, action, symbol, log
-                )
-                return result
-            except Exception as e:
-                log.result = str(e)
-                log.success = 0
-                sdb.add(log)
-                await sdb.commit()
-                return WebhookResponse(success=False, message=str(e))
+    # Route to live or paper processing
+    if settings.trading_mode == "live":
+        lock_key = ("__live__", symbol)
+        lock = _webhook_locks[lock_key]
+        async with lock:
+            async with async_session() as sdb:
+                try:
+                    result = await _process_webhook_live(
+                        sdb, engine, payload, action, symbol, log
+                    )
+                    return result
+                except Exception as e:
+                    log.result = str(e)
+                    log.success = 0
+                    sdb.add(log)
+                    await sdb.commit()
+                    return WebhookResponse(success=False, message=str(e))
+    else:
+        # Paper mode — strategy is required
+        if not payload.strategy:
+            log.result = "Strategy name required for paper trading"
+            log.success = 0
+            db.add(log)
+            await db.commit()
+            return WebhookResponse(
+                success=False, message="Strategy name required for paper trading"
+            )
+
+        lock = _webhook_locks[(payload.strategy, symbol)]
+        async with lock:
+            async with async_session() as sdb:
+                try:
+                    result = await _process_webhook(
+                        sdb, engine, payload, action, symbol, log
+                    )
+                    return result
+                except Exception as e:
+                    log.result = str(e)
+                    log.success = 0
+                    sdb.add(log)
+                    await sdb.commit()
+                    return WebhookResponse(success=False, message=str(e))
 
 
 async def _process_webhook(
@@ -264,6 +291,145 @@ async def _process_webhook(
             message=f"Position closed. P&L: ${pnl:.2f}",
             trade_id=trade.id if trade else None,
         )
+
+    else:
+        raise ValueError(f"Unknown action: {action}")
+
+
+async def _process_webhook_live(
+    db: AsyncSession,
+    engine,
+    payload: WebhookPayload,
+    action: str,
+    symbol: str,
+    log: WebhookLog,
+) -> WebhookResponse:
+    """Process webhook in live mode — no strategy, HL is source of truth."""
+    leverage = int(round(settings.leverage))
+
+    if action in ("buy", "sell"):
+        # Get current price
+        price = await engine.get_current_price(symbol)
+        if not price:
+            raise ValueError(f"Cannot get price for {symbol}")
+
+        # Resolve szDecimals for quantity rounding
+        coin = market_data.normalize_coin(symbol)
+        sz_decimals = await market_data.get_sz_decimals(coin)
+
+        # Get account balance for sizing
+        account_balance = await engine.get_balance()
+        if account_balance <= 0:
+            raise ValueError("Account balance is zero or unavailable")
+
+        # Calculate quantity from account balance
+        size_pct = payload.size_pct or settings.default_size_pct
+        quantity = payload.quantity or 0.0
+        if quantity <= 0:
+            if settings.use_max_size and not payload.size_pct:
+                notional = account_balance * (settings.default_max_position_pct / 100)
+            else:
+                margin = account_balance * (size_pct / 100)
+                notional = margin * leverage
+            quantity = notional / price
+
+        quantity = round(quantity, sz_decimals)
+        if quantity <= 0:
+            raise ValueError("Calculated quantity is zero after rounding to szDecimals")
+
+        if quantity * price < 10.0:
+            raise ValueError(
+                f"Order notional ${quantity * price:.2f} below Hyperliquid minimum of $10"
+            )
+
+        # Risk check
+        allowed, reason = await risk_manager.check_trade_live(
+            db, symbol, quantity, price, account_balance
+        )
+        if not allowed:
+            asyncio.create_task(notifier.notify_risk_breach(
+                strategy_name="Live", symbol=symbol, reason=reason,
+            ))
+            raise ValueError(f"Risk check failed: {reason}")
+
+        # Execute order
+        result = await engine.execute_order_with_fallback(symbol, action, quantity)
+        if not result.success:
+            raise ValueError(result.message)
+
+        # Fire Telegram notification
+        side = "long" if action == "buy" else "short"
+        asyncio.create_task(notifier.notify_trade_open(
+            symbol=symbol, side=side, quantity=result.quantity,
+            price=result.filled_price, strategy_name="Live",
+            fill_type=result.fill_type, leverage=leverage,
+        ))
+
+        log.result = result.message
+        log.success = 1
+        db.add(log)
+        await db.commit()
+        return WebhookResponse(success=True, message=result.message)
+
+    elif action in ("close_long", "close_short", "close_all"):
+        # For live mode, we need to check HL positions directly
+        from app.services.hl_account import hl_account
+        hl_positions = await hl_account.get_open_positions()
+
+        if action == "close_all":
+            if not hl_positions:
+                log.result = "No positions to close"
+                log.success = 0
+                db.add(log)
+                await db.commit()
+                return WebhookResponse(success=False, message="No positions to close")
+
+            results = []
+            for pos in hl_positions:
+                close_side = "sell" if pos["side"] == "long" else "buy"
+                r = await engine.execute_order_with_fallback(
+                    pos["symbol"], close_side, pos["size"]
+                )
+                results.append(f"{pos['symbol']}: {'OK' if r.success else r.message}")
+
+            msg = f"Closed all: {', '.join(results)}"
+            log.result = msg
+            log.success = 1
+            db.add(log)
+            await db.commit()
+            return WebhookResponse(success=True, message=msg)
+
+        # Close specific symbol
+        coin = market_data.normalize_coin(symbol)
+        matching = [p for p in hl_positions if p["symbol"] == coin]
+        if not matching:
+            log.result = f"No open position for {symbol}"
+            log.success = 0
+            db.add(log)
+            await db.commit()
+            return WebhookResponse(success=False, message=f"No open position for {symbol}")
+
+        pos = matching[0]
+        close_side = "sell" if pos["side"] == "long" else "buy"
+        result = await engine.execute_order_with_fallback(
+            symbol, close_side, pos["size"]
+        )
+        if not result.success:
+            raise ValueError(result.message)
+
+        asyncio.create_task(notifier.notify_trade_close(
+            symbol=symbol, side=pos["side"],
+            quantity=pos["size"], entry_price=pos["entry_price"],
+            exit_price=result.filled_price,
+            pnl=pos["unrealized_pnl"],
+            strategy_name="Live", leverage=leverage,
+        ))
+
+        log.result = result.message
+        log.success = 1
+        db.add(log)
+        await db.commit()
+        return WebhookResponse(success=True, message=result.message)
 
     else:
         raise ValueError(f"Unknown action: {action}")

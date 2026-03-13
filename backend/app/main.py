@@ -10,7 +10,7 @@ from app.database import init_db, async_session
 from app.models import AppSettings
 from app.websocket_manager import ws_manager
 from app.services.pnl_broadcaster import pnl_broadcast_loop
-from app.routers import webhook, strategies, trades, positions, dashboard, analytics, settings as settings_router, status
+from app.routers import webhook, strategies, trades, positions, dashboard, analytics, settings as settings_router, status, live
 
 import datetime as dt
 
@@ -69,6 +69,7 @@ app.include_router(dashboard.router, prefix="/api", tags=["dashboard"])
 app.include_router(analytics.router, prefix="/api", tags=["analytics"])
 app.include_router(settings_router.router, prefix="/api", tags=["settings"])
 app.include_router(status.router, prefix="/api", tags=["status"])
+app.include_router(live.router, prefix="/api", tags=["live"])
 
 
 @app.get("/api/health")
