@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,6 +9,7 @@ from app.version import __version__
 from app.database import init_db, async_session
 from app.models import AppSettings
 from app.websocket_manager import ws_manager
+from app.services.pnl_broadcaster import pnl_broadcast_loop
 from app.routers import webhook, strategies, trades, positions, dashboard, analytics, settings as settings_router, status
 
 import datetime as dt
@@ -34,7 +36,13 @@ async def seed_settings():
 async def lifespan(app: FastAPI):
     await init_db()
     await seed_settings()
+    pnl_task = asyncio.create_task(pnl_broadcast_loop())
     yield
+    pnl_task.cancel()
+    try:
+        await pnl_task
+    except asyncio.CancelledError:
+        pass
 
 
 app = FastAPI(

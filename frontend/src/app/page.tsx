@@ -1,6 +1,7 @@
 "use client";
 
 import { useDashboard, usePositions, useTrades, useStrategies } from "@/hooks/use-api";
+import { useWebSocket } from "@/hooks/use-websocket";
 import { PortfolioValue } from "@/components/dashboard/portfolio-value";
 import { PnlCards } from "@/components/dashboard/pnl-cards";
 import { PositionsTable } from "@/components/dashboard/positions-table";
@@ -52,6 +53,7 @@ export default function DashboardPage() {
   const { data: positions } = usePositions();
   const { data: trades } = useTrades();
   const { data: strategies } = useStrategies();
+  const { subscribe } = useWebSocket();
 
   return (
     <div className="relative z-10 space-y-6">
@@ -103,7 +105,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Positions */}
-      <PositionsTable positions={positions ?? []} />
+      <PositionsTable positions={positions ?? []} subscribe={subscribe} />
 
       {/* Bottom Grid */}
       <div className="grid grid-cols-2 gap-6">

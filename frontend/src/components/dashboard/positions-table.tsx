@@ -1,15 +1,60 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency, formatPrice, formatPercent } from "@/lib/utils";
 import type { Position } from "@/types";
 import { Crosshair } from "lucide-react";
 
-interface PositionsTableProps {
-  positions: Position[];
+type SubscribeFn = (event: string, handler: (data: Record<string, unknown>) => void) => () => void;
+
+interface PnlOverlay {
+  current_price: number;
+  unrealized_pnl: number;
+  pnl_pct: number;
+  notional_value: number;
 }
 
-export function PositionsTable({ positions }: PositionsTableProps) {
+interface PositionsTableProps {
+  positions: Position[];
+  subscribe?: SubscribeFn;
+}
+
+export function PositionsTable({ positions, subscribe }: PositionsTableProps) {
+  const [overlay, setOverlay] = useState<Map<number, PnlOverlay>>(new Map());
+  const prevPositionsRef = useRef(positions);
+
+  // Clear overlay when SWR delivers fresh positions (SWR remains source of truth)
+  useEffect(() => {
+    if (positions !== prevPositionsRef.current) {
+      prevPositionsRef.current = positions;
+      setOverlay(new Map());
+    }
+  }, [positions]);
+
+  // Subscribe to real-time P&L updates
+  useEffect(() => {
+    if (!subscribe) return;
+
+    return subscribe("pnl_update", (data) => {
+      const updates = data as unknown as (PnlOverlay & { id: number })[];
+      if (!Array.isArray(updates)) return;
+
+      setOverlay((prev) => {
+        const next = new Map(prev);
+        for (const u of updates) {
+          next.set(u.id, {
+            current_price: u.current_price,
+            unrealized_pnl: u.unrealized_pnl,
+            pnl_pct: u.pnl_pct,
+            notional_value: u.notional_value,
+          });
+        }
+        return next;
+      });
+    });
+  }, [subscribe]);
+
   if (positions.length === 0) {
     return (
       <Card>
@@ -29,6 +74,19 @@ export function PositionsTable({ positions }: PositionsTableProps) {
       </Card>
     );
   }
+
+  // Merge WS overlay into positions for rendering
+  const merged = positions.map((pos) => {
+    const o = overlay.get(pos.id);
+    if (!o) return pos;
+    return {
+      ...pos,
+      current_price: o.current_price,
+      unrealized_pnl: o.unrealized_pnl,
+      pnl_pct: o.pnl_pct,
+      notional_value: o.notional_value,
+    };
+  });
 
   return (
     <Card>
@@ -58,7 +116,7 @@ export function PositionsTable({ positions }: PositionsTableProps) {
             </tr>
           </thead>
           <tbody>
-            {positions.map((pos) => {
+            {merged.map((pos) => {
               const positive = pos.unrealized_pnl >= 0;
               return (
                 <tr
@@ -89,13 +147,13 @@ export function PositionsTable({ positions }: PositionsTableProps) {
                   <td className="px-3 py-4 text-right font-mono text-white/50">
                     {formatPrice(pos.entry_price)}
                   </td>
-                  <td className="px-3 py-4 text-right font-mono text-white">
+                  <td className="px-3 py-4 text-right font-mono text-white transition-all duration-300">
                     {formatPrice(pos.current_price)}
                   </td>
                   <td className="px-3 py-4 text-right font-mono text-white/50">
                     {formatCurrency(pos.margin_used)}
                   </td>
-                  <td className="px-3 py-4 text-right">
+                  <td className="px-3 py-4 text-right transition-all duration-300">
                     <span className={`font-bold ${positive ? "text-emerald-400" : "text-red-400"}`}>
                       {formatCurrency(pos.unrealized_pnl)}
                     </span>
@@ -104,7 +162,7 @@ export function PositionsTable({ positions }: PositionsTableProps) {
                       {formatPercent(pos.pnl_pct)}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-right font-mono text-white/30">
+                  <td className="px-6 py-4 text-right font-mono text-white/30 transition-all duration-300">
                     {formatCurrency(pos.notional_value)}
                   </td>
                 </tr>
