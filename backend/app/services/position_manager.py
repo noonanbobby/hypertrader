@@ -184,6 +184,9 @@ class PositionManager:
         result = await db.execute(stmt)
         positions = result.scalars().all()
 
+        from app.config import settings as app_settings
+        leverage = app_settings.leverage
+
         updates = []
         for pos in positions:
             price = await market_data.get_mid_price(pos.symbol)
@@ -194,12 +197,16 @@ class PositionManager:
                 else:
                     pos.unrealized_pnl = round((pos.entry_price - price) * pos.quantity, 6)
                 pos.updated_at = dt.datetime.utcnow()
+
+                margin = pos.entry_price * pos.quantity / leverage
+                pnl_pct = round((pos.unrealized_pnl / margin * 100) if margin > 0 else 0.0, 2)
+
                 updates.append({
-                    "symbol": pos.symbol,
-                    "side": pos.side,
-                    "unrealized_pnl": pos.unrealized_pnl,
-                    "current_price": price,
-                    "strategy_id": pos.strategy_id,
+                    "id": pos.id,
+                    "current_price": round(price, 6),
+                    "unrealized_pnl": round(pos.unrealized_pnl, 4),
+                    "pnl_pct": pnl_pct,
+                    "notional_value": round(price * pos.quantity, 2),
                 })
 
         await db.commit()
