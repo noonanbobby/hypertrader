@@ -46,7 +46,7 @@ export default function SettingsPage() {
   const [liveConfirmOpen, setLiveConfirmOpen] = useState(false);
   const [editingSecrets, setEditingSecrets] = useState<Record<string, boolean>>({});
 
-  const webhookUrl = `${API_BASE_URL}/api/webhook`;
+  const [webhookUrl, setWebhookUrl] = useState(`${API_BASE_URL}/api/webhook`);
   const isDirty = Object.keys(form).length > 0;
   const frontendVersion = process.env.NEXT_PUBLIC_APP_VERSION ?? "—";
 
@@ -767,14 +767,19 @@ export default function SettingsPage() {
             </label>
             <div className="flex gap-2">
               <Input
+                type="text"
                 value={webhookUrl}
-                readOnly
+                onChange={(e) => setWebhookUrl(e.target.value)}
+                placeholder="https://your-ngrok-url.ngrok-free.app/api/webhook"
                 className="font-mono text-xs"
               />
               <Button variant="outline" size="sm" onClick={copyWebhookUrl}>
                 <Copy className="h-3.5 w-3.5" />
               </Button>
             </div>
+            <p className="text-[10px] text-white/20 mt-1">
+              Paste your ngrok public URL here (e.g. https://abc123.ngrok-free.app/api/webhook)
+            </p>
           </div>
 
           <div>
