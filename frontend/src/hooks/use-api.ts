@@ -51,20 +51,20 @@ export function useSettings() {
 }
 
 // --- Hyperliquid Live ---
-export function useLivePortfolio() {
-  return useSWR<HLPortfolio>("/api/live/portfolio", fetcher, {
+export function useLivePortfolio(enabled = true) {
+  return useSWR<HLPortfolio>(enabled ? "/api/live/portfolio" : null, fetcher, {
     refreshInterval: 5000,
   });
 }
 
-export function useLivePositions() {
-  return useSWR<HLPosition[]>("/api/live/positions", fetcher, {
+export function useLivePositions(enabled = true) {
+  return useSWR<HLPosition[]>(enabled ? "/api/live/positions" : null, fetcher, {
     refreshInterval: 5000,
   });
 }
 
-export function useLiveFills() {
-  return useSWR<HLFill[]>("/api/live/fills", fetcher, {
+export function useLiveFills(enabled = true) {
+  return useSWR<HLFill[]>(enabled ? "/api/live/fills" : null, fetcher, {
     refreshInterval: 10000,
   });
 }

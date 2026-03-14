@@ -53,13 +53,20 @@ class HLAccountService:
         return await asyncio.to_thread(info.user_state, address)
 
     async def get_portfolio(self) -> dict:
-        """Get portfolio summary from marginSummary."""
+        """Get portfolio summary from marginSummary + positions."""
         state = await self.get_account_state()
         margin = state.get("marginSummary", {})
+
+        # Sum unrealized PNL from individual positions
+        total_unrealized = 0.0
+        for item in state.get("assetPositions", []):
+            pos = item.get("position", {})
+            total_unrealized += float(pos.get("unrealizedPnl", 0))
+
         return {
             "account_value": float(margin.get("accountValue", 0)),
             "total_margin_used": float(margin.get("totalMarginUsed", 0)),
-            "total_unrealized_pnl": float(margin.get("totalNtlPos", 0)) - float(margin.get("accountValue", 0)) + float(margin.get("totalMarginUsed", 0)),
+            "total_unrealized_pnl": total_unrealized,
             "available_balance": float(margin.get("accountValue", 0)) - float(margin.get("totalMarginUsed", 0)),
         }
 

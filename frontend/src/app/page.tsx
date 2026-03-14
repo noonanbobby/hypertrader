@@ -266,12 +266,12 @@ function HLFillsTable({ fills }: { fills: { symbol: string; side: string; size: 
 
 export default function DashboardPage() {
   const { data: status, isLoading: statusLoading } = useLiveStatus();
-  const { data: portfolio } = useLivePortfolio();
-  const { data: positions } = useLivePositions();
-  const { data: fills } = useLiveFills();
-
   const isConfigured = status?.configured ?? false;
   const isConnected = status?.connected ?? false;
+
+  const { data: portfolio } = useLivePortfolio(isConnected);
+  const { data: positions } = useLivePositions(isConnected);
+  const { data: fills } = useLiveFills(isConnected);
 
   return (
     <div className="relative z-10 space-y-6">
@@ -311,7 +311,7 @@ export default function DashboardPage() {
               color="bg-amber-500/10 text-amber-400"
             />
             <StatCard
-              icon={portfolio?.total_unrealized_pnl ?? 0 >= 0 ? TrendingUp : TrendingDown}
+              icon={(portfolio?.total_unrealized_pnl ?? 0) >= 0 ? TrendingUp : TrendingDown}
               label="Unrealized PNL"
               value={formatCurrency(portfolio?.total_unrealized_pnl ?? 0)}
               color={(portfolio?.total_unrealized_pnl ?? 0) >= 0 ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"}
