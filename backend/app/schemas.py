@@ -256,6 +256,8 @@ class HLPortfolio(BaseModel):
     total_margin_used: float
     total_unrealized_pnl: float
     available_balance: float
+    perps_balance: float = 0.0
+    spot_balance: float = 0.0
 
 
 class HLPosition(BaseModel):

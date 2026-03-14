@@ -53,7 +53,7 @@ class HLAccountService:
         return await asyncio.to_thread(info.user_state, address)
 
     async def get_portfolio(self) -> dict:
-        """Get portfolio summary from marginSummary + positions."""
+        """Get portfolio summary from marginSummary + spot balances."""
         state = await self.get_account_state()
         margin = state.get("marginSummary", {})
 
@@ -63,12 +63,34 @@ class HLAccountService:
             pos = item.get("position", {})
             total_unrealized += float(pos.get("unrealizedPnl", 0))
 
+        perps_value = float(margin.get("accountValue", 0))
+
+        # Also fetch spot USDC balance
+        spot_balance = await self._get_spot_usdc()
+
+        total_value = perps_value + spot_balance
+
         return {
-            "account_value": float(margin.get("accountValue", 0)),
+            "account_value": total_value,
             "total_margin_used": float(margin.get("totalMarginUsed", 0)),
             "total_unrealized_pnl": total_unrealized,
-            "available_balance": float(margin.get("accountValue", 0)) - float(margin.get("totalMarginUsed", 0)),
+            "available_balance": total_value - float(margin.get("totalMarginUsed", 0)),
+            "perps_balance": perps_value,
+            "spot_balance": spot_balance,
         }
+
+    async def _get_spot_usdc(self) -> float:
+        """Get USDC balance from spot wallet."""
+        try:
+            info = self._get_info()
+            address = settings.hl_api_key
+            spot = await asyncio.to_thread(info.spot_user_state, address)
+            for bal in spot.get("balances", []):
+                if bal.get("coin") == "USDC":
+                    return float(bal.get("total", 0))
+        except Exception as e:
+            logger.warning("Failed to get spot balance: %s", e)
+        return 0.0
 
     async def get_open_positions(self) -> list[dict]:
         """Parse assetPositions from user_state."""

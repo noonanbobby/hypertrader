@@ -13,6 +13,8 @@ import {
   ArrowLeftRight,
   AlertTriangle,
   Settings,
+  Landmark,
+  CircleDollarSign,
 } from "lucide-react";
 import { formatCurrency, formatPrice } from "@/lib/utils";
 import Link from "next/link";
@@ -291,16 +293,30 @@ export default function DashboardPage() {
       {isConfigured && isConnected && (
         <>
           {/* Portfolio Stats */}
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <StatCard
               icon={Wallet}
-              label="Account Value"
+              label="Total Value"
               value={formatCurrency(portfolio?.account_value ?? 0)}
               color="bg-blue-500/10 text-blue-400"
             />
             <StatCard
+              icon={Landmark}
+              label="Perps Balance"
+              value={formatCurrency(portfolio?.perps_balance ?? 0)}
+              color="bg-purple-500/10 text-purple-400"
+            />
+            <StatCard
+              icon={CircleDollarSign}
+              label="Spot Balance"
+              value={formatCurrency(portfolio?.spot_balance ?? 0)}
+              color="bg-cyan-500/10 text-cyan-400"
+            />
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            <StatCard
               icon={Shield}
-              label="Available Balance"
+              label="Available"
               value={formatCurrency(portfolio?.available_balance ?? 0)}
               color="bg-emerald-500/10 text-emerald-400"
             />

@@ -95,6 +95,8 @@ export interface HLPortfolio {
   total_margin_used: number;
   total_unrealized_pnl: number;
   available_balance: number;
+  perps_balance: number;
+  spot_balance: number;
 }
 
 export interface HLPosition {
