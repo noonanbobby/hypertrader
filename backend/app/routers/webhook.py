@@ -308,6 +308,8 @@ async def _process_webhook_live(
     leverage = int(round(settings.leverage))
 
     if action in ("buy", "sell"):
+        new_side = "long" if action == "buy" else "short"
+
         # Get current price
         price = await engine.get_current_price(symbol)
         if not price:
@@ -317,7 +319,38 @@ async def _process_webhook_live(
         coin = market_data.normalize_coin(symbol)
         sz_decimals = await market_data.get_sz_decimals(coin)
 
-        # Get account balance for sizing
+        # Check for existing HL position on this symbol
+        from app.services.hl_account import hl_account
+        hl_positions = await hl_account.get_open_positions()
+        existing = next((p for p in hl_positions if p["symbol"] == coin), None)
+
+        # Same-side signal = duplicate → no-op
+        if existing and existing["side"] == new_side:
+            msg = f"Already {existing['side']} {coin} — duplicate signal ignored"
+            log.result = msg
+            log.success = 1
+            db.add(log)
+            await db.commit()
+            return WebhookResponse(success=True, message=msg)
+
+        # Opposite-side signal = close existing position first
+        if existing:
+            close_side = "sell" if existing["side"] == "long" else "buy"
+            close_result = await engine.execute_order_with_fallback(
+                coin, close_side, existing["size"]
+            )
+            if not close_result.success:
+                raise ValueError(f"Close failed: {close_result.message}")
+
+            asyncio.create_task(notifier.notify_trade_close(
+                symbol=coin, side=existing["side"],
+                quantity=existing["size"], entry_price=existing["entry_price"],
+                exit_price=close_result.filled_price,
+                pnl=existing["unrealized_pnl"],
+                strategy_name="Live", leverage=leverage,
+            ))
+
+        # Get account balance for sizing the new position
         account_balance = await engine.get_balance()
         if account_balance <= 0:
             raise ValueError("Account balance is zero or unavailable")
@@ -352,24 +385,26 @@ async def _process_webhook_live(
             ))
             raise ValueError(f"Risk check failed: {reason}")
 
-        # Execute order
+        # Execute new position
         result = await engine.execute_order_with_fallback(symbol, action, quantity)
         if not result.success:
             raise ValueError(result.message)
 
         # Fire Telegram notification
-        side = "long" if action == "buy" else "short"
         asyncio.create_task(notifier.notify_trade_open(
-            symbol=symbol, side=side, quantity=result.quantity,
+            symbol=symbol, side=new_side, quantity=result.quantity,
             price=result.filled_price, strategy_name="Live",
             fill_type=result.fill_type, leverage=leverage,
         ))
 
-        log.result = result.message
+        msg = result.message
+        if existing:
+            msg = f"Flipped {existing['side']}→{new_side} {coin} | {msg}"
+        log.result = msg
         log.success = 1
         db.add(log)
         await db.commit()
-        return WebhookResponse(success=True, message=result.message)
+        return WebhookResponse(success=True, message=msg)
 
     elif action in ("close_long", "close_short", "close_all"):
         # For live mode, we need to check HL positions directly

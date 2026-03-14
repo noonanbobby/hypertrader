@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { useLiveStatus, useLivePortfolio, useLivePositions, useLiveFills } from "@/hooks/use-api";
+import { closeLivePosition } from "@/lib/api";
 import { MarketTicker } from "@/components/dashboard/market-ticker";
 import { ServiceStatus } from "@/components/dashboard/service-status";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +17,7 @@ import {
   Settings,
   Landmark,
   CircleDollarSign,
+  X,
 } from "lucide-react";
 import { formatCurrency, formatPrice } from "@/lib/utils";
 import Link from "next/link";
@@ -89,7 +92,26 @@ function ConnectionError() {
   );
 }
 
-function HLPositionsTable({ positions }: { positions: { symbol: string; side: string; size: number; entry_price: number; mark_price: number; unrealized_pnl: number; leverage: number; liquidation_price: number | null; margin_used: number; notional: number }[] }) {
+function HLPositionsTable({ positions, onClose }: { positions: { symbol: string; side: string; size: number; entry_price: number; mark_price: number; unrealized_pnl: number; leverage: number; liquidation_price: number | null; margin_used: number; notional: number }[]; onClose: (symbol: string) => void }) {
+  const [closingSymbol, setClosingSymbol] = useState<string | null>(null);
+
+  const handleClose = async (symbol: string) => {
+    if (closingSymbol) return;
+    if (!confirm(`Close ${symbol} position?`)) return;
+    setClosingSymbol(symbol);
+    try {
+      const res = await closeLivePosition(symbol);
+      if (!res.success) {
+        alert(res.message);
+      }
+      onClose(symbol);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to close position");
+    } finally {
+      setClosingSymbol(null);
+    }
+  };
+
   if (positions.length === 0) {
     return (
       <Card>
@@ -132,14 +154,17 @@ function HLPositionsTable({ positions }: { positions: { symbol: string; side: st
               <th className="text-right px-3 py-3 text-[10px] font-semibold uppercase tracking-wider text-white/30">Entry</th>
               <th className="text-right px-3 py-3 text-[10px] font-semibold uppercase tracking-wider text-white/30">Mark</th>
               <th className="text-right px-3 py-3 text-[10px] font-semibold uppercase tracking-wider text-white/30">Unreal. P&L</th>
+              <th className="text-right px-3 py-3 text-[10px] font-semibold uppercase tracking-wider text-white/30">P&L %</th>
               <th className="text-right px-3 py-3 text-[10px] font-semibold uppercase tracking-wider text-white/30">Margin</th>
               <th className="text-right px-3 py-3 text-[10px] font-semibold uppercase tracking-wider text-white/30">Liq Price</th>
-              <th className="text-right px-6 py-3 text-[10px] font-semibold uppercase tracking-wider text-white/30">Notional</th>
+              <th className="text-right px-3 py-3 text-[10px] font-semibold uppercase tracking-wider text-white/30">Notional</th>
+              <th className="text-right px-6 py-3 text-[10px] font-semibold uppercase tracking-wider text-white/30"></th>
             </tr>
           </thead>
           <tbody>
             {positions.map((pos, i) => {
               const positive = pos.unrealized_pnl >= 0;
+              const pnlPct = pos.margin_used > 0 ? (pos.unrealized_pnl / pos.margin_used) * 100 : 0;
               return (
                 <tr key={`${pos.symbol}-${i}`} className="border-b border-white/[0.03] table-row-hover">
                   <td className="px-6 py-4">
@@ -168,11 +193,30 @@ function HLPositionsTable({ positions }: { positions: { symbol: string; side: st
                       {formatCurrency(pos.unrealized_pnl)}
                     </span>
                   </td>
+                  <td className="px-3 py-4 text-right">
+                    <span className={`font-bold text-xs ${positive ? "text-emerald-400" : "text-red-400"}`}>
+                      {positive ? "+" : ""}{pnlPct.toFixed(2)}%
+                    </span>
+                  </td>
                   <td className="px-3 py-4 text-right font-mono text-white/50">{formatCurrency(pos.margin_used)}</td>
                   <td className="px-3 py-4 text-right font-mono text-white/30">
                     {pos.liquidation_price ? formatPrice(pos.liquidation_price) : "—"}
                   </td>
-                  <td className="px-6 py-4 text-right font-mono text-white/30">{formatCurrency(pos.notional)}</td>
+                  <td className="px-3 py-4 text-right font-mono text-white/30">{formatCurrency(pos.notional)}</td>
+                  <td className="px-6 py-4 text-right">
+                    <button
+                      onClick={() => handleClose(pos.symbol)}
+                      disabled={closingSymbol === pos.symbol}
+                      className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wider bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-colors disabled:opacity-50"
+                    >
+                      {closingSymbol === pos.symbol ? (
+                        <div className="h-2.5 w-2.5 border-2 border-red-400/30 border-t-red-400 rounded-full animate-spin" />
+                      ) : (
+                        <X className="h-2.5 w-2.5" />
+                      )}
+                      Close
+                    </button>
+                  </td>
                 </tr>
               );
             })}
@@ -271,9 +315,15 @@ export default function DashboardPage() {
   const isConfigured = status?.configured ?? false;
   const isConnected = status?.connected ?? false;
 
-  const { data: portfolio } = useLivePortfolio(isConnected);
-  const { data: positions } = useLivePositions(isConnected);
-  const { data: fills } = useLiveFills(isConnected);
+  const { data: portfolio, mutate: mutatePortfolio } = useLivePortfolio(isConnected);
+  const { data: positions, mutate: mutatePositions } = useLivePositions(isConnected);
+  const { data: fills, mutate: mutateFills } = useLiveFills(isConnected);
+
+  const handlePositionClosed = () => {
+    mutatePortfolio();
+    mutatePositions();
+    mutateFills();
+  };
 
   return (
     <div className="relative z-10 space-y-6">
@@ -336,7 +386,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Positions */}
-          <HLPositionsTable positions={positions ?? []} />
+          <HLPositionsTable positions={positions ?? []} onClose={handlePositionClosed} />
 
           {/* Recent Fills */}
           <HLFillsTable fills={fills ?? []} />

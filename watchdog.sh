@@ -219,74 +219,53 @@ def send(text):
     try: urllib.request.urlopen(req, timeout=10)
     except: pass
 
-# Fetch all data
-dash = fetch('/dashboard')
-if dash is None:
-    send('📋 <b>HyperTrader Snapshot</b>\n\n⚠️ Backend unavailable')
+now = datetime.now(timezone.utc)
+
+portfolio = fetch('/live/portfolio')
+positions = fetch('/live/positions') or []
+fills = fetch('/live/fills') or []
+
+if portfolio is None:
+    send('📋 <b>HyperTrader Live</b>\n\n⚠️ Cannot reach Hyperliquid')
     exit()
 
-now = datetime.now(timezone.utc)
-start_24h = (now - timedelta(hours=24)).strftime('%Y-%m-%dT%H:%M:%S')
-closed = fetch(f'/trades?status=closed&start_date={start_24h}&limit=1000') or []
-positions = fetch('/positions') or []
-analytics = fetch('/analytics')
-
-lines = ['📋 <b>HyperTrader 24h Snapshot</b>']
+lines = ['📋 <b>HyperTrader Live Snapshot</b>']
 lines.append(f'🕐 {now.strftime(\"%b %d, %H:%M\")} UTC')
 lines.append('')
 
-# ── Wallet Overview ──
-mode = dash.get('trading_mode', 'paper').upper()
-equity = dash.get('total_equity', 0)
-total_pnl = dash.get('total_pnl', 0)
-daily_pnl = dash.get('daily_pnl', 0)
-weekly_pnl = dash.get('weekly_pnl', 0)
+# ── Portfolio ──
+acct = portfolio.get('account_value', 0)
+perps = portfolio.get('perps_balance', 0)
+spot = portfolio.get('spot_balance', 0)
+available = portfolio.get('available_balance', 0)
+margin_used = portfolio.get('total_margin_used', 0)
+total_upnl = portfolio.get('total_unrealized_pnl', 0)
 
-lines.append(f'💼 <b>Wallet</b> ({mode})')
-lines.append(f'   Equity: \${equity:,.2f}')
-lines.append(f'   Total P&L: {fmt(total_pnl)}')
-lines.append(f'   24h P&L: {fmt(daily_pnl)}')
-lines.append(f'   7d P&L: {fmt(weekly_pnl)}')
+lines.append(f'💼 <b>Portfolio</b> (LIVE)')
+lines.append(f'   Total Value: \${acct:,.2f}')
+lines.append(f'   Perps: \${perps:,.2f} | Spot: \${spot:,.2f}')
+lines.append(f'   Available: \${available:,.2f}')
+lines.append(f'   Margin Used: \${margin_used:,.2f}')
+upnl_emoji = '🟢' if total_upnl >= 0 else '🔴'
+lines.append(f'   {upnl_emoji} Unrealized: {fmt(total_upnl)}')
 lines.append('')
 
-# ── 24h Trading Activity ──
-wins_24h = sum(1 for t in closed if t.get('realized_pnl', 0) > 0)
-losses_24h = len(closed) - wins_24h
-realized_24h = sum(t.get('realized_pnl', 0) for t in closed)
-fees_24h = sum(t.get('fees', 0) for t in closed)
-wr_24h = (wins_24h / len(closed) * 100) if closed else 0
-
-lines.append(f'📊 <b>24h Activity</b>')
-lines.append(f'   Trades: {len(closed)} ({wins_24h}W / {losses_24h}L)')
-if closed:
-    lines.append(f'   Win Rate: {wr_24h:.1f}%')
-    lines.append(f'   Realized: {fmt(realized_24h)}')
-    lines.append(f'   Fees: \${fees_24h:,.2f}')
-    best = max(closed, key=lambda t: t.get('realized_pnl', 0))
-    worst = min(closed, key=lambda t: t.get('realized_pnl', 0))
-    lines.append(f'   Best: {best[\"symbol\"]} {fmt(best[\"realized_pnl\"])}')
-    lines.append(f'   Worst: {worst[\"symbol\"]} {fmt(worst[\"realized_pnl\"])}')
-lines.append('')
-
-# ── Performance Metrics ──
-if analytics:
-    pf = analytics.get('profit_factor', 0)
-    md = analytics.get('max_drawdown', 0)
-    sr = analytics.get('sharpe_ratio', 0)
-    aw = analytics.get('avg_win', 0)
-    al = analytics.get('avg_loss', 0)
-    wr = analytics.get('win_rate', 0)
-    lines.append(f'📈 <b>Performance</b>')
-    lines.append(f'   Win Rate: {wr:.1f}% | PF: {pf:.2f}')
-    lines.append(f'   Avg Win: {fmt(aw)} | Avg Loss: {fmt(al)}')
-    lines.append(f'   Max DD: {md:.2f}% | Sharpe: {sr:.2f}')
+# ── Recent Fills (last 24h) ──
+cutoff = int((now - timedelta(hours=24)).timestamp() * 1000)
+recent = [f for f in fills if f.get('time', 0) >= cutoff]
+if recent:
+    total_closed = sum(f.get('closed_pnl', 0) for f in recent)
+    total_fees = sum(f.get('fee', 0) for f in recent)
+    lines.append(f'📊 <b>24h Fills</b> ({len(recent)})')
+    lines.append(f'   Closed P&L: {fmt(total_closed)}')
+    lines.append(f'   Fees: \${total_fees:,.2f}')
+    lines.append('')
+else:
+    lines.append(f'📊 <b>24h Fills</b>: None')
     lines.append('')
 
 # ── Open Positions ──
 if positions:
-    total_unrealized = sum(p.get('unrealized_pnl', 0) for p in positions)
-    total_notional = sum(p.get('notional_value', 0) for p in positions)
-
     lines.append(f'🔓 <b>Open Positions</b> ({len(positions)})')
     lines.append('')
 
@@ -294,29 +273,27 @@ if positions:
         symbol = p.get('symbol', '?')
         side = p.get('side', '?').upper()
         entry = p.get('entry_price', 0)
-        current = p.get('current_price', 0)
-        qty = p.get('quantity', 0)
+        mark = p.get('mark_price', 0)
+        size = p.get('size', 0)
         pnl = p.get('unrealized_pnl', 0)
-        pnl_pct = p.get('pnl_pct', 0)
-        notional = p.get('notional_value', 0)
         margin = p.get('margin_used', 0)
         leverage = p.get('leverage', 1)
-        strategy = p.get('strategy_name', '')
+        notional = p.get('notional', 0)
+        pnl_pct = (pnl / margin * 100) if margin > 0 else 0
 
         emoji = '🟢' if pnl >= 0 else '🔴'
         side_emoji = '📈' if side == 'LONG' else '📉'
 
-        lines.append(f'{side_emoji} <b>{symbol}</b> {side} {leverage}x')
-        lines.append(f'   Entry: \${entry:,.2f} → Now: \${current:,.2f}')
-        lines.append(f'   Qty: {qty:.4f} | Margin: \${margin:,.2f}')
+        lines.append(f'{side_emoji} <b>{symbol}</b> {side} {leverage:.0f}x')
+        lines.append(f'   Entry: \${entry:,.2f} → Mark: \${mark:,.2f}')
+        lines.append(f'   Size: {size} | Margin: \${margin:,.2f}')
         lines.append(f'   {emoji} P&L: {fmt(pnl)} ({sign(pnl_pct)}{pnl_pct:.2f}%)')
-        if strategy:
-            lines.append(f'   Strategy: {strategy}')
         lines.append('')
 
-    u_emoji = '🟢' if total_unrealized >= 0 else '🔴'
     lines.append(f'━━━━━━━━━━━━━━━━━━━━')
-    lines.append(f'{u_emoji} <b>Unrealized: {fmt(total_unrealized)}</b>')
+    u_emoji = '🟢' if total_upnl >= 0 else '🔴'
+    lines.append(f'{u_emoji} <b>Unrealized: {fmt(total_upnl)}</b>')
+    total_notional = sum(p.get('notional', 0) for p in positions)
     lines.append(f'💰 Notional: \${total_notional:,.2f}')
 else:
     lines.append('🔓 <b>Open Positions</b>: None')
@@ -390,9 +367,58 @@ handle_telegram_command() {
         send_telegram "⚠️ Failed to unpause — backend may be down"
       fi
       ;;
+    /close*)
+      log INFO "Telegram command: $cmd from $chat_id"
+      # Extract symbol argument (e.g. /close BTC or /close all)
+      local close_arg
+      close_arg=$(echo "$cmd" | sed 's|^/close[[:space:]]*||' | tr '[:lower:]' '[:upper:]' | xargs)
+      if [ -z "$close_arg" ]; then
+        send_telegram "⚠️ <b>Usage:</b> /close BTC or /close ALL"
+      elif [ "$close_arg" = "ALL" ]; then
+        log INFO "Closing ALL live positions via Telegram"
+        # Fetch all positions and close each
+        local positions_json
+        positions_json=$(curl -s --max-time 10 http://localhost:8000/api/live/positions 2>/dev/null || echo "[]")
+        local count
+        count=$(echo "$positions_json" | python -c "import sys,json; print(len(json.load(sys.stdin)))" 2>/dev/null || echo "0")
+        if [ "$count" = "0" ]; then
+          send_telegram "ℹ️ No open positions to close"
+        else
+          send_telegram "🔄 Closing $count position(s)..."
+          local close_results=""
+          for symbol in $(echo "$positions_json" | python -c "import sys,json; [print(p['symbol']) for p in json.load(sys.stdin)]" 2>/dev/null); do
+            local result
+            result=$(curl -s --max-time 30 -X POST "http://localhost:8000/api/live/positions/${symbol}/close" 2>/dev/null || echo '{"success":false,"message":"Request failed"}')
+            local success
+            success=$(echo "$result" | python -c "import sys,json; print(json.load(sys.stdin).get('success',False))" 2>/dev/null || echo "False")
+            local msg
+            msg=$(echo "$result" | python -c "import sys,json; print(json.load(sys.stdin).get('message',''))" 2>/dev/null || echo "Unknown error")
+            if [ "$success" = "True" ]; then
+              close_results="${close_results}✅ ${symbol}: ${msg}%0A"
+            else
+              close_results="${close_results}❌ ${symbol}: ${msg}%0A"
+            fi
+          done
+          send_telegram "📊 <b>Close Results</b>%0A%0A${close_results}"
+        fi
+      else
+        log INFO "Closing $close_arg position via Telegram"
+        local result
+        result=$(curl -s --max-time 30 -X POST "http://localhost:8000/api/live/positions/${close_arg}/close" 2>/dev/null || echo '{"success":false,"message":"Request failed"}')
+        local success
+        success=$(echo "$result" | python -c "import sys,json; print(json.load(sys.stdin).get('success',False))" 2>/dev/null || echo "False")
+        local msg
+        msg=$(echo "$result" | python -c "import sys,json; print(json.load(sys.stdin).get('message',''))" 2>/dev/null || echo "Unknown error")
+        if [ "$success" = "True" ]; then
+          send_telegram "✅ <b>Position Closed</b>%0A%0A${msg}"
+        else
+          send_telegram "❌ <b>Close Failed</b>%0A%0A${msg}"
+        fi
+      fi
+      ;;
     /help)
       log INFO "Telegram command: /help from $chat_id"
-      send_telegram "🤖 <b>HyperTrader Commands</b>%0A%0A/status — Service status & uptime%0A/trades — Open positions & P&L%0A/pause — Pause all trading (block webhooks)%0A/unpause — Resume trading%0A/restart — Restart all services%0A/stop — Stop watchdog & all services%0A/help — Show this message"
+      send_telegram "🤖 <b>HyperTrader Commands</b>%0A%0A/status — Service status & uptime%0A/trades — Open positions & P&L%0A/close BTC — Close a specific position%0A/close all — Close all positions%0A/pause — Pause all trading (block webhooks)%0A/unpause — Resume trading%0A/restart — Restart all services%0A/stop — Stop watchdog & all services%0A/help — Show this message"
       ;;
     *)
       # Ignore unknown commands silently
@@ -434,8 +460,10 @@ try:
         uid = u['update_id']
         msg = u.get('message', {})
         chat_id = str(msg.get('chat', {}).get('id', ''))
-        text = msg.get('text', '').strip().split()[0].split('@')[0] if msg.get('text') else ''
-        if chat_id and text.startswith('/'):
+        raw = msg.get('text', '').strip() if msg.get('text') else ''
+        cmd = raw.split()[0].split('@')[0] if raw else ''
+        text = raw if raw else ''
+        if chat_id and cmd.startswith('/'):
             print(f'{uid}|{chat_id}|{text}')
         else:
             print(f'{uid}||')

@@ -219,16 +219,34 @@ class LiveTrader(TradingEngine):
             except Exception as e:
                 logger.warning("Error polling order %s: %s", oid, e)
 
-        # Timeout — cancel the order
+        # Timeout — cancel the order and check for partial fills
+        filled_sz = 0.0
         try:
             await asyncio.to_thread(exchange.cancel, coin, oid)
             logger.info("Cancelled resting order %s after %.1fs timeout", oid, timeout)
         except Exception as e:
             logger.warning("Failed to cancel order %s: %s", oid, e)
 
+        # Check if there were partial fills before cancellation
+        try:
+            order_status = await asyncio.to_thread(
+                info.query_order_by_oid, address, oid
+            )
+            if order_status:
+                order_data = order_status.get("order", {})
+                orig_sz = float(order_data.get("origSz", expected_sz))
+                remaining = float(order_data.get("sz", orig_sz))
+                filled_sz = orig_sz - remaining
+                if filled_sz > 0:
+                    logger.info("Limit order %s partially filled: %.6f / %.6f", oid, filled_sz, orig_sz)
+        except Exception as e:
+            logger.warning("Error checking partial fill for order %s: %s", oid, e)
+
         return OrderResult(
             success=False,
-            message=f"Limit order {oid} not filled after {timeout}s, cancelled",
+            quantity=filled_sz if filled_sz > 0 else None,
+            message=f"Limit order {oid} not filled after {timeout}s, cancelled"
+                    + (f" (partial fill: {filled_sz})" if filled_sz > 0 else ""),
         )
 
     def _parse_order_response(

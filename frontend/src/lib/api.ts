@@ -95,6 +95,11 @@ export const getLivePositions = () => fetchApi<HLPosition[]>("/api/live/position
 export const getLiveFills = () => fetchApi<HLFill[]>("/api/live/fills");
 export const getLiveStatus = () => fetchApi<HLStatus>("/api/live/status");
 
+export const closeLivePosition = (symbol: string) =>
+  fetchApi<{ success: boolean; message: string }>(`/api/live/positions/${symbol}/close`, {
+    method: "POST",
+  });
+
 // SWR fetcher
 export const fetcher = (url: string) =>
   fetch(`${API_BASE_URL}${url}`).then((r) => r.json());

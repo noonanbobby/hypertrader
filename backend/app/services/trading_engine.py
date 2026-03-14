@@ -131,10 +131,21 @@ class TradingEngine(ABC):
             result.fill_type = "maker"
             return result
 
-        # Fallback to market order
-        market_result = await self.execute_order(symbol, side, quantity, order_type="market")
+        # Check if limit order had partial fills — only send remaining quantity
+        remaining_qty = quantity
+        if result.quantity and result.quantity > 0:
+            remaining_qty = quantity - result.quantity
+            if remaining_qty <= 0:
+                # Fully filled via partial fills (shouldn't happen if success=False, but be safe)
+                result.success = True
+                result.fill_type = "maker"
+                return result
+
+        # Fallback to market order for remaining quantity
+        market_result = await self.execute_order(symbol, side, remaining_qty, order_type="market")
         market_result.fill_type = "taker"
-        market_result.message = f"Limit unfilled, market fallback: {market_result.message}"
+        partial_note = f" (partial limit fill: {result.quantity})" if result.quantity else ""
+        market_result.message = f"Limit unfilled, market fallback{partial_note}: {market_result.message}"
         return market_result
 
 
