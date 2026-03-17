@@ -13,6 +13,7 @@ import asyncio
 import json
 import logging
 import sqlite3
+import sys
 import time
 from datetime import datetime, timezone
 from logging.handlers import RotatingFileHandler
@@ -46,7 +47,8 @@ log.setLevel(logging.INFO)
 handler = RotatingFileHandler(LOG_FILE, maxBytes=5_000_000, backupCount=3)
 handler.setFormatter(logging.Formatter("[%(asctime)s] [%(levelname)s] %(message)s"))
 log.addHandler(handler)
-log.addHandler(logging.StreamHandler())
+if sys.stderr.isatty():
+    log.addHandler(logging.StreamHandler())
 
 # ─── Config ───────────────────────────────────────────────────────────────────────
 
@@ -86,7 +88,7 @@ async def api_get(path: str) -> dict | list | None:
 
 async def api_post(path: str, data: dict = None) -> dict | None:
     try:
-        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=15)) as s:
+        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=60)) as s:
             async with s.post(f"{API_BASE}{path}", json=data or {}) as r:
                 return await r.json()
     except Exception as e:
@@ -171,8 +173,9 @@ async def cmd_status(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     acct = portfolio.get("account_value", 0)
     margin = portfolio.get("total_margin_used", 0)
     margin_pct = (margin / acct * 100) if acct > 0 else 0
+    available = portfolio.get("available_balance", acct - margin)
 
-    lines = [f"💰 {fmt_usd(acct)} | Margin: {margin_pct:.1f}%\n"]
+    lines = [f"💰 {fmt_usd(acct)} | Available: {fmt_usd(available)} | Margin: {fmt_usd(margin)} ({margin_pct:.1f}%)\n"]
     buttons = []
     asset_map = {a["coin"]: a for a in (assets or [])}
     positioned_coins = set()
@@ -207,10 +210,15 @@ async def cmd_status(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         elif p.get("origin") == "reconciler":
             origin_badge = " 🔄"
 
+        margin_pos = notional / lev if lev > 0 else notional
+        margin_acct_pct = (margin_pos / acct * 100) if acct > 0 else 0
+
         lines.append(
-            f"{emoji} {coin} {side} {pnl_sign}{fmt_usd(pnl)} ({fmt_pct(pnl_pct_val)}){origin_badge}\n"
-            f"   Entry {fmt_usd(entry)} → {fmt_usd(current)} | {fmt_usd(notional)}{size_detail} | {lev}x"
-            + (f" | {held}" if held else "")
+            f"{emoji} {coin} {side} {lev}x | {fmt_usd(notional)} notional{origin_badge}\n"
+            f"   Entry {fmt_usd(entry)} → {fmt_usd(current)}"
+            + (f" | {held}" if held else "") + "\n"
+            f"   Margin: {fmt_usd(margin_pos)} ({margin_acct_pct:.1f}% of account)\n"
+            f"   {pnl_sign}{fmt_usd(pnl)} ({fmt_pct(pnl_pct_val)}){size_detail}"
         )
         buttons.append([
             InlineKeyboardButton(f"Close {coin}", callback_data=f"cc:{coin}"),
@@ -697,6 +705,78 @@ async def handle_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             await query.edit_message_text(f"✅ {coin} leverage changed to {new_lev}x. Active position updated.")
         else:
             await query.edit_message_text(f"❌ Failed to update leverage")
+
+    # ── Legacy callback formats (from old messages still in chat) ──
+    elif data.startswith("add:"):
+        # Old format: "add:BTC:25" — map to new add flow
+        parts = data.split(":")
+        coin = parts[1]
+        if len(parts) > 2:
+            # Direct add with percentage
+            if rate_limited():
+                await query.edit_message_text("⏳ Please wait...")
+                return
+            pct = int(parts[2])
+            result = await api_post(f"/api/positions/{coin}/add", {"add_pct": pct})
+            if result and result.get("success"):
+                await query.edit_message_text(f"✅ {result['message']}")
+            else:
+                msg = result.get("message", "Unknown error") if result else "Backend unreachable"
+                await query.edit_message_text(f"❌ Add failed: {msg}")
+        else:
+            # Show submenu
+            kb = InlineKeyboardMarkup([
+                [
+                    InlineKeyboardButton("+25%", callback_data=f"ax:{coin}:25"),
+                    InlineKeyboardButton("+50%", callback_data=f"ax:{coin}:50"),
+                    InlineKeyboardButton("+100%", callback_data=f"ax:{coin}:100"),
+                ],
+                [InlineKeyboardButton("Cancel", callback_data="cancel")],
+            ])
+            await query.edit_message_text(f"Add to {coin} position — choose amount:", reply_markup=kb)
+
+    elif data.startswith("reduce:"):
+        # Old format: "reduce:BTC:50"
+        parts = data.split(":")
+        coin = parts[1]
+        if len(parts) > 2:
+            if rate_limited():
+                await query.edit_message_text("⏳ Please wait...")
+                return
+            pct = int(parts[2])
+            result = await api_post(f"/api/positions/{coin}/reduce", {"reduce_pct": pct})
+            if result and result.get("success"):
+                await query.edit_message_text(f"✅ {result['message']}")
+            else:
+                msg = result.get("message", "Unknown error") if result else "Backend unreachable"
+                await query.edit_message_text(f"❌ Reduce failed: {msg}")
+        else:
+            kb = InlineKeyboardMarkup([
+                [
+                    InlineKeyboardButton("25%", callback_data=f"rx:{coin}:25"),
+                    InlineKeyboardButton("50%", callback_data=f"rx:{coin}:50"),
+                    InlineKeyboardButton("75%", callback_data=f"rx:{coin}:75"),
+                ],
+                [InlineKeyboardButton("Cancel", callback_data="cancel")],
+            ])
+            await query.edit_message_text(f"Reduce {coin} position — choose amount:", reply_markup=kb)
+
+    elif data.startswith("close:"):
+        # Old format: "close:BTC"
+        coin = data[6:]
+        positions = await api_get("/api/positions")
+        pos = next((p for p in (positions or []) if p["coin"] == coin and p.get("direction")), None)
+        if not pos:
+            await query.edit_message_text(f"No open position for {coin}")
+            return
+        pnl = pos.get("unrealized_pnl") or 0
+        pnl_sign = "+" if pnl >= 0 else ""
+        text = f"⚠️ Close {coin} {pos['direction'].upper()}? Current P&L: {pnl_sign}{fmt_usd(pnl)}"
+        kb = InlineKeyboardMarkup([[
+            InlineKeyboardButton(f"Yes, Close {coin}", callback_data=f"cx:{coin}"),
+            InlineKeyboardButton("Cancel", callback_data="cancel"),
+        ]])
+        await query.edit_message_text(text, reply_markup=kb)
 
     # ── Cancel ──
     elif data == "cancel":

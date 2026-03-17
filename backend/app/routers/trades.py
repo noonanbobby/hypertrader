@@ -28,10 +28,64 @@ async def list_trades(
     origin: Optional[str] = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
-    # In live mode, return from live_trades table
+    # In live mode, return from live_trades table adapted to TradeResponse format
     if settings.trading_mode == "live" and strategy_id is None:
-        from app.routers.position_tracking import list_trades as _live_trades
-        return await _live_trades(limit=limit, coin=coin or symbol, origin=origin, db=db)
+        from app.models import LiveTrade, AssetConfig
+        stmt = select(LiveTrade).order_by(desc(LiveTrade.timestamp))
+        if coin or symbol:
+            filter_coin = (coin or symbol).upper()
+            stmt = stmt.where(LiveTrade.coin == filter_coin)
+        if origin:
+            stmt = stmt.where(LiveTrade.origin == origin)
+        stmt = stmt.limit(limit)
+        result = await db.execute(stmt)
+        live_trades = result.scalars().all()
+
+        # Build adapted responses the frontend can render
+        adapted = []
+        for lt in live_trades:
+            # Derive side from action
+            action_lower = lt.action.lower()
+            if "long" in action_lower:
+                trade_side = "long"
+            elif "short" in action_lower:
+                trade_side = "short"
+            else:
+                trade_side = "long"
+
+            # Derive status from action
+            is_close = "close" in action_lower or "reduce" in action_lower
+            trade_status = "closed" if is_close else "open"
+
+            # Get per-asset leverage
+            asset_r = await db.execute(select(AssetConfig).where(AssetConfig.coin == lt.coin))
+            asset_cfg = asset_r.scalar_one_or_none()
+            leverage = float(asset_cfg.leverage) if asset_cfg else settings.leverage
+
+            notional = lt.size
+            margin = notional / leverage if leverage > 0 else notional
+
+            adapted.append(TradeResponse(
+                id=lt.id,
+                strategy_id=0,
+                strategy_name=lt.origin,
+                symbol=lt.coin,
+                side=trade_side,
+                entry_price=lt.price,
+                exit_price=lt.price if is_close else None,
+                quantity=round(lt.size / lt.price, 8) if lt.price > 0 else 0,
+                notional_value=round(notional, 2),
+                margin_used=round(margin, 2),
+                leverage=leverage,
+                realized_pnl=lt.pnl or 0.0,
+                fees=0.0,
+                status=trade_status,
+                entry_time=lt.timestamp,
+                exit_time=lt.timestamp if is_close else None,
+                message=lt.notes or lt.action,
+                fill_type="taker",
+            ))
+        return adapted
     stmt = select(Trade).join(Strategy).order_by(desc(Trade.entry_time))
 
     if strategy_id:
