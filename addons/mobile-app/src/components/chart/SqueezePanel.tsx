@@ -24,6 +24,7 @@ const SQZ_COLORS: Record<SqueezePoint["color"], string> = {
 interface SqueezePanelProps {
   data: SqueezePoint[];
   height: number;
+  priceScaleWidth?: number;
   onCrosshairMove?: (time: Time | null) => void;
   onChartReady?: (chart: IChartApi) => void;
 }
@@ -31,6 +32,7 @@ interface SqueezePanelProps {
 export const SqueezePanel = memo(function SqueezePanel({
   data,
   height,
+  priceScaleWidth,
   onCrosshairMove,
   onChartReady,
 }: SqueezePanelProps) {
@@ -73,7 +75,7 @@ export const SqueezePanel = memo(function SqueezePanel({
       rightPriceScale: {
         borderColor: "rgba(42,46,57,0.5)",
         scaleMargins: { top: 0.1, bottom: 0.1 },
-        minimumWidth: 60,
+        minimumWidth: priceScaleWidth ?? 75,
       },
       timeScale: {
         borderColor: "rgba(42,46,57,0.5)",

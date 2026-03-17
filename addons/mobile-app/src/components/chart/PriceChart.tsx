@@ -19,6 +19,7 @@ interface PriceChartProps {
   stPoints: EnrichedSTPoint[];
   markers: ChartMarker[];
   height: number;
+  priceScaleWidth?: number;
   onCrosshairMove?: (time: Time | null) => void;
   onChartReady?: (chart: IChartApi) => void;
 }
@@ -28,6 +29,7 @@ export const PriceChart = memo(function PriceChart({
   stPoints,
   markers,
   height,
+  priceScaleWidth,
   onCrosshairMove,
   onChartReady,
 }: PriceChartProps) {
@@ -62,7 +64,7 @@ export const PriceChart = memo(function PriceChart({
       rightPriceScale: {
         borderColor: "rgba(42,46,57,0.5)",
         scaleMargins: { top: 0.05, bottom: 0.15 },
-        minimumWidth: 60,
+        minimumWidth: priceScaleWidth ?? 75,
       },
       timeScale: {
         borderColor: "rgba(42,46,57,0.5)",

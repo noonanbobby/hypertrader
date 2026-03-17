@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { IChartApi, Time, LogicalRange } from "lightweight-charts";
 import { PriceChart } from "./PriceChart";
 import { SqueezePanel } from "./SqueezePanel";
@@ -28,6 +28,10 @@ const STATUS_PANEL_HEIGHT = 140;
 const OHLC_HEIGHT = 44;
 const LABEL_HEIGHT = 18;
 
+// Fixed width for the right price scale — must be identical on both panels.
+// BTC prices like "$74,652" need ~75px. Squeeze values need less but we force same width.
+const PRICE_SCALE_WIDTH = 75;
+
 export function ChartContainer({
   candles,
   stPoints,
@@ -40,13 +44,13 @@ export function ChartContainer({
   const [crosshairTime, setCrosshairTime] = useState<Time | null>(null);
   const chartsRef = useRef<(IChartApi | null)[]>([null, null]);
   const syncingRef = useRef(false);
+  const dataLoadedRef = useRef(false);
 
-  // Layout: OHLC bar + Price chart + Squeeze label + Squeeze + Status panel
   const available = containerHeight - OHLC_HEIGHT - LABEL_HEIGHT - STATUS_PANEL_HEIGHT;
   const priceHeight = Math.round(available * 0.72);
   const squeezeHeight = available - priceHeight;
 
-  // Time scale sync between price chart and squeeze
+  // Sync visible range between panels — bidirectional
   const syncTimeScale = useCallback((sourceIndex: number) => {
     return (range: LogicalRange | null) => {
       if (syncingRef.current || !range) return;
@@ -60,29 +64,40 @@ export function ChartContainer({
     };
   }, []);
 
+  // Scroll all panels to show the latest bar on the right edge
+  const scrollAllToRealTime = useCallback(() => {
+    const priceChart = chartsRef.current[0];
+    if (!priceChart) return;
+    // Scroll the price chart to realtime, then force-sync the squeeze panel
+    priceChart.timeScale().scrollToRealTime();
+    const range = priceChart.timeScale().getVisibleLogicalRange();
+    if (range) {
+      chartsRef.current.forEach((c, i) => {
+        if (i !== 0 && c) c.timeScale().setVisibleLogicalRange(range);
+      });
+    }
+  }, []);
+
   const handlePriceChartReady = useCallback((chart: IChartApi) => {
     chartsRef.current[0] = chart;
     chart.timeScale().subscribeVisibleLogicalRangeChange(syncTimeScale(0));
-    setTimeout(() => {
-      chartsRef.current.forEach((c) => c?.timeScale().scrollToRealTime());
-      const range = chart.timeScale().getVisibleLogicalRange();
-      if (range) {
-        chartsRef.current.forEach((c, i) => {
-          if (i !== 0 && c) c.timeScale().setVisibleLogicalRange(range);
-        });
-      }
-    }, 150);
   }, [syncTimeScale]);
 
   const handleSqueezeChartReady = useCallback((chart: IChartApi) => {
     chartsRef.current[1] = chart;
     chart.timeScale().subscribeVisibleLogicalRangeChange(syncTimeScale(1));
-    const priceChart = chartsRef.current[0];
-    if (priceChart) {
-      const range = priceChart.timeScale().getVisibleLogicalRange();
-      if (range) chart.timeScale().setVisibleLogicalRange(range);
-    }
   }, [syncTimeScale]);
+
+  // After data loads (candles change), scroll to realtime and sync panels
+  useEffect(() => {
+    if (candles.length === 0) return;
+    // Small delay to let both charts render their data
+    const timer = setTimeout(() => {
+      scrollAllToRealTime();
+      dataLoadedRef.current = true;
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [candles, scrollAllToRealTime]);
 
   const handleCrosshairMove = useCallback((time: Time | null) => {
     setCrosshairTime(time);
@@ -107,7 +122,6 @@ export function ChartContainer({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: `${containerHeight}px`, overflow: "hidden" }}>
-      {/* OHLC Info Bar */}
       <OhlcBar
         candle={hoveredCandle}
         currentPrice={currentPrice}
@@ -115,17 +129,16 @@ export function ChartContainer({
         supertrendDirection={hoveredSupertrend?.direction ?? null}
       />
 
-      {/* Price Chart */}
       <PriceChart
         candles={candles}
         stPoints={stPoints}
         markers={markers}
         height={priceHeight}
+        priceScaleWidth={PRICE_SCALE_WIDTH}
         onCrosshairMove={handleCrosshairMove}
         onChartReady={handlePriceChartReady}
       />
 
-      {/* Squeeze label */}
       <div
         style={{
           display: "flex",
@@ -142,15 +155,14 @@ export function ChartContainer({
         </span>
       </div>
 
-      {/* Squeeze Momentum */}
       <SqueezePanel
         data={squeezeData}
         height={squeezeHeight}
+        priceScaleWidth={PRICE_SCALE_WIDTH}
         onCrosshairMove={handleCrosshairMove}
         onChartReady={handleSqueezeChartReady}
       />
 
-      {/* Status Table Panel — fixed at bottom */}
       <div
         style={{
           height: `${STATUS_PANEL_HEIGHT}px`,
