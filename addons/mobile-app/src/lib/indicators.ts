@@ -101,7 +101,7 @@ export function calcSupertrend(
   candles: CandleData[],
   config = SUPERTREND_CONFIG,
 ): { points: SupertrendPoint[]; signals: SupertrendSignal[] } {
-  const { atrPeriod, multiplier } = config;
+  const { atrPeriod, multiplier, source } = config;
   const n = candles.length;
   if (n < atrPeriod + 1) return { points: [], signals: [] };
 
@@ -118,7 +118,9 @@ export function calcSupertrend(
   for (let i = 0; i < n; i++) {
     if (isNaN(atr[i])) continue;
 
-    const hl2 = (candles[i].high + candles[i].low) / 2;
+    const hl2 = source === "close" ? candles[i].close
+      : source === "hlc3" ? (candles[i].high + candles[i].low + candles[i].close) / 3
+      : (candles[i].high + candles[i].low) / 2;
     const basicUpper = hl2 + multiplier * atr[i];
     const basicLower = hl2 - multiplier * atr[i];
 
@@ -189,6 +191,81 @@ export function calcSupertrend(
   }
 
   return { points, signals };
+}
+
+/* ─────────────────────────────────────────────
+   ADX — Average Directional Index
+   ───────────────────────────────────────────── */
+
+export function calcAdx(
+  candles: CandleData[],
+  period: number = 14,
+): { adx: number; rising: boolean } | null {
+  const n = candles.length;
+  if (n < period * 2 + 3) return null;
+
+  const highs = candles.map((c) => c.high);
+  const lows = candles.map((c) => c.low);
+  const closes = candles.map((c) => c.close);
+
+  const plusDm = new Array(n).fill(0);
+  const minusDm = new Array(n).fill(0);
+  for (let i = 1; i < n; i++) {
+    const up = highs[i] - highs[i - 1];
+    const down = lows[i - 1] - lows[i];
+    if (up > down && up > 0) plusDm[i] = up;
+    if (down > up && down > 0) minusDm[i] = down;
+  }
+
+  const tr: number[] = [highs[0] - lows[0]];
+  for (let i = 1; i < n; i++) {
+    tr.push(Math.max(highs[i] - lows[i], Math.abs(highs[i] - closes[i - 1]), Math.abs(lows[i] - closes[i - 1])));
+  }
+
+  const rmaSmooth = (data: number[], p: number): number[] => {
+    const out = new Array(n).fill(0);
+    let sum = 0;
+    for (let i = 1; i <= p; i++) sum += data[i];
+    out[p] = sum;
+    for (let i = p + 1; i < n; i++) out[i] = out[i - 1] - out[i - 1] / p + data[i];
+    return out;
+  };
+
+  const sTr = rmaSmooth(tr, period);
+  const sPdm = rmaSmooth(plusDm, period);
+  const sMdm = rmaSmooth(minusDm, period);
+
+  const dx = new Array(n).fill(0);
+  for (let i = period; i < n; i++) {
+    if (sTr[i] > 0) {
+      const pdi = (100 * sPdm[i]) / sTr[i];
+      const mdi = (100 * sMdm[i]) / sTr[i];
+      const total = pdi + mdi;
+      if (total > 0) dx[i] = (100 * Math.abs(pdi - mdi)) / total;
+    }
+  }
+
+  const adxArr = new Array(n).fill(NaN);
+  let fv = period;
+  while (fv < n && dx[fv] === 0) fv++;
+  if (fv + period >= n) return null;
+
+  let adxSum = 0;
+  for (let i = fv; i < fv + period; i++) adxSum += dx[i];
+  adxArr[fv + period - 1] = adxSum / period;
+  for (let i = fv + period; i < n; i++) {
+    adxArr[i] = (adxArr[i - 1] * (period - 1) + dx[i]) / period;
+  }
+
+  // Use last closed candle (n-2)
+  const idx = n - 2;
+  const prevIdx = idx - 4; // lookback 4
+  if (isNaN(adxArr[idx])) return null;
+
+  return {
+    adx: adxArr[idx],
+    rising: prevIdx >= 0 && !isNaN(adxArr[prevIdx]) && adxArr[idx] > adxArr[prevIdx],
+  };
 }
 
 /* ─────────────────────────────────────────────

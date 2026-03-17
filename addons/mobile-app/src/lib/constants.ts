@@ -75,11 +75,11 @@ export const TAB_ITEMS = [
   { key: "settings", label: "Settings", href: "/settings" },
 ] as const;
 
-export const SUPERTREND_CONFIG = {
+export const SUPERTREND_CONFIG: { atrPeriod: number; multiplier: number; source: string } = {
   atrPeriod: 10,
   multiplier: 4.0,
-  source: "hl2" as const,
-} as const;
+  source: "hl2",
+};
 
 export const SQUEEZE_CONFIG = {
   bbLength: 20,

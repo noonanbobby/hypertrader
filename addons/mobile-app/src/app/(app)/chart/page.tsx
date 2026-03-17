@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useCandles, useCurrentPrice } from "@/hooks/useHyperliquid";
-import { calcSupertrend, calcSqueezeMomentum, calcMacdRsi } from "@/lib/indicators";
+import { calcSupertrend, calcSqueezeMomentum, calcMacdRsi, calcAdx } from "@/lib/indicators";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useLivePositions } from "@/hooks/useApi";
 import { SkeletonChart } from "@/components/ui/Skeleton";
@@ -201,18 +201,52 @@ function PositionBar({ position, coin }: { position: HLPosition | undefined; coi
 }
 
 /* ── Status Overlay ── */
-function StatusOverlay({
-  supertrendPoints,
-  coin,
-}: {
-  supertrendPoints: SupertrendPoint[];
-  coin: string;
-}) {
-  // Get last closed candle's direction
-  const lastSt = supertrendPoints.length > 1 ? supertrendPoints[supertrendPoints.length - 2] : null;
-  if (!lastSt) return null;
+interface StatusData {
+  st15m: "BULL" | "BEAR" | null;
+  st1h: "BULL" | "BEAR" | null;
+  aligned: boolean;
+  adxValue: number | null;
+  adxRising: boolean;
+  squeezeOn: boolean | null;
+  signalReady: boolean;
+  signalBlockReason: string;
+}
 
-  const isBullish = lastSt.direction === "bullish";
+function StatusOverlay({ status }: { status: StatusData | null }) {
+  if (!status) return null;
+
+  const rows: { label: string; value: string; color: string }[] = [
+    {
+      label: "15m ST",
+      value: status.st15m ?? "—",
+      color: status.st15m === "BULL" ? COLORS.bullish : status.st15m === "BEAR" ? COLORS.bearish : COLORS.textSecondary,
+    },
+    {
+      label: "1H ST",
+      value: status.st1h ?? "—",
+      color: status.st1h === "BULL" ? COLORS.bullish : status.st1h === "BEAR" ? COLORS.bearish : COLORS.textSecondary,
+    },
+    {
+      label: "Aligned",
+      value: status.aligned ? "YES" : "NO",
+      color: status.aligned ? COLORS.bullish : COLORS.bearish,
+    },
+    {
+      label: "ADX",
+      value: status.adxValue !== null ? `${status.adxValue.toFixed(1)} ${status.adxRising ? "RISING" : "falling"}` : "—",
+      color: status.adxValue !== null && status.adxValue >= 15 && status.adxRising ? COLORS.bullish : COLORS.textSecondary,
+    },
+    {
+      label: "Squeeze",
+      value: status.squeezeOn === null ? "—" : status.squeezeOn ? "ON blocked" : "OFF ok",
+      color: status.squeezeOn ? COLORS.bearish : COLORS.bullish,
+    },
+    {
+      label: "Signal",
+      value: status.signalReady ? "READY" : `BLOCKED`,
+      color: status.signalReady ? COLORS.bullish : COLORS.bearish,
+    },
+  ];
 
   return (
     <div
@@ -223,27 +257,25 @@ function StatusOverlay({
         zIndex: 10,
         display: "flex",
         flexDirection: "column",
-        gap: "2px",
+        gap: "3px",
         padding: "6px 8px",
         borderRadius: "6px",
-        backgroundColor: "rgba(10,10,15,0.85)",
+        backgroundColor: "rgba(10,10,15,0.9)",
         border: `1px solid ${COLORS.border}`,
         backdropFilter: "blur(8px)",
         pointerEvents: "none",
+        minWidth: "140px",
       }}
     >
-      <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
-        <span style={{ fontSize: "9px", color: COLORS.textSecondary, width: "32px" }}>15m ST</span>
-        <span
-          style={{
-            fontSize: "9px",
-            fontWeight: 700,
-            color: isBullish ? COLORS.bullish : COLORS.bearish,
-          }}
-        >
-          {isBullish ? "BULL" : "BEAR"}
-        </span>
+      <div style={{ fontSize: "8px", color: COLORS.textSecondary, fontWeight: 600, letterSpacing: "0.5px", marginBottom: "1px" }}>
+        MTF Recovery ST + ADX + SQZ
       </div>
+      {rows.map((r) => (
+        <div key={r.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "8px" }}>
+          <span style={{ fontSize: "9px", color: COLORS.textSecondary, fontFamily: "'JetBrains Mono', monospace" }}>{r.label}</span>
+          <span style={{ fontSize: "9px", fontWeight: 700, color: r.color, fontFamily: "'JetBrains Mono', monospace" }}>{r.value}</span>
+        </div>
+      ))}
     </div>
   );
 }
@@ -312,6 +344,7 @@ export default function ChartPage() {
   const days = daysMap[tfLower] ?? 7;
 
   const { data: candles, error: candleError, mutate: retryCandles } = useCandles(activeCoin, tfLower, days);
+  const { data: candles1h } = useCandles(activeCoin, "1h", 14);
   const { data: currentPrice } = useCurrentPrice(activeCoin);
   const { data: positions } = useLivePositions();
   const { connected } = useWebSocket();
@@ -346,6 +379,46 @@ export default function ChartPage() {
       macdRsi: calcMacdRsi(candles),
     };
   }, [candles]);
+
+  // Full status for overlay
+  const statusData = useMemo((): StatusData | null => {
+    if (!candles || candles.length < 50) return null;
+
+    // 15m ST direction (last closed candle)
+    const st15m = indicators?.supertrend?.points;
+    const last15m = st15m && st15m.length > 1 ? st15m[st15m.length - 2] : null;
+    const dir15m = last15m ? (last15m.direction === "bullish" ? "BULL" as const : "BEAR" as const) : null;
+
+    // 1H ST direction
+    let dir1h: "BULL" | "BEAR" | null = null;
+    if (candles1h && candles1h.length > 20) {
+      const st1hResult = calcSupertrend(candles1h, { atrPeriod: 10, multiplier: 4.0, source: "close" });
+      const last1h = st1hResult.points.length > 1 ? st1hResult.points[st1hResult.points.length - 2] : null;
+      dir1h = last1h ? (last1h.direction === "bullish" ? "BULL" : "BEAR") : null;
+    }
+
+    const aligned = dir15m !== null && dir1h !== null && dir15m === dir1h;
+
+    // ADX
+    const adxResult = calcAdx(candles, 14);
+    const adxValue = adxResult?.adx ?? null;
+    const adxRising = adxResult?.rising ?? false;
+    const adxPass = adxValue !== null && adxValue >= 15 && adxRising;
+
+    // Squeeze (last closed candle)
+    const sqzPoints = indicators?.squeeze;
+    const lastSqz = sqzPoints && sqzPoints.length > 1 ? sqzPoints[sqzPoints.length - 2] : null;
+    const squeezeOn = lastSqz?.squeezeOn ?? null;
+    const sqzPass = squeezeOn === false;
+
+    const signalReady = aligned && adxPass && sqzPass;
+    let blockReason = "";
+    if (!aligned) blockReason = "timeframes disagree";
+    else if (!adxPass) blockReason = adxValue !== null && adxValue < 15 ? "ADX below 15" : "ADX falling";
+    else if (!sqzPass) blockReason = "squeeze on";
+
+    return { st15m: dir15m, st1h: dir1h, aligned, adxValue, adxRising, squeezeOn, signalReady, signalBlockReason: blockReason };
+  }, [candles, candles1h, indicators]);
 
   const handleCoinChange = useCallback((coin: string) => {
     setActiveCoin(coin);
@@ -389,7 +462,7 @@ export default function ChartPage() {
         <ChartLoadingSkeleton />
       ) : (
         <div style={{ position: "relative", flex: 1 }}>
-          <StatusOverlay supertrendPoints={indicators.supertrend.points} coin={activeCoin} />
+          <StatusOverlay status={statusData} />
           <ChartContainer
             candles={candles}
             supertrendPoints={indicators.supertrend.points}
