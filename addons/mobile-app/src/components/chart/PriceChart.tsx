@@ -64,6 +64,7 @@ export const PriceChart = memo(function PriceChart({
       rightPriceScale: {
         borderColor: "rgba(42,46,57,0.5)",
         scaleMargins: { top: 0.05, bottom: 0.15 },
+        minimumWidth: 60,
       },
       timeScale: {
         borderColor: "rgba(42,46,57,0.5)",

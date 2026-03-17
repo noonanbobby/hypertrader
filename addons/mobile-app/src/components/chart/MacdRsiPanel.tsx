@@ -75,6 +75,7 @@ export const MacdRsiPanel = memo(function MacdRsiPanel({
       rightPriceScale: {
         borderColor: "rgba(42,46,57,0.5)",
         scaleMargins: { top: 0.1, bottom: 0.1 },
+        minimumWidth: 60,
       },
       timeScale: {
         borderColor: "rgba(42,46,57,0.5)",

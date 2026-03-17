@@ -3,12 +3,12 @@
 import { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useCandles, useCurrentPrice } from "@/hooks/useHyperliquid";
-import { calcSupertrend, calcSqueezeMomentum, calcMacdRsi, calcAdx } from "@/lib/indicators";
+import { calcSupertrend, calcSqueezeMomentum, calcAdx } from "@/lib/indicators";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useLivePositions } from "@/hooks/useApi";
 import { SkeletonChart } from "@/components/ui/Skeleton";
 import { ASSET_COLORS, COLORS, TIMEFRAMES } from "@/lib/constants";
-import type { HLPosition, SupertrendPoint } from "@/types";
+import type { HLPosition } from "@/types";
 
 const ChartContainer = dynamic(
   () => import("@/components/chart/ChartContainer").then((m) => ({ default: m.ChartContainer })),
@@ -200,7 +200,7 @@ function PositionBar({ position, coin }: { position: HLPosition | undefined; coi
   );
 }
 
-/* ── Status Overlay ── */
+/* ── Status Data ── */
 interface StatusData {
   st15m: "BULL" | "BEAR" | null;
   st1h: "BULL" | "BEAR" | null;
@@ -210,74 +210,6 @@ interface StatusData {
   squeezeOn: boolean | null;
   signalReady: boolean;
   signalBlockReason: string;
-}
-
-function StatusOverlay({ status }: { status: StatusData | null }) {
-  if (!status) return null;
-
-  const rows: { label: string; value: string; color: string }[] = [
-    {
-      label: "15m ST",
-      value: status.st15m ?? "—",
-      color: status.st15m === "BULL" ? COLORS.bullish : status.st15m === "BEAR" ? COLORS.bearish : COLORS.textSecondary,
-    },
-    {
-      label: "1H ST",
-      value: status.st1h ?? "—",
-      color: status.st1h === "BULL" ? COLORS.bullish : status.st1h === "BEAR" ? COLORS.bearish : COLORS.textSecondary,
-    },
-    {
-      label: "Aligned",
-      value: status.aligned ? "YES" : "NO",
-      color: status.aligned ? COLORS.bullish : COLORS.bearish,
-    },
-    {
-      label: "ADX",
-      value: status.adxValue !== null ? `${status.adxValue.toFixed(1)} ${status.adxRising ? "RISING" : "falling"}` : "—",
-      color: status.adxValue !== null && status.adxValue >= 15 && status.adxRising ? COLORS.bullish : COLORS.textSecondary,
-    },
-    {
-      label: "Squeeze",
-      value: status.squeezeOn === null ? "—" : status.squeezeOn ? "ON blocked" : "OFF ok",
-      color: status.squeezeOn ? COLORS.bearish : COLORS.bullish,
-    },
-    {
-      label: "Signal",
-      value: status.signalReady ? "READY" : `BLOCKED`,
-      color: status.signalReady ? COLORS.bullish : COLORS.bearish,
-    },
-  ];
-
-  return (
-    <div
-      style={{
-        position: "absolute",
-        top: "8px",
-        left: "8px",
-        zIndex: 10,
-        display: "flex",
-        flexDirection: "column",
-        gap: "3px",
-        padding: "6px 8px",
-        borderRadius: "6px",
-        backgroundColor: "rgba(10,10,15,0.9)",
-        border: `1px solid ${COLORS.border}`,
-        backdropFilter: "blur(8px)",
-        pointerEvents: "none",
-        minWidth: "140px",
-      }}
-    >
-      <div style={{ fontSize: "8px", color: COLORS.textSecondary, fontWeight: 600, letterSpacing: "0.5px", marginBottom: "1px" }}>
-        MTF Recovery ST + ADX + SQZ
-      </div>
-      {rows.map((r) => (
-        <div key={r.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "8px" }}>
-          <span style={{ fontSize: "9px", color: COLORS.textSecondary, fontFamily: "'JetBrains Mono', monospace" }}>{r.label}</span>
-          <span style={{ fontSize: "9px", fontWeight: 700, color: r.color, fontFamily: "'JetBrains Mono', monospace" }}>{r.value}</span>
-        </div>
-      ))}
-    </div>
-  );
 }
 
 /* ── Loading & Error ── */
@@ -376,7 +308,6 @@ export default function ChartPage() {
     return {
       supertrend: calcSupertrend(candles),
       squeeze: calcSqueezeMomentum(candles),
-      macdRsi: calcMacdRsi(candles),
     };
   }, [candles]);
 
@@ -420,6 +351,20 @@ export default function ChartPage() {
     return { st15m: dir15m, st1h: dir1h, aligned, adxValue, adxRising, squeezeOn, signalReady, signalBlockReason: blockReason };
   }, [candles, candles1h, indicators]);
 
+  const statusRows = useMemo(() => {
+    const s = statusData;
+    if (!s) return [];
+    return [
+      { label: "15m ST", value: s.st15m ?? "—", color: s.st15m === "BULL" ? COLORS.bullish : s.st15m === "BEAR" ? COLORS.bearish : COLORS.textSecondary },
+      { label: "1H ST", value: s.st1h ?? "—", color: s.st1h === "BULL" ? COLORS.bullish : s.st1h === "BEAR" ? COLORS.bearish : COLORS.textSecondary },
+      { label: "Aligned", value: s.aligned ? "YES" : "NO", color: s.aligned ? COLORS.bullish : COLORS.bearish },
+      { label: "ADX", value: s.adxValue !== null ? `${s.adxValue.toFixed(1)} ${s.adxRising ? "RISING" : "falling"}` : "—", color: s.adxValue !== null && s.adxValue >= 15 && s.adxRising ? COLORS.bullish : s.adxValue !== null && s.adxValue >= 15 ? "#ff9800" : COLORS.textSecondary },
+      { label: "Squeeze", value: s.squeezeOn === null ? "—" : s.squeezeOn ? "ON blocked" : "OFF ok", color: s.squeezeOn ? COLORS.bearish : COLORS.bullish },
+      { label: "Recovery", value: s.st15m !== null ? "ACTIVE" : "standby", color: s.st15m !== null ? COLORS.bullish : COLORS.textSecondary },
+      { label: "Signal", value: s.signalReady ? "READY" : `BLOCKED: ${s.signalBlockReason}`, color: s.signalReady ? COLORS.bullish : COLORS.bearish },
+    ];
+  }, [statusData]);
+
   const handleCoinChange = useCallback((coin: string) => {
     setActiveCoin(coin);
   }, []);
@@ -461,16 +406,15 @@ export default function ChartPage() {
       ) : !candles || !indicators || chartHeight <= 0 ? (
         <ChartLoadingSkeleton />
       ) : (
-        <div style={{ position: "relative", flex: 1 }}>
-          <StatusOverlay status={statusData} />
+        <div style={{ flex: 1 }}>
           <ChartContainer
             candles={candles}
             supertrendPoints={indicators.supertrend.points}
             supertrendSignals={indicators.supertrend.signals}
             squeezeData={indicators.squeeze}
-            macdRsiData={indicators.macdRsi}
             currentPrice={currentPrice ?? null}
             containerHeight={chartHeight}
+            statusRows={statusRows}
           />
         </div>
       )}
