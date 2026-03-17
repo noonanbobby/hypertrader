@@ -7,10 +7,15 @@ import type {
   Analytics,
   AppSettings,
   AppSettingsUpdate,
+  AssetConfig,
+  AssetConfigUpdate,
   HLPortfolio,
   HLPosition,
   HLFill,
   HLStatus,
+  PositionTracking,
+  LiveTrade,
+  PositionActionResponse,
 } from "@/types";
 
 async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
@@ -89,6 +94,14 @@ export const testTelegram = () =>
 export const getHealth = () =>
   fetchApi<{ status: string; mode: string; version: string }>("/api/health");
 
+// Assets
+export const getAssets = () => fetchApi<AssetConfig[]>("/api/assets");
+export const updateAsset = (coin: string, data: AssetConfigUpdate) =>
+  fetchApi<AssetConfig>(`/api/assets/${encodeURIComponent(coin)}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+
 // Live (Hyperliquid)
 export const getLivePortfolio = () => fetchApi<HLPortfolio>("/api/live/portfolio");
 export const getLivePositions = () => fetchApi<HLPosition[]>("/api/live/positions");
@@ -99,6 +112,39 @@ export const closeLivePosition = (symbol: string) =>
   fetchApi<{ success: boolean; message: string }>(`/api/live/positions/${symbol}/close`, {
     method: "POST",
   });
+
+// Position Tracking
+export const getPositionTracking = () =>
+  fetchApi<PositionTracking[]>("/api/positions");
+export const openPosition = (coin: string, data: { direction: string; amount_usd: number }) =>
+  fetchApi<PositionActionResponse>(`/api/positions/${coin}/open`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+export const addToPosition = (coin: string, add_pct: number) =>
+  fetchApi<PositionActionResponse>(`/api/positions/${coin}/add`, {
+    method: "POST",
+    body: JSON.stringify({ add_pct }),
+  });
+export const reducePosition = (coin: string, reduce_pct: number) =>
+  fetchApi<PositionActionResponse>(`/api/positions/${coin}/reduce`, {
+    method: "POST",
+    body: JSON.stringify({ reduce_pct }),
+  });
+export const closeTrackedPosition = (coin: string) =>
+  fetchApi<PositionActionResponse>(`/api/positions/${coin}/close`, {
+    method: "POST",
+  });
+export const closeAllPositions = () =>
+  fetchApi<PositionActionResponse>("/api/positions/close-all", {
+    method: "POST",
+  });
+
+// Live Trades
+export const getLiveTrades = (params?: Record<string, string>) => {
+  const qs = params ? "?" + new URLSearchParams(params).toString() : "";
+  return fetchApi<LiveTrade[]>(`/api/trades${qs}`);
+};
 
 // SWR fetcher
 export const fetcher = (url: string) =>

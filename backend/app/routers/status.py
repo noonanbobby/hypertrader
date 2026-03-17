@@ -13,23 +13,20 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-async def _check_ngrok() -> ServiceCheck:
+async def _check_nginx() -> ServiceCheck:
     try:
-        async with httpx.AsyncClient(timeout=3) as client:
-            resp = await client.get("http://127.0.0.1:4040/api/tunnels")
-            data = resp.json()
-            tunnels = data.get("tunnels", [])
-            if tunnels:
-                public_url = tunnels[0].get("public_url", "")
-                return ServiceCheck(
-                    name="ngrok",
-                    status="ok",
-                    message=f"Tunnel active",
-                    url=public_url,
-                )
-            return ServiceCheck(name="ngrok", status="down", message="No active tunnels")
+        import asyncio, subprocess
+        proc = await asyncio.create_subprocess_exec(
+            "systemctl", "is-active", "nginx",
+            stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE,
+        )
+        stdout, _ = await proc.communicate()
+        state = stdout.decode().strip()
+        if state == "active":
+            return ServiceCheck(name="nginx", status="ok", message="Reverse proxy active")
+        return ServiceCheck(name="nginx", status="down", message=f"nginx: {state}")
     except Exception:
-        return ServiceCheck(name="ngrok", status="down", message="ngrok not running")
+        return ServiceCheck(name="nginx", status="down", message="Cannot check nginx")
 
 
 async def _check_telegram() -> ServiceCheck:
@@ -60,13 +57,13 @@ def _check_websocket() -> ServiceCheck:
 
 @router.get("/status", response_model=SystemStatus)
 async def get_system_status():
-    ngrok_check, telegram_check = await asyncio.gather(
-        _check_ngrok(),
+    nginx_check, telegram_check = await asyncio.gather(
+        _check_nginx(),
         _check_telegram(),
     )
     return SystemStatus(
         backend=ServiceCheck(name="backend", status="ok", message="Running"),
-        ngrok=ngrok_check,
+        ngrok=nginx_check,
         websocket=_check_websocket(),
         telegram=telegram_check,
         checked_at=datetime.now(timezone.utc),

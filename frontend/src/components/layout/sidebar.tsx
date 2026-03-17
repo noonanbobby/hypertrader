@@ -9,6 +9,7 @@ import {
   BarChart3,
   Settings,
   Zap,
+  Coins,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLiveStatus } from "@/hooks/use-api";
@@ -31,6 +32,7 @@ const NAV_SECTIONS = [
   {
     label: "System",
     items: [
+      { label: "Assets", href: "/assets", icon: Coins },
       { label: "Settings", href: "/settings", icon: Settings },
     ],
   },

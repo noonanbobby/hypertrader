@@ -1,0 +1,268 @@
+{
+  "Filtered MTF (Vol+Time+SL)": {
+    "regimes": {
+      "trending": {
+        "regime": "Trending (ADX>=25)",
+        "trades": 84,
+        "pnl": -161.22,
+        "win_rate": 34.5,
+        "pf": 0.8,
+        "avg_pnl": -1.92,
+        "wins": 29,
+        "losses": 55,
+        "gross_profit": 662.28,
+        "gross_loss": 823.5
+      },
+      "ranging": {
+        "regime": "Ranging (ADX<20)",
+        "trades": 86,
+        "pnl": -132.49,
+        "win_rate": 31.4,
+        "pf": 0.8,
+        "avg_pnl": -1.54,
+        "wins": 27,
+        "losses": 59,
+        "gross_profit": 541.22,
+        "gross_loss": 673.71
+      },
+      "neutral": {
+        "regime": "Neutral (ADX 20-25)",
+        "trades": 98,
+        "pnl": 269.27,
+        "win_rate": 38.8,
+        "pf": 1.37,
+        "avg_pnl": 2.75,
+        "wins": 38,
+        "losses": 60,
+        "gross_profit": 991.78,
+        "gross_loss": 722.51
+      },
+      "all": {
+        "regime": "ALL",
+        "trades": 268,
+        "pnl": -24.44,
+        "win_rate": 35.1,
+        "pf": 0.99,
+        "avg_pnl": -0.09,
+        "wins": 94,
+        "losses": 174,
+        "gross_profit": 2195.28,
+        "gross_loss": 2219.72
+      }
+    },
+    "quarters": {
+      "2024-Q1": {
+        "trades": 3,
+        "pnl": -70.81,
+        "win_rate": 0.0,
+        "pf": 0.0,
+        "avg_adx": 19.8,
+        "trending_pct": 0.0
+      },
+      "2024-Q2": {
+        "trades": 33,
+        "pnl": 88.78,
+        "win_rate": 42.4,
+        "pf": 1.32,
+        "avg_adx": 23.0,
+        "trending_pct": 27.0
+      },
+      "2024-Q3": {
+        "trades": 34,
+        "pnl": 92.19,
+        "win_rate": 32.4,
+        "pf": 1.18,
+        "avg_adx": 23.9,
+        "trending_pct": 44.0
+      },
+      "2024-Q4": {
+        "trades": 32,
+        "pnl": -177.78,
+        "win_rate": 31.2,
+        "pf": 0.54,
+        "avg_adx": 22.8,
+        "trending_pct": 31.0
+      },
+      "2025-Q1": {
+        "trades": 41,
+        "pnl": -103.38,
+        "win_rate": 34.1,
+        "pf": 0.72,
+        "avg_adx": 22.5,
+        "trending_pct": 27.0
+      },
+      "2025-Q2": {
+        "trades": 37,
+        "pnl": -49.29,
+        "win_rate": 32.4,
+        "pf": 0.69,
+        "avg_adx": 22.8,
+        "trending_pct": 30.0
+      },
+      "2025-Q3": {
+        "trades": 31,
+        "pnl": -0.37,
+        "win_rate": 35.5,
+        "pf": 1.0,
+        "avg_adx": 23.2,
+        "trending_pct": 32.0
+      },
+      "2025-Q4": {
+        "trades": 27,
+        "pnl": 135.37,
+        "win_rate": 51.9,
+        "pf": 2.14,
+        "avg_adx": 23.1,
+        "trending_pct": 33.0
+      },
+      "2026-Q1": {
+        "trades": 30,
+        "pnl": 60.86,
+        "win_rate": 26.7,
+        "pf": 1.25,
+        "avg_adx": 23.0,
+        "trending_pct": 30.0
+      }
+    },
+    "total_trades": 268,
+    "final_equity": 338.61,
+    "total_pnl": -161.39,
+    "profitable_quarters": 4,
+    "total_quarters": 9,
+    "long_pnl": -195.14,
+    "short_pnl": 170.7
+  },
+  "Pure MTF (no filters)": {
+    "regimes": {
+      "trending": {
+        "regime": "Trending (ADX>=25)",
+        "trades": 129,
+        "pnl": 21.95,
+        "win_rate": 36.4,
+        "pf": 1.02,
+        "avg_pnl": 0.17,
+        "wins": 47,
+        "losses": 82,
+        "gross_profit": 997.72,
+        "gross_loss": 975.77
+      },
+      "ranging": {
+        "regime": "Ranging (ADX<20)",
+        "trades": 148,
+        "pnl": -202.85,
+        "win_rate": 31.8,
+        "pf": 0.8,
+        "avg_pnl": -1.37,
+        "wins": 47,
+        "losses": 101,
+        "gross_profit": 795.89,
+        "gross_loss": 998.74
+      },
+      "neutral": {
+        "regime": "Neutral (ADX 20-25)",
+        "trades": 160,
+        "pnl": 231.08,
+        "win_rate": 38.1,
+        "pf": 1.21,
+        "avg_pnl": 1.44,
+        "wins": 61,
+        "losses": 99,
+        "gross_profit": 1327.23,
+        "gross_loss": 1096.15
+      },
+      "all": {
+        "regime": "ALL",
+        "trades": 437,
+        "pnl": 50.18,
+        "win_rate": 35.5,
+        "pf": 1.02,
+        "avg_pnl": 0.11,
+        "wins": 155,
+        "losses": 282,
+        "gross_profit": 3120.84,
+        "gross_loss": 3070.66
+      }
+    },
+    "quarters": {
+      "2024-Q1": {
+        "trades": 6,
+        "pnl": -100.64,
+        "win_rate": 16.7,
+        "pf": 0.02,
+        "avg_adx": 21.4,
+        "trending_pct": 17.0
+      },
+      "2024-Q2": {
+        "trades": 48,
+        "pnl": 80.7,
+        "win_rate": 41.7,
+        "pf": 1.19,
+        "avg_adx": 22.6,
+        "trending_pct": 25.0
+      },
+      "2024-Q3": {
+        "trades": 50,
+        "pnl": 13.33,
+        "win_rate": 30.0,
+        "pf": 1.02,
+        "avg_adx": 23.8,
+        "trending_pct": 40.0
+      },
+      "2024-Q4": {
+        "trades": 54,
+        "pnl": -95.04,
+        "win_rate": 35.2,
+        "pf": 0.79,
+        "avg_adx": 22.2,
+        "trending_pct": 26.0
+      },
+      "2025-Q1": {
+        "trades": 62,
+        "pnl": -73.57,
+        "win_rate": 32.3,
+        "pf": 0.83,
+        "avg_adx": 23.1,
+        "trending_pct": 29.0
+      },
+      "2025-Q2": {
+        "trades": 58,
+        "pnl": -6.44,
+        "win_rate": 36.2,
+        "pf": 0.97,
+        "avg_adx": 22.2,
+        "trending_pct": 24.0
+      },
+      "2025-Q3": {
+        "trades": 61,
+        "pnl": -1.66,
+        "win_rate": 32.8,
+        "pf": 0.99,
+        "avg_adx": 22.5,
+        "trending_pct": 31.0
+      },
+      "2025-Q4": {
+        "trades": 53,
+        "pnl": 156.75,
+        "win_rate": 45.3,
+        "pf": 1.6,
+        "avg_adx": 23.8,
+        "trending_pct": 38.0
+      },
+      "2026-Q1": {
+        "trades": 45,
+        "pnl": 76.74,
+        "win_rate": 33.3,
+        "pf": 1.19,
+        "avg_adx": 22.4,
+        "trending_pct": 24.0
+      }
+    },
+    "total_trades": 437,
+    "final_equity": 347.13,
+    "total_pnl": -152.87,
+    "profitable_quarters": 4,
+    "total_quarters": 9,
+    "long_pnl": -218.54,
+    "short_pnl": 268.71
+  }
+}

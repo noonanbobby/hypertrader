@@ -53,6 +53,8 @@ class RiskManager:
 
         return True, "OK"
 
+    GLOBAL_MAX_MARGIN_PCT = 80.0  # Never use more than 80% of account as margin
+
     async def check_trade_live(
         self,
         db: AsyncSession,
@@ -60,22 +62,35 @@ class RiskManager:
         quantity: float,
         price: float,
         account_balance: float,
+        leverage_override: int | None = None,
+        max_position_pct_override: float | None = None,
     ) -> tuple[bool, str]:
-        """Run pre-trade risk checks for live mode (no strategy). Returns (allowed, reason)."""
+        """Run pre-trade risk checks for live mode. Returns (allowed, reason)."""
         from app.config import settings
 
-        # 1. Position size check: margin vs account_balance * default_max_position_pct
         notional = quantity * price
-        leverage = settings.leverage if settings.leverage > 0 else 1
+        leverage = leverage_override or (settings.leverage if settings.leverage > 0 else 1)
         margin = notional / leverage
-        max_margin = account_balance * (settings.default_max_position_pct / 100)
-        if margin > max_margin * 1.005:
-            return False, (
-                f"Margin ${margin:.2f} exceeds "
-                f"{settings.default_max_position_pct}% limit (${max_margin:.2f})"
-            )
 
-        # 2. Daily loss limit check against webhook_logs for today
+        # 1. Per-asset position size check (if account_balance is available)
+        if account_balance > 0:
+            max_pct = max_position_pct_override or settings.default_max_position_pct
+            max_margin = account_balance * (max_pct / 100)
+            if margin > max_margin * 1.005:
+                return False, (
+                    f"Margin ${margin:.2f} exceeds "
+                    f"{max_pct}% limit (${max_margin:.2f})"
+                )
+
+            # 2. Global margin cap — never use more than 80% of account
+            global_max = account_balance * (self.GLOBAL_MAX_MARGIN_PCT / 100)
+            if margin > global_max:
+                return False, (
+                    f"Margin ${margin:.2f} exceeds global "
+                    f"{self.GLOBAL_MAX_MARGIN_PCT}% cap (${global_max:.2f})"
+                )
+
+        # 3. Daily loss limit
         daily_pnl = await self._get_daily_pnl_live(db)
         if daily_pnl <= -settings.default_daily_loss_limit:
             return False, (

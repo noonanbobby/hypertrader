@@ -1,0 +1,43 @@
+{
+  "data_15m": {
+    "date_range": "2024-03-16T15:15:00+00:00 to 2026-03-16T15:00:00+00:00",
+    "total_candles": 70080,
+    "total_days": 730.0,
+    "gaps": 0,
+    "missing_candles": 0
+  },
+  "data_1h": {
+    "date_range": "2024-03-16T16:00:00+00:00 to 2026-03-16T15:00:00+00:00",
+    "total_candles": 17520,
+    "total_days": 730.0,
+    "gaps": 0,
+    "missing_candles": 0
+  },
+  "indicators_last_bar": {
+    "timestamp": "2026-03-16T15:00:00+00:00",
+    "close": 73522.86,
+    "supertrend_10_3_hl2": {
+      "value": 74525.21,
+      "direction": "BEAR"
+    },
+    "supertrend_10_2_hl2": {
+      "value": 74122.01,
+      "direction": "BEAR"
+    },
+    "supertrend_10_1.3_close": {
+      "value": 73660.22,
+      "direction": "BEAR"
+    },
+    "rsi_7": 44.1,
+    "rsi_14": 47.92,
+    "macd": {
+      "line": 51.99,
+      "signal": 110.42,
+      "histogram": -58.43
+    },
+    "squeeze_momentum": {
+      "histogram": 108.15,
+      "squeeze_on": false
+    }
+  }
+}

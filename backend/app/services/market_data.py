@@ -34,12 +34,7 @@ class MarketDataService:
 
     async def get_mid_price(self, symbol: str) -> Optional[float]:
         """Get current mid price for a symbol."""
-        # Normalize symbol to Hyperliquid format (e.g. BTCUSDC -> BTC)
-        clean_symbol = symbol.upper().replace("-PERP", "").replace("/USD", "")
-        for suffix in ("USDC", "USDT", "USD", "PERP"):
-            if clean_symbol.endswith(suffix) and len(clean_symbol) > len(suffix):
-                clean_symbol = clean_symbol[: -len(suffix)]
-                break
+        clean_symbol = self.normalize_coin(symbol)
 
         # Try cache first, then fetch
         if clean_symbol not in self._price_cache:
@@ -60,13 +55,41 @@ class MarketDataService:
         return self._sz_decimals.get(coin, 5)
 
     def normalize_coin(self, symbol: str) -> str:
-        """Normalize symbol to Hyperliquid coin format (e.g. BTCUSDT -> BTC)."""
-        coin = symbol.upper().replace("-PERP", "").replace("/USD", "")
+        """Normalize symbol to Hyperliquid coin format.
+
+        Handles TradingView formats: BTCUSDT.P, ETHUSDT.P, SOLUSDT.P
+        and standard formats: BTCUSDT, BTCUSDC, BTC-PERP, BTC/USD, BTC
+        """
+        coin = symbol.upper().strip()
+        # TradingView perpetual suffix (e.g. BTCUSDT.P)
+        if coin.endswith(".P"):
+            coin = coin[:-2]
+        coin = coin.replace("-PERP", "").replace("/USD", "")
         for suffix in ("USDC", "USDT", "USD", "PERP"):
             if coin.endswith(suffix) and len(coin) > len(suffix):
                 coin = coin[: -len(suffix)]
                 break
         return coin
+
+    async def get_best_bid_ask(self, symbol: str) -> tuple[Optional[float], Optional[float]]:
+        """Get best bid and ask from L2 order book."""
+        coin = self.normalize_coin(symbol)
+        client = await self._get_client()
+        try:
+            response = await client.post(
+                HYPERLIQUID_INFO_URL,
+                json={"type": "l2Book", "coin": coin},
+            )
+            response.raise_for_status()
+            data = response.json()
+            levels = data.get("levels", [[], []])
+            bids = levels[0] if len(levels) > 0 else []
+            asks = levels[1] if len(levels) > 1 else []
+            best_bid = float(bids[0]["px"]) if bids else None
+            best_ask = float(asks[0]["px"]) if asks else None
+            return best_bid, best_ask
+        except Exception:
+            return None, None
 
     async def get_meta(self) -> dict:
         """Fetch exchange metadata (available assets, etc)."""

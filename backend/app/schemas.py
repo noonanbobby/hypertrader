@@ -289,6 +289,126 @@ class HLStatus(BaseModel):
     account_value: Optional[float] = None
 
 
+# --- Asset Config ---
+class AssetConfigResponse(BaseModel):
+    id: int
+    coin: str
+    display_name: str
+    enabled: bool
+    fixed_trade_amount_usd: float
+    leverage: int
+    max_leverage: int
+    max_position_pct: float
+    st_atr_period: int
+    st_multiplier: float
+    st_source: str
+    htf_timeframe: str
+    htf_st_atr_period: int
+    htf_st_multiplier: float
+    adx_period: int
+    adx_minimum: float
+    adx_rising_required: bool
+    squeeze_block: bool
+    sqz_bb_length: int
+    sqz_bb_mult: float
+    sqz_kc_length: int
+    sqz_kc_mult: float
+    total_trades: int
+    winning_trades: int
+    total_pnl: float
+    last_trade_at: Optional[datetime] = None
+    last_trade_direction: Optional[str] = None
+    last_trade_price: Optional[float] = None
+    notes: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class AssetConfigUpdate(BaseModel):
+    enabled: Optional[bool] = None
+    fixed_trade_amount_usd: Optional[float] = Field(default=None, gt=0)
+    leverage: Optional[int] = Field(default=None, gt=0, le=100)
+    max_position_pct: Optional[float] = Field(default=None, gt=0, le=100)
+    st_atr_period: Optional[int] = Field(default=None, gt=0)
+    st_multiplier: Optional[float] = Field(default=None, gt=0)
+    st_source: Optional[str] = None
+    htf_timeframe: Optional[str] = None
+    htf_st_atr_period: Optional[int] = Field(default=None, gt=0)
+    htf_st_multiplier: Optional[float] = Field(default=None, gt=0)
+    adx_period: Optional[int] = Field(default=None, gt=0)
+    adx_minimum: Optional[float] = Field(default=None, ge=0)
+    adx_rising_required: Optional[bool] = None
+    squeeze_block: Optional[bool] = None
+    sqz_bb_length: Optional[int] = Field(default=None, gt=0)
+    sqz_bb_mult: Optional[float] = Field(default=None, gt=0)
+    sqz_kc_length: Optional[int] = Field(default=None, gt=0)
+    sqz_kc_mult: Optional[float] = Field(default=None, gt=0)
+    notes: Optional[str] = None
+
+
+# --- Position Tracking ---
+class PositionTrackingResponse(BaseModel):
+    id: int
+    coin: str
+    direction: Optional[str] = None
+    signal_size: float = 0.0
+    manual_size: float = 0.0
+    total_size: float = 0.0
+    entry_price: Optional[float] = None
+    opened_at: Optional[datetime] = None
+    origin: Optional[str] = None
+    last_modified_at: Optional[datetime] = None
+    last_modified_by: Optional[str] = None
+    # Enriched from live data
+    current_price: Optional[float] = None
+    unrealized_pnl: Optional[float] = None
+    pnl_pct: Optional[float] = None
+    leverage: Optional[int] = None
+    notional: Optional[float] = None
+    held_duration: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
+
+class PositionOpenRequest(BaseModel):
+    direction: Literal["long", "short"]
+    amount_usd: float = Field(gt=0)
+
+
+class PositionAddRequest(BaseModel):
+    add_pct: float = Field(gt=0, le=100)
+
+
+class PositionReduceRequest(BaseModel):
+    reduce_pct: float = Field(gt=0, le=100)
+
+
+class PositionActionResponse(BaseModel):
+    success: bool
+    message: str
+    pnl: Optional[float] = None
+    held_duration: Optional[str] = None
+    position: Optional[PositionTrackingResponse] = None
+
+
+# --- Live Trade Log ---
+class LiveTradeResponse(BaseModel):
+    id: int
+    coin: str
+    action: str
+    origin: str
+    size: float
+    price: float
+    pnl: Optional[float] = None
+    total_position_after: float
+    timestamp: datetime
+    notes: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
+
 class SettingsUpdate(BaseModel):
     trading_mode: Optional[Literal["paper", "live"]] = None
     webhook_secret: Optional[str] = None

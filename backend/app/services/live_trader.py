@@ -58,13 +58,8 @@ class LiveTrader(TradingEngine):
         return self._exchange, self._info
 
     def _normalize_coin(self, symbol: str) -> str:
-        """Normalize symbol to Hyperliquid coin format (e.g. BTCUSDT -> BTC)."""
-        coin = symbol.upper().replace("-PERP", "").replace("/USD", "")
-        for suffix in ("USDC", "USDT", "USD", "PERP"):
-            if coin.endswith(suffix) and len(coin) > len(suffix):
-                coin = coin[: -len(suffix)]
-                break
-        return coin
+        """Normalize symbol to Hyperliquid coin format."""
+        return market_data.normalize_coin(symbol)
 
     async def _get_sz_decimals(self, coin: str) -> int:
         """Fetch and cache szDecimals via centralized market data service."""

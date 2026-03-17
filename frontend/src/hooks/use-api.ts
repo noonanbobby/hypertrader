@@ -2,7 +2,7 @@
 
 import useSWR from "swr";
 import { fetcher } from "@/lib/api";
-import type { DashboardStats, Strategy, Trade, Position, Analytics, AppSettings, SystemStatus, HLPortfolio, HLPosition, HLFill, HLStatus } from "@/types";
+import type { DashboardStats, Strategy, Trade, Position, Analytics, AppSettings, AssetConfig, SystemStatus, HLPortfolio, HLPosition, HLFill, HLStatus, PositionTracking, LiveTrade } from "@/types";
 
 export function useDashboard() {
   return useSWR<DashboardStats>("/api/dashboard", fetcher, {
@@ -50,6 +50,13 @@ export function useSettings() {
   });
 }
 
+// --- Assets ---
+export function useAssets() {
+  return useSWR<AssetConfig[]>("/api/assets", fetcher, {
+    refreshInterval: 30000,
+  });
+}
+
 // --- Hyperliquid Live ---
 export function useLivePortfolio(enabled = true) {
   return useSWR<HLPortfolio>(enabled ? "/api/live/portfolio" : null, fetcher, {
@@ -72,5 +79,19 @@ export function useLiveFills(enabled = true) {
 export function useLiveStatus() {
   return useSWR<HLStatus>("/api/live/status", fetcher, {
     refreshInterval: 30000,
+  });
+}
+
+// --- Position Tracking ---
+export function usePositionTracking(enabled = true) {
+  return useSWR<PositionTracking[]>(enabled ? "/api/positions" : null, fetcher, {
+    refreshInterval: 5000,
+  });
+}
+
+export function useLiveTrades(params?: Record<string, string>) {
+  const qs = params ? "?" + new URLSearchParams(params).toString() : "";
+  return useSWR<LiveTrade[]>(`/api/trades${qs}`, fetcher, {
+    refreshInterval: 10000,
   });
 }

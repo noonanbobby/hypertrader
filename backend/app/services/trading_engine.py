@@ -111,16 +111,23 @@ class TradingEngine(ABC):
             result.fill_type = "taker"
             return result
 
-        # Get mid price and calculate limit price with offset
-        mid_price = await self.get_current_price(symbol)
-        if mid_price is None:
-            return OrderResult(success=False, message=f"Cannot get price for {symbol}")
+        # Use best bid/ask from L2 book for limit price (better than mid + offset)
+        from app.services.market_data import market_data
+        best_bid, best_ask = await market_data.get_best_bid_ask(symbol)
+
+        if best_bid is None or best_ask is None:
+            # Fallback to mid price if L2 unavailable
+            mid_price = await self.get_current_price(symbol)
+            if mid_price is None:
+                return OrderResult(success=False, message=f"Cannot get price for {symbol}")
+            best_bid = mid_price
+            best_ask = mid_price
 
         offset = settings.limit_order_offset_pct / 100
         if side in ("buy", "long"):
-            limit_price = mid_price * (1 + offset)  # slightly above mid for buys
+            limit_price = best_ask * (1 + offset)  # at or slightly above best ask
         else:
-            limit_price = mid_price * (1 - offset)  # slightly below mid for sells
+            limit_price = best_bid * (1 - offset)  # at or slightly below best bid
 
         # Attempt limit order
         result = await self.execute_order(

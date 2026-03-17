@@ -159,6 +159,73 @@ class AppSettings(Base):
     updated_at: Mapped[dt.datetime] = mapped_column(DateTime, default=dt.datetime.utcnow, onupdate=dt.datetime.utcnow)
 
 
+class AssetConfig(Base):
+    __tablename__ = "asset_configs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    coin: Mapped[str] = mapped_column(String(20), unique=True, nullable=False)
+    display_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    fixed_trade_amount_usd: Mapped[float] = mapped_column(Float, nullable=False, default=42.0)
+    leverage: Mapped[int] = mapped_column(Integer, nullable=False, default=10)
+    max_leverage: Mapped[int] = mapped_column(Integer, nullable=False, default=40)
+    max_position_pct: Mapped[float] = mapped_column(Float, nullable=False, default=25.0)
+    st_atr_period: Mapped[int] = mapped_column(Integer, nullable=False, default=10)
+    st_multiplier: Mapped[float] = mapped_column(Float, nullable=False, default=2.0)
+    st_source: Mapped[str] = mapped_column(String(10), nullable=False, default="close")
+    htf_timeframe: Mapped[str] = mapped_column(String(10), nullable=False, default="1h")
+    htf_st_atr_period: Mapped[int] = mapped_column(Integer, nullable=False, default=10)
+    htf_st_multiplier: Mapped[float] = mapped_column(Float, nullable=False, default=2.0)
+    adx_period: Mapped[int] = mapped_column(Integer, nullable=False, default=14)
+    adx_minimum: Mapped[float] = mapped_column(Float, nullable=False, default=15.0)
+    adx_rising_required: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    squeeze_block: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    sqz_bb_length: Mapped[int] = mapped_column(Integer, nullable=False, default=20)
+    sqz_bb_mult: Mapped[float] = mapped_column(Float, nullable=False, default=2.0)
+    sqz_kc_length: Mapped[int] = mapped_column(Integer, nullable=False, default=20)
+    sqz_kc_mult: Mapped[float] = mapped_column(Float, nullable=False, default=1.5)
+    total_trades: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    winning_trades: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    total_pnl: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    last_trade_at: Mapped[dt.datetime | None] = mapped_column(DateTime, nullable=True)
+    last_trade_direction: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    last_trade_price: Mapped[float | None] = mapped_column(Float, nullable=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[dt.datetime] = mapped_column(DateTime, nullable=False, default=dt.datetime.utcnow)
+    updated_at: Mapped[dt.datetime] = mapped_column(DateTime, nullable=False, default=dt.datetime.utcnow, onupdate=dt.datetime.utcnow)
+
+
+class PositionTracking(Base):
+    __tablename__ = "position_tracking"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    coin: Mapped[str] = mapped_column(String(20), unique=True, nullable=False)
+    direction: Mapped[str | None] = mapped_column(String(10), nullable=True)  # "long", "short", or null (flat)
+    signal_size: Mapped[float] = mapped_column(Float, default=0.0)
+    manual_size: Mapped[float] = mapped_column(Float, default=0.0)
+    total_size: Mapped[float] = mapped_column(Float, default=0.0)
+    entry_price: Mapped[float | None] = mapped_column(Float, nullable=True)
+    opened_at: Mapped[dt.datetime | None] = mapped_column(DateTime, nullable=True)
+    origin: Mapped[str | None] = mapped_column(String(20), nullable=True)  # "signal", "reconciler", "manual"
+    last_modified_at: Mapped[dt.datetime | None] = mapped_column(DateTime, nullable=True)
+    last_modified_by: Mapped[str | None] = mapped_column(String(30), nullable=True)  # "signal", "reconciler", "manual_add", "manual_reduce"
+
+
+class LiveTrade(Base):
+    __tablename__ = "live_trades"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    coin: Mapped[str] = mapped_column(String(20), nullable=False)
+    action: Mapped[str] = mapped_column(String(30), nullable=False)  # open_long, close_long, flip_to_short, add_long, reduce_long, etc.
+    origin: Mapped[str] = mapped_column(String(30), nullable=False)  # signal, reconciler, manual_open, manual_add, manual_reduce, manual_close
+    size: Mapped[float] = mapped_column(Float, nullable=False)
+    price: Mapped[float] = mapped_column(Float, nullable=False)
+    pnl: Mapped[float | None] = mapped_column(Float, nullable=True)
+    total_position_after: Mapped[float] = mapped_column(Float, default=0.0)
+    timestamp: Mapped[dt.datetime] = mapped_column(DateTime, default=dt.datetime.utcnow)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
 class WebhookLog(Base):
     __tablename__ = "webhook_logs"
 

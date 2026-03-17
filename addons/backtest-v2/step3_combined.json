@@ -1,0 +1,113 @@
+[
+  {
+    "filters": "Volume + Time",
+    "params": {
+      "Volume": 1.25,
+      "Time": [
+        22,
+        6
+      ]
+    },
+    "avg_pf_improvement": 0.1769,
+    "avg_pf": 1.5355,
+    "avg_pnl": 371.14,
+    "avg_trades": 72.8
+  },
+  {
+    "filters": "Volume",
+    "params": {
+      "Volume": 1.25
+    },
+    "avg_pf_improvement": 0.1534,
+    "avg_pf": 1.512,
+    "avg_pnl": 509.18,
+    "avg_trades": 108.0
+  },
+  {
+    "filters": "Volume + Time + RSI",
+    "params": {
+      "Volume": 1.25,
+      "Time": [
+        22,
+        6
+      ],
+      "RSI": [
+        14,
+        50,
+        80,
+        20,
+        50
+      ]
+    },
+    "avg_pf_improvement": 0.1435,
+    "avg_pf": 1.5021,
+    "avg_pnl": 337.18,
+    "avg_trades": 71.6
+  },
+  {
+    "filters": "Volume + RSI",
+    "params": {
+      "Volume": 1.25,
+      "RSI": [
+        14,
+        50,
+        80,
+        20,
+        50
+      ]
+    },
+    "avg_pf_improvement": 0.13,
+    "avg_pf": 1.4886,
+    "avg_pnl": 469.96,
+    "avg_trades": 106.8
+  },
+  {
+    "filters": "Time",
+    "params": {
+      "Time": [
+        22,
+        6
+      ]
+    },
+    "avg_pf_improvement": 0.0581,
+    "avg_pf": 1.4167,
+    "avg_pnl": 339.14,
+    "avg_trades": 97.4
+  },
+  {
+    "filters": "Time + RSI",
+    "params": {
+      "Time": [
+        22,
+        6
+      ],
+      "RSI": [
+        14,
+        50,
+        80,
+        20,
+        50
+      ]
+    },
+    "avg_pf_improvement": 0.0326,
+    "avg_pf": 1.3913,
+    "avg_pnl": 306.99,
+    "avg_trades": 96.2
+  },
+  {
+    "filters": "RSI",
+    "params": {
+      "RSI": [
+        14,
+        50,
+        80,
+        20,
+        50
+      ]
+    },
+    "avg_pf_improvement": -0.0172,
+    "avg_pf": 1.3414,
+    "avg_pnl": 369.76,
+    "avg_trades": 142.2
+  }
+]

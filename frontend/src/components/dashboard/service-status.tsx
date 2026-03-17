@@ -17,7 +17,7 @@ import { useState, useCallback } from "react";
 
 const SERVICE_ICONS: Record<string, React.ElementType> = {
   backend: Server,
-  ngrok: Globe,
+  nginx: Globe,
   websocket: Radio,
   telegram: MessageSquare,
 };
@@ -75,8 +75,8 @@ function ServiceIndicator({ service }: { service: ServiceCheck }) {
       {service.message && (
         <span className="text-[10px] text-white/30">{service.message}</span>
       )}
-      {service.name === "ngrok" && service.status === "ok" && service.url && (
-        <CopyWebhookButton ngrokUrl={service.url} />
+      {service.name === "nginx" && service.status === "ok" && (
+        <span className="text-[10px] text-white/30">proxy</span>
       )}
     </div>
   );

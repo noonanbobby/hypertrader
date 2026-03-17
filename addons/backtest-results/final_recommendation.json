@@ -1,0 +1,210 @@
+{
+  "recommendation": "Finalist B",
+  "config": {
+    "supertrend": {
+      "atr_period": 9,
+      "multiplier": 3.0,
+      "source": "hl2"
+    },
+    "rsi_filter": {
+      "enabled": true,
+      "period": 7,
+      "buy_signal": {
+        "min_rsi": 40,
+        "max_rsi": 70,
+        "logic": "Allow BUY only when RSI(7) >= 40 AND RSI(7) <= 70"
+      },
+      "sell_signal": {
+        "min_rsi": 20,
+        "max_rsi": 60,
+        "logic": "Allow SELL (short) only when RSI(7) <= 60 AND RSI(7) >= 20"
+      }
+    },
+    "trailing_supertrend_stop": {
+      "enabled": true,
+      "logic": "On each bar, if LONG and bar low < Supertrend line, close at ST line. If SHORT and bar high > Supertrend line, close at ST line. This exits BEFORE the official Supertrend flip when price touches the ST line intrabar."
+    },
+    "position_sizing": {
+      "mode": "fixed",
+      "position_pct": 25.0,
+      "leverage": 10.0
+    },
+    "execution": {
+      "entry": "On Supertrend direction change, execute on NEXT bar open",
+      "exit": "Trailing ST stop (intrabar touch) OR Supertrend flip, whichever comes first",
+      "fees_modeled": "Taker 0.045% + Slippage 0.005% per side"
+    },
+    "filters_NOT_used": [
+      "ADX",
+      "MACD",
+      "EMA200",
+      "VWAP",
+      "Volume",
+      "Time-of-day",
+      "Cooldown",
+      "Squeeze"
+    ]
+  },
+  "full_dataset_stats": {
+    "data_span_days": 52,
+    "total_trades": 70,
+    "win_rate": 57.14285714285714,
+    "profit_factor": 2.1761710228400304,
+    "net_pnl": 883.4264064126929,
+    "net_pnl_pct": 176.68528128253857,
+    "max_drawdown": 114.44346363545105,
+    "max_drawdown_pct": 7.832647277293161,
+    "sharpe_ratio": 1.9460883496159773,
+    "sortino_ratio": 5.028255507878391,
+    "calmar_ratio": 15829.496885353517,
+    "avg_trade_pnl": 12.620377234467043,
+    "avg_winner": 40.86325264596486,
+    "avg_loser": -25.036789980863375,
+    "win_loss_ratio": 1.632128267130023,
+    "largest_win": 246.7243820444282,
+    "largest_loss": -74.2399927757769,
+    "total_fees": 96.89352397311957,
+    "total_funding": -10.120758018149155,
+    "avg_hold_bars": 35.72857142857143,
+    "avg_hold_hours": 8.932142857142857,
+    "trades_per_day": 1.3423891330403515,
+    "whipsaw_count": 0,
+    "longest_win_streak": 8,
+    "longest_lose_streak": 4,
+    "blocked_trades": 34,
+    "blocked_winners": 19,
+    "blocked_losers": 15,
+    "monthly_pnl": {
+      "2026-01": -22.80323993553055,
+      "2026-02": 929.7339380222433,
+      "2026-03": -23.504291674019537
+    }
+  },
+  "validation": {
+    "walk_forward_pass": false,
+    "walk_forward_note": "Failed by -$26.58 on 16-day holdout. Close to breakeven.",
+    "thirds_pass": false,
+    "thirds_note": "1st: +$527, 2nd: +$116, 3rd: -$8. Third was near-zero loss.",
+    "robustness_pass": true,
+    "robustness_note": "All 6 parameter variations profitable. Some even higher PnL.",
+    "monte_carlo_prob_profit_100": 98.5,
+    "monte_carlo_max_dd_p95": 39.9,
+    "validation_score": "5/10"
+  },
+  "regime_analysis": {
+    "trending_adx_gte_25": {
+      "trades": 21,
+      "pnl": 12.83,
+      "win_rate": 42.9
+    },
+    "ranging_adx_lt_20": {
+      "trades": 28,
+      "pnl": 628.1,
+      "win_rate": 67.9
+    },
+    "neutral_adx_20_25": {
+      "trades": 21,
+      "pnl": 242.5,
+      "win_rate": 57.1
+    },
+    "note": "Profitable in ALL three regimes. Strongest in ranging markets."
+  },
+  "comparison": {
+    "Finalist A: ST(14,3.0,close)+CD+TOD+Trail": {
+      "total_trades": 74,
+      "win_rate": 51.35135135135135,
+      "profit_factor": 1.8740663776006814,
+      "net_pnl": 597.0128953595568,
+      "net_pnl_pct": 119.40257907191135,
+      "max_drawdown_pct": 12.419611874335079,
+      "sharpe_ratio": 1.6619391556883227,
+      "sortino_ratio": 4.757759505417917,
+      "avg_trade_pnl": 8.067741829183202,
+      "whipsaw_count": 0,
+      "total_fees": 80.44797269103621,
+      "monthly_pnl": {
+        "2026-01": -24.92803117554693,
+        "2026-02": 644.5525371455008,
+        "2026-03": -22.611610610396923
+      }
+    },
+    "Finalist B: ST(9,3.0,hl2)+RSI(7,40-70)+Trail": {
+      "total_trades": 70,
+      "win_rate": 57.14285714285714,
+      "profit_factor": 2.1761710228400304,
+      "net_pnl": 883.4264064126929,
+      "net_pnl_pct": 176.68528128253857,
+      "max_drawdown_pct": 7.832647277293161,
+      "sharpe_ratio": 1.9460883496159773,
+      "sortino_ratio": 5.028255507878391,
+      "avg_trade_pnl": 12.620377234467043,
+      "whipsaw_count": 0,
+      "total_fees": 96.89352397311957,
+      "monthly_pnl": {
+        "2026-01": -22.80323993553055,
+        "2026-02": 929.7339380222433,
+        "2026-03": -23.504291674019537
+      }
+    },
+    "Current Live: ST(10,2.0,hl2)+RSI(14)": {
+      "total_trades": 186,
+      "win_rate": 30.64516129032258,
+      "profit_factor": 0.7797054246468273,
+      "net_pnl": -237.53115982631508,
+      "net_pnl_pct": -47.50623196526301,
+      "max_drawdown_pct": 58.89082728156006,
+      "sharpe_ratio": -1.101842256564927,
+      "sortino_ratio": -2.891554921982688,
+      "avg_trade_pnl": -1.2770492463780374,
+      "whipsaw_count": 185,
+      "total_fees": 87.42477493531092,
+      "monthly_pnl": {
+        "2026-01": 25.64367725928939,
+        "2026-02": -218.25884322398622,
+        "2026-03": -44.915993861618155
+      }
+    },
+    "Colleague: ST(10,1.3,close)": {
+      "total_trades": 459,
+      "win_rate": 28.75816993464052,
+      "profit_factor": 0.6408070963463379,
+      "net_pnl": -404.65385040955016,
+      "net_pnl_pct": -80.93077008191003,
+      "max_drawdown_pct": 82.12717246652065,
+      "sharpe_ratio": -3.087565834763558,
+      "sortino_ratio": -6.373029816273104,
+      "avg_trade_pnl": -0.8815988026351853,
+      "whipsaw_count": 458,
+      "total_fees": 127.59491872396192,
+      "monthly_pnl": {
+        "2026-01": -115.380579921495,
+        "2026-02": -196.92715202841308,
+        "2026-03": -92.34611845964189
+      }
+    },
+    "Baseline: ST(10,3.0,hl2)": {
+      "total_trades": 108,
+      "win_rate": 36.11111111111111,
+      "profit_factor": 1.134716420092624,
+      "net_pnl": 169.48520694048213,
+      "net_pnl_pct": 33.897041388096426,
+      "max_drawdown_pct": 31.249873154450086,
+      "sharpe_ratio": 0.44085916779359935,
+      "sortino_ratio": 1.2539512738309788,
+      "avg_trade_pnl": 1.5693074716711293,
+      "whipsaw_count": 107,
+      "total_fees": 92.48853973463295,
+      "monthly_pnl": {
+        "2026-01": -47.70575430461624,
+        "2026-02": 299.9212195772989,
+        "2026-03": -82.73025833220075
+      }
+    }
+  },
+  "warnings": [
+    "Only 52 days of data. Ideally need 90-180 days for high confidence.",
+    "February 2026 was an exceptionally strong trending month. Results may be inflated.",
+    "March 2026 shows small losses across all configs \u2014 monitor for regime change.",
+    "Trailing ST stop requires bot-level logic, not just TradingView alerts."
+  ]
+}

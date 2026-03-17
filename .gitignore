@@ -9,6 +9,10 @@ venv/
 # Environment
 .env
 backend/.env
+addons/.env.addons
+
+# Lock files
+addons/.*.lock
 
 # Node
 node_modules/

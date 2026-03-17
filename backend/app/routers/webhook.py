@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import settings
 from app.database import get_db, async_session
 from app.schemas import WebhookPayload, WebhookResponse
-from app.models import WebhookLog, Position
+from app.models import WebhookLog, Position, AssetConfig, PositionTracking, LiveTrade
 from app.services.trading_engine import create_engine
 from app.services.market_data import market_data
 from app.services.strategy_manager import strategy_manager
@@ -57,7 +57,8 @@ async def receive_webhook(payload: WebhookPayload, db: AsyncSession = Depends(ge
         engine = create_engine(settings.trading_mode)
 
     action = payload.action.lower()
-    symbol = payload.symbol.upper()
+    # Normalize TradingView symbols (BTCUSDT.P → BTC)
+    symbol = market_data.normalize_coin(payload.symbol)
 
     # Route to live or paper processing
     if settings.trading_mode == "live":
@@ -304,27 +305,51 @@ async def _process_webhook_live(
     symbol: str,
     log: WebhookLog,
 ) -> WebhookResponse:
-    """Process webhook in live mode — no strategy, HL is source of truth."""
-    leverage = int(round(settings.leverage))
+    """Process webhook in live mode with position tracking integration."""
+    coin = symbol
+
+    # Look up per-asset config from DB
+    asset_result = await db.execute(
+        select(AssetConfig).where(AssetConfig.coin == coin)
+    )
+    asset_cfg = asset_result.scalar_one_or_none()
+
+    leverage = int(asset_cfg.leverage) if asset_cfg else int(round(settings.leverage))
+    fixed_amount = asset_cfg.fixed_trade_amount_usd if asset_cfg else None
+
+    if asset_cfg and not asset_cfg.enabled:
+        log.result = f"Asset {coin} is disabled"
+        log.success = 0
+        db.add(log)
+        await db.commit()
+        return WebhookResponse(success=False, message=f"Asset {coin} is disabled")
+
+    # Look up position tracking
+    pt_result = await db.execute(
+        select(PositionTracking).where(PositionTracking.coin == coin)
+    )
+    pt = pt_result.scalar_one_or_none()
+
+    # Determine origin from payload
+    origin = "signal"
+    if payload.message and "reconciler" in payload.message.lower():
+        origin = "reconciler"
 
     if action in ("buy", "sell"):
         new_side = "long" if action == "buy" else "short"
 
-        # Get current price
-        price = await engine.get_current_price(symbol)
+        price = await engine.get_current_price(coin)
         if not price:
-            raise ValueError(f"Cannot get price for {symbol}")
+            raise ValueError(f"Cannot get price for {coin}")
 
-        # Resolve szDecimals for quantity rounding
-        coin = market_data.normalize_coin(symbol)
         sz_decimals = await market_data.get_sz_decimals(coin)
 
-        # Check for existing HL position on this symbol
+        # Check existing HL position
         from app.services.hl_account import hl_account
         hl_positions = await hl_account.get_open_positions()
         existing = next((p for p in hl_positions if p["symbol"] == coin), None)
 
-        # Same-side signal = duplicate → no-op
+        # Same-side = duplicate → no-op
         if existing and existing["side"] == new_side:
             msg = f"Already {existing['side']} {coin} — duplicate signal ignored"
             log.result = msg
@@ -333,7 +358,8 @@ async def _process_webhook_live(
             await db.commit()
             return WebhookResponse(success=True, message=msg)
 
-        # Opposite-side signal = close existing position first
+        # Opposite-side = close ENTIRE position (signal + manual), then open fresh at strategy size
+        close_pnl = 0.0
         if existing:
             close_side = "sell" if existing["side"] == "long" else "buy"
             close_result = await engine.execute_order_with_fallback(
@@ -342,28 +368,55 @@ async def _process_webhook_live(
             if not close_result.success:
                 raise ValueError(f"Close failed: {close_result.message}")
 
+            # Calculate PnL
+            if existing["side"] == "long":
+                close_pnl = (close_result.filled_price - existing["entry_price"]) * existing["size"]
+            else:
+                close_pnl = (existing["entry_price"] - close_result.filled_price) * existing["size"]
+            close_pnl = round(close_pnl, 4)
+
+            closed_notional = pt.total_size if (pt and pt.total_size > 0) else existing["notional"]
+
+            # Log the close trade
+            db.add(LiveTrade(
+                coin=coin,
+                action=f"close_{existing['side']}",
+                origin=origin,
+                size=closed_notional,
+                price=close_result.filled_price,
+                pnl=close_pnl,
+                total_position_after=0.0,
+                notes=f"Closed for {action} signal",
+            ))
+
+            await _update_asset_stats(
+                db, coin, "close", close_result.filled_price,
+                pnl=close_pnl, is_close=True,
+            )
+
             asyncio.create_task(notifier.notify_trade_close(
                 symbol=coin, side=existing["side"],
                 quantity=existing["size"], entry_price=existing["entry_price"],
                 exit_price=close_result.filled_price,
-                pnl=existing["unrealized_pnl"],
+                pnl=close_pnl,
                 strategy_name="Live", leverage=leverage,
             ))
 
-        # Get account balance for sizing the new position
-        account_balance = await engine.get_balance()
-        if account_balance <= 0:
-            raise ValueError("Account balance is zero or unavailable")
-
-        # Calculate quantity from account balance
-        size_pct = payload.size_pct or settings.default_size_pct
+        # Calculate quantity for NEW position at strategy size
         quantity = payload.quantity or 0.0
         if quantity <= 0:
-            if settings.use_max_size and not payload.size_pct:
-                notional = account_balance * (settings.default_max_position_pct / 100)
+            if fixed_amount and fixed_amount > 0:
+                notional = fixed_amount * leverage
             else:
-                margin = account_balance * (size_pct / 100)
-                notional = margin * leverage
+                account_balance = await engine.get_balance()
+                if account_balance <= 0:
+                    raise ValueError("Account balance is zero or unavailable")
+                size_pct = payload.size_pct or settings.default_size_pct
+                if settings.use_max_size and not payload.size_pct:
+                    notional = account_balance * (settings.default_max_position_pct / 100)
+                else:
+                    margin = account_balance * (size_pct / 100)
+                    notional = margin * leverage
             quantity = notional / price
 
         quantity = round(quantity, sz_decimals)
@@ -376,30 +429,67 @@ async def _process_webhook_live(
             )
 
         # Risk check
+        account_balance_for_risk = await engine.get_balance() if not fixed_amount else 0
         allowed, reason = await risk_manager.check_trade_live(
-            db, symbol, quantity, price, account_balance
+            db, coin, quantity, price, account_balance_for_risk,
+            leverage_override=leverage,
+            max_position_pct_override=asset_cfg.max_position_pct if asset_cfg else None,
         )
         if not allowed:
             asyncio.create_task(notifier.notify_risk_breach(
-                strategy_name="Live", symbol=symbol, reason=reason,
+                strategy_name="Live", symbol=coin, reason=reason,
             ))
             raise ValueError(f"Risk check failed: {reason}")
 
         # Execute new position
-        result = await engine.execute_order_with_fallback(symbol, action, quantity)
+        result = await engine.execute_order_with_fallback(coin, action, quantity)
         if not result.success:
             raise ValueError(result.message)
 
-        # Fire Telegram notification
+        fill_price = result.filled_price or price
+        filled_notional = fill_price * (result.quantity or quantity)
+
+        # Update position tracking
+        now = dt.datetime.utcnow()
+        if pt is None:
+            pt = PositionTracking(coin=coin)
+            db.add(pt)
+
+        pt.direction = new_side
+        pt.signal_size = filled_notional
+        pt.manual_size = 0.0
+        pt.total_size = filled_notional
+        pt.entry_price = fill_price
+        pt.opened_at = now
+        pt.origin = origin
+        pt.last_modified_at = now
+        pt.last_modified_by = origin
+
+        # Log the open trade
+        trade_action = f"open_{new_side}" if not existing else f"flip_to_{new_side}"
+        db.add(LiveTrade(
+            coin=coin,
+            action=trade_action,
+            origin=origin,
+            size=filled_notional,
+            price=fill_price,
+            pnl=None,
+            total_position_after=filled_notional,
+            notes=payload.message or f"{origin.title()} {new_side} signal",
+        ))
+
+        await _update_asset_stats(db, coin, new_side, fill_price)
+
         asyncio.create_task(notifier.notify_trade_open(
-            symbol=symbol, side=new_side, quantity=result.quantity,
-            price=result.filled_price, strategy_name="Live",
+            symbol=coin, side=new_side, quantity=result.quantity,
+            price=fill_price, strategy_name="Live",
             fill_type=result.fill_type, leverage=leverage,
         ))
 
         msg = result.message
         if existing:
-            msg = f"Flipped {existing['side']}→{new_side} {coin} | {msg}"
+            pnl_sign = "+" if close_pnl >= 0 else ""
+            msg = f"Flipped {existing['side']}→{new_side} {coin} (P&L: {pnl_sign}${close_pnl:.2f}) | {msg}"
         log.result = msg
         log.success = 1
         db.add(log)
@@ -407,7 +497,6 @@ async def _process_webhook_live(
         return WebhookResponse(success=True, message=msg)
 
     elif action in ("close_long", "close_short", "close_all"):
-        # For live mode, we need to check HL positions directly
         from app.services.hl_account import hl_account
         hl_positions = await hl_account.get_open_positions()
 
@@ -425,7 +514,23 @@ async def _process_webhook_live(
                 r = await engine.execute_order_with_fallback(
                     pos["symbol"], close_side, pos["size"]
                 )
-                results.append(f"{pos['symbol']}: {'OK' if r.success else r.message}")
+                coin_sym = pos["symbol"]
+                if r.success:
+                    # Update tracking
+                    pt_r = await db.execute(
+                        select(PositionTracking).where(PositionTracking.coin == coin_sym)
+                    )
+                    pt_row = pt_r.scalar_one_or_none()
+                    if pt_row:
+                        pt_row.direction = None
+                        pt_row.signal_size = 0.0
+                        pt_row.manual_size = 0.0
+                        pt_row.total_size = 0.0
+                        pt_row.entry_price = None
+                        pt_row.opened_at = None
+                        pt_row.last_modified_at = dt.datetime.utcnow()
+                        pt_row.last_modified_by = origin
+                results.append(f"{coin_sym}: {'OK' if r.success else r.message}")
 
             msg = f"Closed all: {', '.join(results)}"
             log.result = msg
@@ -435,28 +540,56 @@ async def _process_webhook_live(
             return WebhookResponse(success=True, message=msg)
 
         # Close specific symbol
-        coin = market_data.normalize_coin(symbol)
         matching = [p for p in hl_positions if p["symbol"] == coin]
         if not matching:
-            log.result = f"No open position for {symbol}"
+            log.result = f"No open position for {coin}"
             log.success = 0
             db.add(log)
             await db.commit()
-            return WebhookResponse(success=False, message=f"No open position for {symbol}")
+            return WebhookResponse(success=False, message=f"No open position for {coin}")
 
         pos = matching[0]
         close_side = "sell" if pos["side"] == "long" else "buy"
         result = await engine.execute_order_with_fallback(
-            symbol, close_side, pos["size"]
+            coin, close_side, pos["size"]
         )
         if not result.success:
             raise ValueError(result.message)
 
+        # PnL
+        if pos["side"] == "long":
+            pnl = (result.filled_price - pos["entry_price"]) * pos["size"]
+        else:
+            pnl = (pos["entry_price"] - result.filled_price) * pos["size"]
+        pnl = round(pnl, 4)
+
+        # Update tracking
+        if pt:
+            db.add(LiveTrade(
+                coin=coin, action=f"close_{pos['side']}", origin=origin,
+                size=pt.total_size, price=result.filled_price,
+                pnl=pnl, total_position_after=0.0,
+                notes=payload.message or f"Signal close",
+            ))
+            pt.direction = None
+            pt.signal_size = 0.0
+            pt.manual_size = 0.0
+            pt.total_size = 0.0
+            pt.entry_price = None
+            pt.opened_at = None
+            pt.last_modified_at = dt.datetime.utcnow()
+            pt.last_modified_by = origin
+
+        await _update_asset_stats(
+            db, coin, "close", result.filled_price,
+            pnl=pnl, is_close=True,
+        )
+
         asyncio.create_task(notifier.notify_trade_close(
-            symbol=symbol, side=pos["side"],
+            symbol=coin, side=pos["side"],
             quantity=pos["size"], entry_price=pos["entry_price"],
             exit_price=result.filled_price,
-            pnl=pos["unrealized_pnl"],
+            pnl=pnl,
             strategy_name="Live", leverage=leverage,
         ))
 
@@ -468,6 +601,28 @@ async def _process_webhook_live(
 
     else:
         raise ValueError(f"Unknown action: {action}")
+
+
+async def _update_asset_stats(
+    db: AsyncSession, coin: str, direction: str, price: float, pnl: float = 0.0, is_close: bool = False
+):
+    """Update asset_configs stats after a trade."""
+    result = await db.execute(
+        select(AssetConfig).where(AssetConfig.coin == coin)
+    )
+    asset = result.scalar_one_or_none()
+    if asset is None:
+        return
+    import datetime as dt
+    asset.total_trades += 1
+    if is_close and pnl > 0:
+        asset.winning_trades += 1
+    if is_close:
+        asset.total_pnl += pnl
+    asset.last_trade_at = dt.datetime.utcnow()
+    asset.last_trade_direction = direction
+    asset.last_trade_price = price
+    asset.updated_at = dt.datetime.utcnow()
 
 
 async def _get_existing_position(

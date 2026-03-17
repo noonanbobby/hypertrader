@@ -12,12 +12,17 @@ from app.services.position_manager import position_manager
 router = APIRouter()
 
 
-@router.get("/positions", response_model=list[PositionResponse])
+@router.get("/positions")
 async def list_positions(
     strategy_id: Optional[int] = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
-    # Update unrealized P&L before returning
+    # In live mode, return position tracking data
+    if settings.trading_mode == "live" and strategy_id is None:
+        from app.routers.position_tracking import list_positions as _live_positions
+        return await _live_positions(db=db)
+
+    # Paper mode — original behavior
     await position_manager.update_unrealized_pnl(db)
 
     stmt = select(Position).order_by(Position.opened_at.desc())

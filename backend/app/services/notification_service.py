@@ -25,7 +25,7 @@ class NotificationService:
         notional = price * quantity
         margin = notional / leverage if leverage else notional
         text = (
-            f"{emoji} {side.upper()} {symbol} @ ${price:,.2f}\n"
+            f"[{ticker}] {emoji} {side.upper()} {symbol} @ ${price:,.2f}\n"
             f"Size: {quantity} {ticker} (${notional:,.2f})\n"
             f"Invested: ${margin:,.2f} ({leverage:.0f}x leverage)\n"
             f"Strategy: {strategy_name}\n"
@@ -56,7 +56,7 @@ class NotificationService:
         notional_exit = exit_price * quantity
         margin = notional_entry / leverage if leverage else notional_entry
         text = (
-            f"{emoji} Closed {side.upper()} {symbol} @ ${exit_price:,.2f}\n"
+            f"[{ticker}] {emoji} Closed {side.upper()} {symbol} @ ${exit_price:,.2f}\n"
             f"\n"
             f"Summary:\n"
             f"  Entry: ${entry_price:,.2f} \u2192 Exit: ${exit_price:,.2f}\n"
@@ -77,8 +77,9 @@ class NotificationService:
     ):
         if not settings.notify_risk_breach:
             return
+        ticker = symbol.replace("USDC", "").replace("USDT", "")
         text = (
-            f"\u26d4 Trade BLOCKED: {symbol}\n"
+            f"[{ticker}] \u26d4 Trade BLOCKED: {symbol}\n"
             f"Reason: {reason}\n"
             f"Strategy: {strategy_name}"
         )

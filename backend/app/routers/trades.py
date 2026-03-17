@@ -14,7 +14,7 @@ from app.services.position_manager import position_manager
 router = APIRouter()
 
 
-@router.get("/trades", response_model=list[TradeResponse])
+@router.get("/trades")
 async def list_trades(
     strategy_id: Optional[int] = Query(None),
     symbol: Optional[str] = Query(None),
@@ -24,8 +24,14 @@ async def list_trades(
     end_date: Optional[str] = Query(None),
     limit: int = Query(100, ge=1, le=1000),
     offset: int = Query(0, ge=0),
+    coin: Optional[str] = Query(None),
+    origin: Optional[str] = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
+    # In live mode, return from live_trades table
+    if settings.trading_mode == "live" and strategy_id is None:
+        from app.routers.position_tracking import list_trades as _live_trades
+        return await _live_trades(limit=limit, coin=coin or symbol, origin=origin, db=db)
     stmt = select(Trade).join(Strategy).order_by(desc(Trade.entry_time))
 
     if strategy_id:

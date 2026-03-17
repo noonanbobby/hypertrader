@@ -76,37 +76,19 @@ async def live_fills():
 
 @router.post("/live/positions/{symbol}/close", response_model=WebhookResponse)
 async def close_live_position(symbol: str):
-    """Close a live position on Hyperliquid by symbol."""
+    """Close a live position — delegates to position tracking system."""
     _require_configured()
+    from app.database import async_session
+    from app.routers.position_tracking import close_position as _close_pos
+    from app.database import get_db
+
+    coin = market_data.normalize_coin(symbol)
     try:
-        # Find the position
-        positions = await hl_account.get_open_positions()
-        coin = market_data.normalize_coin(symbol)
-        matching = [p for p in positions if p["symbol"] == coin]
-        if not matching:
-            return WebhookResponse(success=False, message=f"No open position for {coin}")
-
-        pos = matching[0]
-        close_side = "sell" if pos["side"] == "long" else "buy"
-
-        engine = create_engine("live")
-        result = await engine.execute_order_with_fallback(coin, close_side, pos["size"])
-        if not result.success:
-            return WebhookResponse(success=False, message=result.message)
-
-        leverage = int(round(settings.leverage))
-        asyncio.create_task(notifier.notify_trade_close(
-            symbol=coin, side=pos["side"],
-            quantity=pos["size"], entry_price=pos["entry_price"],
-            exit_price=result.filled_price,
-            pnl=pos["unrealized_pnl"],
-            strategy_name="Live", leverage=leverage,
-        ))
-
-        return WebhookResponse(
-            success=True,
-            message=f"Closed {pos['side']} {pos['size']} {coin} @ {result.filled_price:.4f}",
-        )
+        async with async_session() as db:
+            result = await _close_pos(coin, db=db)
+            return WebhookResponse(success=result.success, message=result.message)
+    except HTTPException as e:
+        return WebhookResponse(success=False, message=e.detail)
     except Exception as e:
         logger.exception("Failed to close live position %s", symbol)
         return WebhookResponse(success=False, message=str(e))

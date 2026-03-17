@@ -1,0 +1,255 @@
+{
+  "gap1_cross_exchange": {
+    "hl_pnl": 79.72,
+    "bn_pnl": 112.07,
+    "hl_trades": 31,
+    "bn_trades": 29,
+    "difference": 32.36
+  },
+  "gap2_top10_winners": [
+    {
+      "entry": "2026-02-04T13:45:00+00:00",
+      "exit": "2026-02-06T06:00:00+00:00",
+      "direction": "short",
+      "entry_price": 75350.54,
+      "exit_price": 66414.75,
+      "pnl": 147.6745,
+      "hours": 40.2
+    },
+    {
+      "entry": "2024-08-04T14:30:00+00:00",
+      "exit": "2024-08-05T14:45:00+00:00",
+      "direction": "short",
+      "entry_price": 60353.95,
+      "exit_price": 54161.47,
+      "pnl": 127.6911,
+      "hours": 24.2
+    },
+    {
+      "entry": "2024-11-10T22:30:00+00:00",
+      "exit": "2024-11-12T10:30:00+00:00",
+      "direction": "long",
+      "entry_price": 80857.8,
+      "exit_price": 87439.66,
+      "pnl": 101.1879,
+      "hours": 36.0
+    },
+    {
+      "entry": "2025-02-24T03:30:00+00:00",
+      "exit": "2025-02-26T15:15:00+00:00",
+      "direction": "short",
+      "entry_price": 95505.46,
+      "exit_price": 88350.42,
+      "pnl": 93.0844,
+      "hours": 59.8
+    },
+    {
+      "entry": "2025-10-10T15:00:00+00:00",
+      "exit": "2025-10-12T04:45:00+00:00",
+      "direction": "short",
+      "entry_price": 120481.11,
+      "exit_price": 111511.74,
+      "pnl": 92.4954,
+      "hours": 37.8
+    },
+    {
+      "entry": "2025-09-30T19:00:00+00:00",
+      "exit": "2025-10-04T11:15:00+00:00",
+      "direction": "long",
+      "entry_price": 113725.92,
+      "exit_price": 122020.09,
+      "pnl": 90.6015,
+      "hours": 88.2
+    },
+    {
+      "entry": "2026-01-31T07:45:00+00:00",
+      "exit": "2026-02-02T10:00:00+00:00",
+      "direction": "short",
+      "entry_price": 83473.72,
+      "exit_price": 77733.1,
+      "pnl": 85.402,
+      "hours": 50.2
+    },
+    {
+      "entry": "2025-03-03T14:45:00+00:00",
+      "exit": "2025-03-04T17:45:00+00:00",
+      "direction": "short",
+      "entry_price": 91354.19,
+      "exit_price": 85228.76,
+      "pnl": 83.2518,
+      "hours": 27.0
+    },
+    {
+      "entry": "2025-11-03T02:30:00+00:00",
+      "exit": "2025-11-05T03:30:00+00:00",
+      "direction": "short",
+      "entry_price": 109238.82,
+      "exit_price": 102116.67,
+      "pnl": 80.9349,
+      "hours": 49.0
+    },
+    {
+      "entry": "2025-03-02T15:30:00+00:00",
+      "exit": "2025-03-03T06:45:00+00:00",
+      "direction": "long",
+      "entry_price": 86439.71,
+      "exit_price": 91984.8,
+      "pnl": 79.6247,
+      "hours": 15.2
+    }
+  ],
+  "gap3_maker_feasibility": {
+    "estimated_fill_rate": 100.0,
+    "blended_50_50_pnl": 549.4
+  },
+  "gap5_52day_prediction": {
+    "trades": 29,
+    "pnl": 112.07
+  },
+  "gap6_starting_sensitivity": [
+    {
+      "start_date": "2024-03-18",
+      "days": 728.0,
+      "trades": 437,
+      "pnl": 235.3,
+      "pnl_pct": 47.1,
+      "win_rate": 35.5,
+      "pf": 1.14,
+      "max_dd": 67.0,
+      "min_eq": 231.6,
+      "verdict": "PROFITABLE + deep DD"
+    },
+    {
+      "start_date": "2024-05-17",
+      "days": 668.0,
+      "trades": 412,
+      "pnl": 127.35,
+      "pnl_pct": 25.5,
+      "win_rate": 34.0,
+      "pf": 1.11,
+      "max_dd": 79.2,
+      "min_eq": 123.65,
+      "verdict": "PROFITABLE + deep DD"
+    },
+    {
+      "start_date": "2024-07-16",
+      "days": 608.0,
+      "trades": 375,
+      "pnl": 187.69,
+      "pnl_pct": 37.5,
+      "win_rate": 34.7,
+      "pf": 1.13,
+      "max_dd": 71.9,
+      "min_eq": 183.99,
+      "verdict": "PROFITABLE + deep DD"
+    },
+    {
+      "start_date": "2024-09-14",
+      "days": 548.0,
+      "trades": 345,
+      "pnl": 232.04,
+      "pnl_pct": 46.4,
+      "win_rate": 35.1,
+      "pf": 1.16,
+      "max_dd": 59.5,
+      "min_eq": 228.34,
+      "verdict": "PROFITABLE + deep DD"
+    },
+    {
+      "start_date": "2024-11-13",
+      "days": 488.0,
+      "trades": 307,
+      "pnl": 260.59,
+      "pnl_pct": 52.1,
+      "win_rate": 35.5,
+      "pf": 1.18,
+      "max_dd": 56.6,
+      "min_eq": 256.89,
+      "verdict": "PROFITABLE + deep DD"
+    },
+    {
+      "start_date": "2025-01-12",
+      "days": 428.0,
+      "trades": 269,
+      "pnl": 366.6,
+      "pnl_pct": 73.3,
+      "win_rate": 36.1,
+      "pf": 1.26,
+      "max_dd": 48.2,
+      "min_eq": 362.9,
+      "verdict": "PROFITABLE"
+    },
+    {
+      "start_date": "2025-03-13",
+      "days": 368.0,
+      "trades": 227,
+      "pnl": 306.37,
+      "pnl_pct": 61.3,
+      "win_rate": 36.6,
+      "pf": 1.27,
+      "max_dd": 41.1,
+      "min_eq": 306.98,
+      "verdict": "PROFITABLE"
+    },
+    {
+      "start_date": "2025-05-12",
+      "days": 308.0,
+      "trades": 191,
+      "pnl": 450.98,
+      "pnl_pct": 90.2,
+      "win_rate": 38.7,
+      "pf": 1.47,
+      "max_dd": 32.1,
+      "min_eq": 462.24,
+      "verdict": "PROFITABLE"
+    },
+    {
+      "start_date": "2025-07-11",
+      "days": 248.0,
+      "trades": 154,
+      "pnl": 304.95,
+      "pnl_pct": 61.0,
+      "win_rate": 37.0,
+      "pf": 1.38,
+      "max_dd": 40.6,
+      "min_eq": 323.48,
+      "verdict": "PROFITABLE"
+    },
+    {
+      "start_date": "2025-09-09",
+      "days": 188.0,
+      "trades": 111,
+      "pnl": 444.23,
+      "pnl_pct": 88.8,
+      "win_rate": 38.7,
+      "pf": 1.69,
+      "max_dd": 21.7,
+      "min_eq": 462.77,
+      "verdict": "PROFITABLE"
+    },
+    {
+      "start_date": "2025-11-08",
+      "days": 128.0,
+      "trades": 77,
+      "pnl": 143.67,
+      "pnl_pct": 28.7,
+      "win_rate": 36.4,
+      "pf": 1.31,
+      "max_dd": 29.3,
+      "min_eq": 493.07,
+      "verdict": "PROFITABLE"
+    },
+    {
+      "start_date": "2026-01-07",
+      "days": 68.0,
+      "trades": 40,
+      "pnl": 81.85,
+      "pnl_pct": 16.4,
+      "win_rate": 30.0,
+      "pf": 1.28,
+      "max_dd": 31.6,
+      "min_eq": 431.24,
+      "verdict": "PROFITABLE"
+    }
+  ]
+}

@@ -1,0 +1,193 @@
+//@version=5
+// MTF Supertrend + ADX Rising + Squeeze Filter
+// Replaces basic Supertrend v4 indicator
+// Backtested on 730 days BTC data: PF=1.39, Win=35.1%, MDD=46%
+
+indicator("MTF Supertrend + ADX + Squeeze", overlay=true, format=format.price, precision=2)
+
+// ─── INPUTS ───────────────────────────────────────────────────────────────────
+grp1 = "15m Supertrend"
+Periods    = input.int(10,     "ATR Period",     group=grp1)
+Multiplier = input.float(4.0,  "ATR Multiplier", group=grp1, step=0.1)
+src        = input.source(hl2, "Source",         group=grp1)
+
+grp2 = "1H Confirmation"
+Periods_1h    = input.int(10,    "1H ATR Period",     group=grp2)
+Multiplier_1h = input.float(4.0, "1H ATR Multiplier", group=grp2, step=0.1)
+
+grp3 = "ADX Filter"
+adx_period  = input.int(14,   "ADX Period",           group=grp3)
+adx_min     = input.float(15, "ADX Minimum",          group=grp3)
+adx_lookback = input.int(1,   "ADX Rising Lookback",  group=grp3, tooltip="Bars to look back for rising check. 1 = previous bar.")
+
+grp4 = "Squeeze Momentum"
+bb_length = input.int(20,     "BB Length",     group=grp4)
+bb_mult   = input.float(2.0,  "BB Multiplier", group=grp4, step=0.1)
+kc_length = input.int(20,     "KC Length",     group=grp4)
+kc_mult   = input.float(1.5,  "KC Multiplier", group=grp4, step=0.1)
+
+grp5 = "Display"
+showsignals  = input.bool(true, "Show Buy/Sell Signals",  group=grp5)
+highlighting = input.bool(true, "Highlighter On/Off",     group=grp5)
+showAllFlips = input.bool(true, "Show Unfiltered Flips (dots)", group=grp5, tooltip="Small dots on ALL Supertrend flips, even blocked ones")
+showTable    = input.bool(true, "Show Status Table",      group=grp5)
+
+// ─── 15M SUPERTREND (manual calculation matching v4 logic exactly) ────────────
+atr_val = ta.atr(Periods)
+up  = src - (Multiplier * atr_val)
+up1 = nz(up[1], up)
+up := close[1] > up1 ? math.max(up, up1) : up
+dn  = src + (Multiplier * atr_val)
+dn1 = nz(dn[1], dn)
+dn := close[1] < dn1 ? math.min(dn, dn1) : dn
+
+var int trend = 1
+trend := nz(trend[1], trend)
+trend := trend == -1 and close > dn1 ? 1 : trend == 1 and close < up1 ? -1 : trend
+
+bullish = trend == 1
+bearish = trend == -1
+flipBull = trend == 1 and trend[1] == -1
+flipBear = trend == -1 and trend[1] == 1
+
+// ─── 1H SUPERTREND CONFIRMATION ──────────────────────────────────────────────
+// Request the 1H Supertrend direction using built-in function
+// ta.supertrend returns [line, direction] where direction: -1=uptrend, +1=downtrend
+[st1h_line, st1h_dir] = request.security(syminfo.tickerid, "60", ta.supertrend(Multiplier_1h, Periods_1h), barmerge.gaps_off, barmerge.lookahead_off)
+
+htf_bullish = st1h_dir == -1
+htf_bearish = st1h_dir == 1
+
+// ─── ADX FILTER (manual calculation — ta.adx() does not exist in Pine v5) ───
+// Step 1: +DM and -DM
+float plus_dm  = na
+float minus_dm = na
+up_move   = high - high[1]
+down_move = low[1] - low
+plus_dm  := up_move > down_move and up_move > 0 ? up_move : 0.0
+minus_dm := down_move > up_move and down_move > 0 ? down_move : 0.0
+
+// Step 2: Smooth TR, +DM, -DM with RMA (Wilder's smoothing)
+smoothed_tr  = ta.rma(ta.tr(true), adx_period)
+smoothed_pdm = ta.rma(plus_dm, adx_period)
+smoothed_mdm = ta.rma(minus_dm, adx_period)
+
+// Step 3: +DI and -DI
+plus_di  = smoothed_tr > 0 ? 100 * smoothed_pdm / smoothed_tr : 0.0
+minus_di = smoothed_tr > 0 ? 100 * smoothed_mdm / smoothed_tr : 0.0
+
+// Step 4: DX
+di_sum = plus_di + minus_di
+dx = di_sum > 0 ? 100 * math.abs(plus_di - minus_di) / di_sum : 0.0
+
+// Step 5: ADX = RMA of DX
+adx_val = ta.rma(dx, adx_period)
+
+adx_ok     = adx_val >= adx_min
+adx_rising = adx_val > adx_val[adx_lookback]
+adx_pass   = adx_ok and adx_rising
+
+// ─── SQUEEZE MOMENTUM (LazyBear method) ──────────────────────────────────────
+// Bollinger Bands
+bb_basis = ta.sma(close, bb_length)
+bb_dev   = bb_mult * ta.stdev(close, bb_length)
+upper_bb = bb_basis + bb_dev
+lower_bb = bb_basis - bb_dev
+
+// Keltner Channels — LazyBear uses SMA of True Range (not ATR/RMA)
+kc_range = ta.sma(ta.tr(true), kc_length)
+kc_basis = ta.sma(close, kc_length)
+upper_kc = kc_basis + kc_mult * kc_range
+lower_kc = kc_basis - kc_mult * kc_range
+
+// Squeeze ON when Bollinger Bands are INSIDE Keltner Channels
+squeeze_on  = lower_bb > lower_kc and upper_bb < upper_kc
+squeeze_off = not squeeze_on
+
+// ─── COMBINED SIGNALS ────────────────────────────────────────────────────────
+buySignal  = flipBull and htf_bullish and adx_pass and squeeze_off
+sellSignal = flipBear and htf_bearish and adx_pass and squeeze_off
+
+// ─── VISUAL: SUPERTREND LINES (same style as original v4) ────────────────────
+upPlot = plot(trend == 1 ? up : na, title="Up Trend",   style=plot.style_linebr, linewidth=2, color=color.green)
+dnPlot = plot(trend == 1 ? na : dn, title="Down Trend", style=plot.style_linebr, linewidth=2, color=color.red)
+
+// ─── VISUAL: FLIP DOTS (all flips, including blocked) ────────────────────────
+plotshape(showAllFlips and flipBull ? up : na, title="Flip Bull Dot", location=location.absolute, style=shape.circle, size=size.tiny, color=color.new(color.green, 60))
+plotshape(showAllFlips and flipBear ? dn : na, title="Flip Bear Dot", location=location.absolute, style=shape.circle, size=size.tiny, color=color.new(color.red, 60))
+
+// ─── VISUAL: BUY/SELL LABELS (only when ALL conditions met) ──────────────────
+plotshape(buySignal and showsignals ? up : na, title="Buy", text="BUY", location=location.absolute, style=shape.labelup, size=size.small, color=color.green, textcolor=color.white)
+plotshape(sellSignal and showsignals ? dn : na, title="Sell", text="SELL", location=location.absolute, style=shape.labeldown, size=size.small, color=color.red, textcolor=color.white)
+
+// ─── VISUAL: HIGHLIGHTING (same as original v4) ─────────────────────────────
+mPlot = plot(ohlc4, title="", style=plot.style_circles, linewidth=0, display=display.none)
+longFillColor  = highlighting ? (trend == 1 ? color.new(color.green, 90) : color.new(color.white, 100)) : color.new(color.white, 100)
+shortFillColor = highlighting ? (trend == -1 ? color.new(color.red, 90) : color.new(color.white, 100)) : color.new(color.white, 100)
+fill(mPlot, upPlot, title="UpTrend Highlighter",   color=longFillColor)
+fill(mPlot, dnPlot, title="DownTrend Highlighter", color=shortFillColor)
+
+// ─── VISUAL: 1H TREND BACKGROUND ────────────────────────────────────────────
+bgcolor(htf_bullish ? color.new(color.green, 96) : htf_bearish ? color.new(color.red, 96) : na, title="1H Trend Background")
+
+// ─── STATUS TABLE ────────────────────────────────────────────────────────────
+if showTable and barstate.islast
+    var table t = table.new(position.middle_left, 2, 7, bgcolor=#131722, border_width=1, border_color=color.gray)
+
+    // Row 0: 15m Supertrend
+    table.cell(t, 0, 0, "15m ST",  text_color=color.white, text_size=size.small, text_halign=text.align_right)
+    table.cell(t, 1, 0, bullish ? "BULL" : "BEAR", text_color=bullish ? color.green : color.red, text_size=size.small)
+
+    // Row 1: 1H Supertrend
+    table.cell(t, 0, 1, "1H ST",   text_color=color.white, text_size=size.small, text_halign=text.align_right)
+    table.cell(t, 1, 1, htf_bullish ? "BULL" : htf_bearish ? "BEAR" : "---", text_color=htf_bullish ? color.green : color.red, text_size=size.small)
+
+    // Row 2: Alignment
+    aligned = (bullish and htf_bullish) or (bearish and htf_bearish)
+    table.cell(t, 0, 2, "Aligned", text_color=color.white, text_size=size.small, text_halign=text.align_right)
+    table.cell(t, 1, 2, aligned ? "YES" : "NO", text_color=aligned ? color.green : color.orange, text_size=size.small)
+
+    // Row 3: ADX
+    adx_str = str.tostring(adx_val, "#.#") + (adx_rising ? " RISING" : " falling")
+    table.cell(t, 0, 3, "ADX(" + str.tostring(adx_period) + ")", text_color=color.white, text_size=size.small, text_halign=text.align_right)
+    table.cell(t, 1, 3, adx_str, text_color=adx_pass ? color.green : color.gray, text_size=size.small)
+
+    // Row 4: Squeeze
+    table.cell(t, 0, 4, "Squeeze", text_color=color.white, text_size=size.small, text_halign=text.align_right)
+    table.cell(t, 1, 4, squeeze_on ? "ON (blocked)" : "OFF (ok)", text_color=squeeze_on ? color.orange : color.green, text_size=size.small)
+
+    // Row 5: Signal readiness
+    table.cell(t, 0, 5, "Signal", text_color=color.white, text_size=size.small, text_halign=text.align_right)
+
+    // Determine which condition is blocking
+    block_reason = ""
+    if not aligned
+        block_reason := "1H disagrees"
+    else if not adx_ok
+        block_reason := "ADX < " + str.tostring(adx_min)
+    else if not adx_rising
+        block_reason := "ADX falling"
+    else if squeeze_on
+        block_reason := "Squeeze ON"
+
+    all_ready = aligned and adx_pass and squeeze_off
+    table.cell(t, 1, 5, all_ready ? "READY" : "BLOCKED: " + block_reason, text_color=all_ready ? color.green : color.red, text_size=size.small)
+
+    // Row 6: Last signal
+    table.cell(t, 0, 6, "Config", text_color=color.gray, text_size=size.tiny, text_halign=text.align_right)
+    table.cell(t, 1, 6, "ST(" + str.tostring(Periods) + "," + str.tostring(Multiplier) + ") 1H(" + str.tostring(Periods_1h) + "," + str.tostring(Multiplier_1h) + ")", text_color=color.gray, text_size=size.tiny)
+
+// ─── ALERTS ──────────────────────────────────────────────────────────────────
+// NOTE: When creating alerts in TradingView, paste the webhook JSON into the
+// alert Message field using {{ticker}} and {{close}} placeholders.
+// The alertcondition message below is a static template.
+
+alertcondition(buySignal, title="MTF Buy Signal",
+     message='{"secret": "yYkzLcgih-s4ArCrSvi2oij5rVYGkz7LwJBZ7O9BocU", "strategy": "BTC Supertrend MTF", "action": "buy", "symbol": "{{ticker}}", "size_pct": 2, "price": "{{close}}", "message": "MTF Buy Signal"}')
+
+alertcondition(sellSignal, title="MTF Sell Signal",
+     message='{"secret": "yYkzLcgih-s4ArCrSvi2oij5rVYGkz7LwJBZ7O9BocU", "strategy": "BTC Supertrend MTF", "action": "sell", "symbol": "{{ticker}}", "size_pct": 2, "price": "{{close}}", "message": "MTF Sell Signal"}')
+
+// Also keep the original direction-change alert for monitoring
+alertcondition(flipBull or flipBear, title="ST Direction Change (unfiltered)",
+     message="Supertrend flipped — check filtered signal")

@@ -1,0 +1,98 @@
+{
+  "strategy": "Pure MTF Supertrend",
+  "description": "15m Supertrend entry with 1H Supertrend directional confirmation",
+
+  "entry_indicator": {
+    "type": "supertrend",
+    "timeframe": "15m",
+    "atr_period": 8,
+    "multiplier": 4.0,
+    "source": "hlc3"
+  },
+
+  "confirmation_indicator": {
+    "type": "supertrend",
+    "timeframe": "1h",
+    "atr_period": 10,
+    "multiplier": 4.0,
+    "source": "close"
+  },
+
+  "signal_logic": "Enter LONG when 15m ST flips bullish AND 1H ST is bullish. Enter SHORT when 15m ST flips bearish AND 1H ST is bearish. Close position when 15m ST flips but 1H disagrees.",
+
+  "position_sizing": {
+    "type": "fixed_dollar",
+    "size_usd": 125.0,
+    "leverage": 10.0,
+    "notional_per_trade": 1250.0,
+    "reason": "Fixed sizing avoids compounding death spiral. Compounding loses money due to asymmetric position sizing after drawdowns."
+  },
+
+  "order_execution": {
+    "preferred": "limit_order",
+    "limit_timeout_seconds": 15,
+    "fallback": "market_order",
+    "taker_fee_pct": 0.045,
+    "maker_fee_pct": 0.020,
+    "expected_maker_fill_rate": "~100% (close-to-open gap is essentially zero on 15m BTC)",
+    "slippage_assumption": 0.01
+  },
+
+  "filters": {
+    "rsi": "disabled (MTF confirmation already filters noise)",
+    "volume": "disabled for deployment (marginal improvement, adds complexity)",
+    "time_of_day": "disabled for deployment",
+    "cooldown": "disabled"
+  },
+
+  "risk_management": {
+    "stop_loss": "none (Supertrend flip handles exits)",
+    "take_profit": "none (cuts winners short)",
+    "trailing_stop": "none",
+    "max_daily_loss": -50.0,
+    "max_drawdown_pct": 70.0
+  },
+
+  "backtest_results": {
+    "period": "730 days (2024-03-16 to 2026-03-16)",
+    "data_source": "Binance BTCUSDT",
+    "total_trades": 437,
+    "net_pnl_usd": 235.30,
+    "net_pnl_pct": 47.1,
+    "win_rate_pct": 35.5,
+    "profit_factor": 1.14,
+    "gross_pnl_before_fees": 726.93,
+    "total_fees": 245.81,
+    "edge_per_trade_pct": 0.1081,
+    "with_maker_fees_pnl": 508.43,
+    "max_drawdown_pct": 67.0,
+    "profitable_from_all_12_starting_points": true
+  },
+
+  "cross_exchange_validation": {
+    "binance_52d_pnl": 112.07,
+    "hyperliquid_52d_pnl": 79.72,
+    "difference": 32.36,
+    "verdict": "ACCEPTABLE — same direction, similar magnitude"
+  },
+
+  "known_risks": [
+    "Strategy loses money in ranging markets (ADX < 20). 35% of bars are ranging.",
+    "Early starts (2024) see 67-79% max drawdown before recovering.",
+    "Only 35.5% win rate — long losing streaks are expected and normal.",
+    "52-day cross-exchange validation shows some trade divergence (31 vs 29 trades).",
+    "No live trade history to validate against — paper trader is essential.",
+    "Compounding DESTROYS this strategy. Never switch to % of equity sizing."
+  ],
+
+  "deployment_checklist": [
+    "1. Run paper trader for 30 days minimum",
+    "2. Compare paper results to backtest predictions",
+    "3. If paper P&L is within 50% of backtest prediction, proceed to live",
+    "4. Start live with $500 capital, fixed $125/trade",
+    "5. Use limit orders with 15s timeout, market fallback",
+    "6. Monitor via Telegram alerts",
+    "7. Review after 50 trades (approximately 2 months)",
+    "8. NEVER enable compounding position sizing"
+  ]
+}

@@ -166,6 +166,107 @@ export interface AppSettings {
 
 export type AppSettingsUpdate = Partial<Omit<AppSettings, "updated_at">>;
 
+export interface AssetConfig {
+  id: number;
+  coin: string;
+  display_name: string;
+  enabled: boolean;
+  fixed_trade_amount_usd: number;
+  leverage: number;
+  max_leverage: number;
+  max_position_pct: number;
+  st_atr_period: number;
+  st_multiplier: number;
+  st_source: string;
+  htf_timeframe: string;
+  htf_st_atr_period: number;
+  htf_st_multiplier: number;
+  adx_period: number;
+  adx_minimum: number;
+  adx_rising_required: boolean;
+  squeeze_block: boolean;
+  sqz_bb_length: number;
+  sqz_bb_mult: number;
+  sqz_kc_length: number;
+  sqz_kc_mult: number;
+  total_trades: number;
+  winning_trades: number;
+  total_pnl: number;
+  last_trade_at: string | null;
+  last_trade_direction: string | null;
+  last_trade_price: number | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type AssetConfigUpdate = Partial<
+  Pick<
+    AssetConfig,
+    | "enabled"
+    | "fixed_trade_amount_usd"
+    | "leverage"
+    | "max_position_pct"
+    | "st_atr_period"
+    | "st_multiplier"
+    | "st_source"
+    | "htf_timeframe"
+    | "htf_st_atr_period"
+    | "htf_st_multiplier"
+    | "adx_period"
+    | "adx_minimum"
+    | "adx_rising_required"
+    | "squeeze_block"
+    | "sqz_bb_length"
+    | "sqz_bb_mult"
+    | "sqz_kc_length"
+    | "sqz_kc_mult"
+    | "notes"
+  >
+>;
+
+// --- Position Tracking ---
+export interface PositionTracking {
+  id: number;
+  coin: string;
+  direction: string | null;
+  signal_size: number;
+  manual_size: number;
+  total_size: number;
+  entry_price: number | null;
+  opened_at: string | null;
+  origin: string | null;
+  last_modified_at: string | null;
+  last_modified_by: string | null;
+  current_price: number | null;
+  unrealized_pnl: number | null;
+  pnl_pct: number | null;
+  leverage: number | null;
+  notional: number | null;
+  held_duration: string | null;
+}
+
+export interface LiveTrade {
+  id: number;
+  coin: string;
+  action: string;
+  origin: string;
+  size: number;
+  price: number;
+  pnl: number | null;
+  total_position_after: number;
+  timestamp: string;
+  notes: string | null;
+}
+
+export interface PositionActionResponse {
+  success: boolean;
+  message: string;
+  pnl?: number | null;
+  held_duration?: string | null;
+  position?: PositionTracking | null;
+}
+
 export interface ServiceCheck {
   name: string;
   status: "ok" | "degraded" | "down";
