@@ -5,21 +5,19 @@ import {
   createChart,
   type IChartApi,
   type ISeriesApi,
-  type CandlestickData,
-  type HistogramData,
   type LineData,
   type Time,
   ColorType,
   LineStyle,
   CrosshairMode,
 } from "lightweight-charts";
-import type { CandleData, SupertrendPoint, SupertrendSignal } from "@/types";
+import type { CandleData, EnrichedSTPoint, ChartMarker } from "@/types";
 import { COLORS } from "@/lib/constants";
 
 interface PriceChartProps {
   candles: CandleData[];
-  supertrendPoints: SupertrendPoint[];
-  supertrendSignals: SupertrendSignal[];
+  stPoints: EnrichedSTPoint[];
+  markers: ChartMarker[];
   height: number;
   onCrosshairMove?: (time: Time | null) => void;
   onChartReady?: (chart: IChartApi) => void;
@@ -27,8 +25,8 @@ interface PriceChartProps {
 
 export const PriceChart = memo(function PriceChart({
   candles,
-  supertrendPoints,
-  supertrendSignals,
+  stPoints,
+  markers,
   height,
   onCrosshairMove,
   onChartReady,
@@ -37,8 +35,8 @@ export const PriceChart = memo(function PriceChart({
   const chartRef = useRef<IChartApi | null>(null);
   const candleSeriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
   const volumeSeriesRef = useRef<ISeriesApi<"Histogram"> | null>(null);
-  const greenLineRef = useRef<ISeriesApi<"Line"> | null>(null);
-  const redLineRef = useRef<ISeriesApi<"Line"> | null>(null);
+  const stLineRef = useRef<ISeriesApi<"Line"> | null>(null);
+  const bgFillRef = useRef<ISeriesApi<"Histogram"> | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -72,21 +70,15 @@ export const PriceChart = memo(function PriceChart({
         secondsVisible: false,
         barSpacing: 6,
         rightOffset: 5,
-        visible: false, // hide on price panel, show on bottom MACD panel only
+        visible: false,
       },
-      handleScroll: {
-        vertTouchDrag: false,
-        horzTouchDrag: true,
-        pressedMouseMove: true,
-      },
-      handleScale: {
-        axisPressedMouseMove: true,
-        pinch: true,
-      },
+      handleScroll: { vertTouchDrag: false, horzTouchDrag: true, pressedMouseMove: true },
+      handleScale: { axisPressedMouseMove: true, pinch: true },
     });
 
     chartRef.current = chart;
 
+    // Candles
     const candleSeries = chart.addCandlestickSeries({
       upColor: COLORS.bullish,
       downColor: COLORS.bearish,
@@ -97,36 +89,30 @@ export const PriceChart = memo(function PriceChart({
     });
     candleSeriesRef.current = candleSeries;
 
+    // Volume
     const volumeSeries = chart.addHistogramSeries({
       priceFormat: { type: "volume" },
       priceScaleId: "volume",
     });
-    chart.priceScale("volume").applyOptions({
-      scaleMargins: { top: 0.85, bottom: 0 },
-    });
+    chart.priceScale("volume").applyOptions({ scaleMargins: { top: 0.85, bottom: 0 } });
     volumeSeriesRef.current = volumeSeries;
 
-    // Green supertrend line (bullish periods)
-    const greenLine = chart.addLineSeries({
-      color: COLORS.bullish,
+    // Single ST line — we'll set color per-point via individual line segments
+    // lightweight-charts doesn't support per-point colors on Line series,
+    // so we use multiple line series: green, red, gray, orange
+    // But only ONE is visible at any bar (the others have gaps).
+    // Actually the simplest approach: use a single line series and update its data
+    // with the line color encoded as separate series.
+    // We'll use 4 line series — one per color — with gaps (NaN) where inactive.
+    const stLine = chart.addLineSeries({
+      color: COLORS.textSecondary, // fallback
       lineWidth: 2,
       lineStyle: LineStyle.Solid,
       priceLineVisible: false,
       lastValueVisible: false,
       crosshairMarkerVisible: false,
     });
-    greenLineRef.current = greenLine;
-
-    // Red supertrend line (bearish periods)
-    const redLine = chart.addLineSeries({
-      color: COLORS.bearish,
-      lineWidth: 2,
-      lineStyle: LineStyle.Solid,
-      priceLineVisible: false,
-      lastValueVisible: false,
-      crosshairMarkerVisible: false,
-    });
-    redLineRef.current = redLine;
+    stLineRef.current = stLine;
 
     chart.subscribeCrosshairMove((param) => {
       onCrosshairMove?.(param.time ?? null);
@@ -166,65 +152,161 @@ export const PriceChart = memo(function PriceChart({
       candles.map((c) => ({
         time: c.time as Time,
         value: c.volume,
-        color: c.close >= c.open ? "rgba(38,166,154,0.2)" : "rgba(239,83,80,0.2)",
+        color: c.close >= c.open ? "rgba(38,166,154,0.15)" : "rgba(239,83,80,0.15)",
       })),
     );
   }, [candles]);
 
-  // Update supertrend — each direction only shows during its own period
-  // Green line only during bullish, red line only during bearish
-  // Transition points are duplicated so lines connect at direction changes
+  // Update ST line — single line, color segments via lightweight-charts
+  // Since lightweight-charts v4 doesn't support per-point colors on line series,
+  // we need multiple line series with gaps. Let's use 4 line series.
   useEffect(() => {
-    if (!greenLineRef.current || !redLineRef.current || supertrendPoints.length === 0) return;
+    const chart = chartRef.current;
+    if (!chart || stPoints.length === 0) return;
 
-    const greenData: LineData[] = [];
-    const redData: LineData[] = [];
+    // Remove old ST line and recreate 4 colored lines
+    if (stLineRef.current) {
+      chart.removeSeries(stLineRef.current);
+      stLineRef.current = null;
+    }
 
-    for (let i = 0; i < supertrendPoints.length; i++) {
-      const pt = supertrendPoints[i];
+    // Build 4 arrays — green, red, gray, orange — with gaps
+    const COLOR_MAP = {
+      green: COLORS.bullish,
+      red: COLORS.bearish,
+      gray: "#787b86",
+      orange: "#ff9800",
+    };
+
+    const colorKeys = ["green", "red", "gray", "orange"] as const;
+    const dataByColor: Record<string, LineData[]> = {};
+    for (const ck of colorKeys) dataByColor[ck] = [];
+
+    // For each point, add to the correct color array and bridge at transitions
+    for (let i = 0; i < stPoints.length; i++) {
+      const pt = stPoints[i];
       const time = pt.time as Time;
+      const activeColor = pt.lineColor;
 
-      if (pt.direction === "bullish") {
-        greenData.push({ time, value: pt.value });
-        // At direction change, add transition point to connect segments
-        if (i > 0 && supertrendPoints[i - 1].direction === "bearish") {
-          // Bridge: end the red line at this point too
-          redData.push({ time, value: pt.value });
-        }
-      } else {
-        redData.push({ time, value: pt.value });
-        if (i > 0 && supertrendPoints[i - 1].direction === "bullish") {
-          greenData.push({ time, value: pt.value });
-        }
+      // Add the point to the active color's array
+      dataByColor[activeColor].push({ time, value: pt.value });
+
+      // Bridge: if color changed from previous, add this point to the previous color too (for continuity)
+      if (i > 0 && stPoints[i - 1].lineColor !== activeColor) {
+        dataByColor[stPoints[i - 1].lineColor].push({ time, value: pt.value });
       }
     }
 
-    greenLineRef.current.setData(greenData);
-    redLineRef.current.setData(redData);
-  }, [supertrendPoints]);
+    // Create line series for each color
+    const seriesRefs: ISeriesApi<"Line">[] = [];
+    for (const ck of colorKeys) {
+      if (dataByColor[ck].length === 0) continue;
+      const s = chart.addLineSeries({
+        color: COLOR_MAP[ck],
+        lineWidth: 2,
+        lineStyle: ck === "orange" ? LineStyle.Dotted : LineStyle.Solid,
+        priceLineVisible: false,
+        lastValueVisible: false,
+        crosshairMarkerVisible: false,
+      });
+      s.setData(dataByColor[ck]);
+      seriesRefs.push(s);
+    }
 
-  // Update buy/sell markers
+    return () => {
+      // Cleanup on re-render
+      seriesRefs.forEach((s) => {
+        try { chart.removeSeries(s); } catch {}
+      });
+    };
+  }, [stPoints]);
+
+  // Markers — buy, sell, exit, unfiltered, executions
   useEffect(() => {
-    if (!candleSeriesRef.current || supertrendSignals.length === 0) return;
+    if (!candleSeriesRef.current || markers.length === 0) return;
 
-    const markers = supertrendSignals.map((sig) => ({
-      time: sig.time as Time,
-      position: sig.type === "buy" ? ("belowBar" as const) : ("aboveBar" as const),
-      color: sig.type === "buy" ? COLORS.bullish : COLORS.bearish,
-      shape: sig.type === "buy" ? ("arrowUp" as const) : ("arrowDown" as const),
-      text: sig.type === "buy" ? "Buy" : "Sell",
-      size: 1,
-    }));
+    // Sort markers by time (required by lightweight-charts)
+    const sorted = [...markers].sort((a, b) => a.time - b.time);
 
-    candleSeriesRef.current.setMarkers(markers);
-  }, [supertrendSignals]);
+    const lwMarkers = sorted.map((m) => {
+      switch (m.type) {
+        case "buy":
+          return {
+            time: m.time as Time,
+            position: "belowBar" as const,
+            color: COLORS.bullish,
+            shape: "arrowUp" as const,
+            text: "Buy",
+            size: 1.5,
+          };
+        case "sell":
+          return {
+            time: m.time as Time,
+            position: "aboveBar" as const,
+            color: COLORS.bearish,
+            shape: "arrowDown" as const,
+            text: "Sell",
+            size: 1.5,
+          };
+        case "exit":
+          return {
+            time: m.time as Time,
+            position: "aboveBar" as const,
+            color: "#ff9800",
+            shape: "circle" as const,
+            text: "X",
+            size: 1,
+          };
+        case "unfilteredBull":
+          return {
+            time: m.time as Time,
+            position: "belowBar" as const,
+            color: "rgba(0,230,118,0.35)",
+            shape: "circle" as const,
+            text: "",
+            size: 0.5,
+          };
+        case "unfilteredBear":
+          return {
+            time: m.time as Time,
+            position: "aboveBar" as const,
+            color: "rgba(255,23,68,0.35)",
+            shape: "circle" as const,
+            text: "",
+            size: 0.5,
+          };
+        case "execBuy":
+          return {
+            time: m.time as Time,
+            position: "belowBar" as const,
+            color: "#00bcd4",
+            shape: "circle" as const,
+            text: "B",
+            size: 1.2,
+          };
+        case "execSell":
+          return {
+            time: m.time as Time,
+            position: "aboveBar" as const,
+            color: COLORS.bearish,
+            shape: "circle" as const,
+            text: "S",
+            size: 1.2,
+          };
+        default:
+          return null;
+      }
+    }).filter(Boolean) as any[];
+
+    candleSeriesRef.current.setMarkers(lwMarkers);
+  }, [markers]);
 
   return (
     <div
       ref={containerRef}
       style={{ width: "100%", height: `${height}px` }}
       role="img"
-      aria-label="BTC price chart with Supertrend indicator"
+      aria-label="Price chart with Recovery SuperTrend"
     />
   );
 });

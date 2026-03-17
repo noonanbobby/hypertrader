@@ -50,6 +50,25 @@ export interface MacdRsiPoint {
   histogramColor: "brightGreen" | "paleGreen" | "brightRed" | "paleRed";
 }
 
+export interface EnrichedSTPoint {
+  time: number;
+  value: number;
+  direction: "bullish" | "bearish";
+  lineColor: "green" | "red" | "gray" | "orange";  // green=all filters pass, red=all pass bear, gray=filters fail, orange=recovery active
+  lineStyle: "solid" | "dotted";  // dotted when recovery tightening
+  htfDir: "bullish" | "bearish" | null;
+  adxPass: boolean;
+  squeezeOff: boolean;
+  recoveryActive: boolean;
+}
+
+export interface ChartMarker {
+  time: number;
+  type: "buy" | "sell" | "exit" | "unfilteredBull" | "unfilteredBear" | "execBuy" | "execSell";
+  price: number;
+  label: string;
+}
+
 /* ── Backend API Types ── */
 export interface DashboardStats {
   total_equity: number;

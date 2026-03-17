@@ -4,8 +4,8 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import type { IChartApi, Time, LogicalRange } from "lightweight-charts";
 import { PriceChart } from "./PriceChart";
 import { SqueezePanel } from "./SqueezePanel";
-import { OhlcBar, getOhlcFromTime, getSupertrendAtTime } from "./OhlcBar";
-import type { CandleData, SupertrendPoint, SupertrendSignal, SqueezePoint } from "@/types";
+import { OhlcBar, getOhlcFromTime } from "./OhlcBar";
+import type { CandleData, EnrichedSTPoint, ChartMarker, SqueezePoint } from "@/types";
 import { COLORS } from "@/lib/constants";
 
 interface StatusRow {
@@ -16,8 +16,8 @@ interface StatusRow {
 
 interface ChartContainerProps {
   candles: CandleData[];
-  supertrendPoints: SupertrendPoint[];
-  supertrendSignals: SupertrendSignal[];
+  stPoints: EnrichedSTPoint[];
+  markers: ChartMarker[];
   squeezeData: SqueezePoint[];
   currentPrice: number | null;
   containerHeight: number;
@@ -30,8 +30,8 @@ const LABEL_HEIGHT = 18;
 
 export function ChartContainer({
   candles,
-  supertrendPoints,
-  supertrendSignals,
+  stPoints,
+  markers,
   squeezeData,
   currentPrice,
   containerHeight,
@@ -94,8 +94,15 @@ export function ChartContainer({
   );
 
   const hoveredSupertrend = useMemo(
-    () => getSupertrendAtTime(supertrendPoints, crosshairTime as number | null),
-    [supertrendPoints, crosshairTime],
+    () => {
+      if (!crosshairTime) return null;
+      const t = crosshairTime as number;
+      for (let i = stPoints.length - 1; i >= 0; i--) {
+        if (stPoints[i].time <= t) return { value: stPoints[i].value, direction: stPoints[i].direction };
+      }
+      return null;
+    },
+    [stPoints, crosshairTime],
   );
 
   return (
@@ -111,8 +118,8 @@ export function ChartContainer({
       {/* Price Chart */}
       <PriceChart
         candles={candles}
-        supertrendPoints={supertrendPoints}
-        supertrendSignals={supertrendSignals}
+        stPoints={stPoints}
+        markers={markers}
         height={priceHeight}
         onCrosshairMove={handleCrosshairMove}
         onChartReady={handlePriceChartReady}
