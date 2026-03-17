@@ -486,6 +486,10 @@ async def _process_webhook_live(
             fill_type=result.fill_type, leverage=leverage,
         ))
 
+        # Post-trade leverage verification (fire-and-forget)
+        from app.services.leverage_manager import verify_leverage_post_trade
+        asyncio.create_task(verify_leverage_post_trade(coin))
+
         msg = result.message
         if existing:
             pnl_sign = "+" if close_pnl >= 0 else ""

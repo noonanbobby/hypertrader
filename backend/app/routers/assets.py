@@ -1,4 +1,3 @@
-import asyncio
 import datetime as dt
 import logging
 from fastapi import APIRouter, Depends, HTTPException
@@ -44,23 +43,20 @@ async def update_asset(
 
     updates = body.model_dump(exclude_none=True)
 
-    # If leverage is changing, apply to HL if there's an active position
+    # If leverage is changing, apply to HL immediately via leverage manager
     if "leverage" in updates:
         new_lev = updates["leverage"]
         old_lev = row.leverage
         if new_lev != old_lev:
             try:
-                from app.services.hl_account import hl_account
-                hl_positions = await hl_account.get_open_positions()
-                hl_pos = next((p for p in hl_positions if p["symbol"] == coin.upper()), None)
-                if hl_pos:
-                    from app.services.trading_engine import create_engine
-                    engine = create_engine("live")
-                    exchange, _ = engine._get_clients()
-                    await asyncio.to_thread(
-                        exchange.update_leverage, new_lev, coin.upper(), is_cross=False
-                    )
-                    logger.info("Updated HL leverage for %s: %dx → %dx (position active)", coin.upper(), old_lev, new_lev)
+                from app.services.leverage_manager import _get_exchange, _set_leverage
+                exchange = await _get_exchange()
+                if exchange:
+                    ok, msg = await _set_leverage(exchange, coin.upper(), new_lev)
+                    if ok:
+                        logger.info("Leverage updated: %s %dx → %dx isolated", coin.upper(), old_lev, new_lev)
+                    else:
+                        logger.warning("Leverage update failed for %s: %s", coin.upper(), msg)
             except Exception as e:
                 logger.warning("Failed to update HL leverage for %s: %s", coin.upper(), e)
 

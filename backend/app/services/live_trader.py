@@ -317,12 +317,7 @@ class LiveTrader(TradingEngine):
             if sz <= 0:
                 return FlipResult(success=False, message="Flip quantity rounds to zero")
 
-            # Set leverage (must be integer for Hyperliquid)
-            leverage = int(round(settings.leverage))
-            await asyncio.to_thread(
-                exchange.update_leverage, leverage, coin, is_cross=False
-            )
-
+            # Leverage is set on startup and verified daily — not on every trade.
             # Single atomic market order — exchange nets the position
             response = await asyncio.to_thread(
                 exchange.market_open, coin, is_buy, sz, None, 0.01

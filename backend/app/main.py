@@ -11,6 +11,7 @@ from app.models import AppSettings
 from app.websocket_manager import ws_manager
 from app.services.pnl_broadcaster import pnl_broadcast_loop
 from app.services.equity_snapshotter import equity_snapshot_loop
+from app.services.leverage_manager import sync_leverage_on_startup, daily_leverage_check_loop
 from app.routers import webhook, strategies, trades, positions, dashboard, analytics, settings as settings_router, status, live, assets, position_tracking
 
 import datetime as dt
@@ -98,11 +99,14 @@ async def lifespan(app: FastAPI):
     await init_db()
     await seed_settings()
     await sync_position_tracking()
+    await sync_leverage_on_startup()
     pnl_task = asyncio.create_task(pnl_broadcast_loop())
     equity_task = asyncio.create_task(equity_snapshot_loop())
+    leverage_task = asyncio.create_task(daily_leverage_check_loop())
     yield
     pnl_task.cancel()
     equity_task.cancel()
+    leverage_task.cancel()
     try:
         await pnl_task
     except asyncio.CancelledError:
