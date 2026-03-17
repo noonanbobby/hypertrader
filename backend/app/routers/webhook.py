@@ -496,6 +496,62 @@ async def _process_webhook_live(
         await db.commit()
         return WebhookResponse(success=True, message=msg)
 
+    elif action == "close":
+        # Close position for this symbol if one exists. Never opens a new position.
+        from app.services.hl_account import hl_account
+        hl_positions = await hl_account.get_open_positions()
+        matching = [p for p in hl_positions if p["symbol"] == coin]
+        if not matching:
+            log.result = f"No open position for {coin} — nothing to close"
+            log.success = 1
+            db.add(log)
+            await db.commit()
+            return WebhookResponse(success=True, message=f"No open position for {coin}")
+
+        pos = matching[0]
+        close_side = "sell" if pos["side"] == "long" else "buy"
+        result = await engine.execute_order_with_fallback(coin, close_side, pos["size"])
+        if not result.success:
+            raise ValueError(result.message)
+
+        if pos["side"] == "long":
+            pnl = (result.filled_price - pos["entry_price"]) * pos["size"]
+        else:
+            pnl = (pos["entry_price"] - result.filled_price) * pos["size"]
+        pnl = round(pnl, 4)
+
+        if pt:
+            db.add(LiveTrade(
+                coin=coin, action=f"close_{pos['side']}", origin="close_signal",
+                size=pt.total_size, price=result.filled_price,
+                pnl=pnl, total_position_after=0.0,
+                notes=payload.message or "Close signal",
+            ))
+            pt.direction = None
+            pt.signal_size = 0.0
+            pt.manual_size = 0.0
+            pt.total_size = 0.0
+            pt.entry_price = None
+            pt.opened_at = None
+            pt.last_modified_at = dt.datetime.utcnow()
+            pt.last_modified_by = "close_signal"
+
+        await _update_asset_stats(db, coin, "close", result.filled_price, pnl=pnl, is_close=True)
+
+        pnl_sign = "+" if pnl >= 0 else ""
+        close_msg = (
+            f"\U0001f534 CLOSE \u2014 {coin} \u2014 Position closed @ ${result.filled_price:,.2f}\n"
+            f"P&L: {pnl_sign}${pnl:,.2f} \u2014 Strategy B exit"
+        )
+        asyncio.create_task(notifier._send_telegram(close_msg))
+
+        msg = f"Closed {pos['side']} {coin} @ {result.filled_price:.4f} | P&L: {pnl_sign}${pnl:.2f}"
+        log.result = msg
+        log.success = 1
+        db.add(log)
+        await db.commit()
+        return WebhookResponse(success=True, message=msg)
+
     elif action in ("close_long", "close_short", "close_all"):
         from app.services.hl_account import hl_account
         hl_positions = await hl_account.get_open_positions()

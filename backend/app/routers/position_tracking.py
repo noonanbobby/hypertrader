@@ -530,7 +530,7 @@ async def update_leverage(coin: str, leverage: int = Query(gt=0, le=100), db: As
         try:
             engine = create_engine("live")
             exchange, _ = engine._get_clients()
-            await asyncio.to_thread(exchange.update_leverage, leverage, coin, is_cross=True)
+            await asyncio.to_thread(exchange.update_leverage, leverage, coin, is_cross=False)
             return {
                 "success": True,
                 "message": f"{coin} leverage changed to {leverage}x. Active position updated.",

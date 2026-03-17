@@ -94,7 +94,7 @@ function linreg(values: number[], period: number): number[] {
 
 /* ─────────────────────────────────────────────
    Supertrend
-   ATR Period: 10, Multiplier: 1.3, Source: close
+   ATR Period: 10, Multiplier: 4.0, Source: (H+L)/2
    ───────────────────────────────────────────── */
 
 export function calcSupertrend(

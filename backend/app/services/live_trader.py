@@ -320,7 +320,7 @@ class LiveTrader(TradingEngine):
             # Set leverage (must be integer for Hyperliquid)
             leverage = int(round(settings.leverage))
             await asyncio.to_thread(
-                exchange.update_leverage, leverage, coin, is_cross=True
+                exchange.update_leverage, leverage, coin, is_cross=False
             )
 
             # Single atomic market order — exchange nets the position

@@ -50,6 +50,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             height: "100dvh",
             backgroundColor: "#131722",
             overflow: "hidden",
+            paddingTop: "env(safe-area-inset-top, 0px)",
           }}
         >
           <OfflineBanner />

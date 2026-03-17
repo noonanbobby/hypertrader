@@ -15,7 +15,7 @@ const ChartContainer = dynamic(
   { ssr: false, loading: () => <ChartLoadingSkeleton /> },
 );
 
-const HEADER_HEIGHT = 96; // asset selector + timeframe bar
+const HEADER_HEIGHT = 96; // asset selector + timeframe bar (safe area handled by parent layout)
 
 /* ── Asset Selector ── */
 function AssetSelector({

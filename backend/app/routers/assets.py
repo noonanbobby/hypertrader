@@ -58,7 +58,7 @@ async def update_asset(
                     engine = create_engine("live")
                     exchange, _ = engine._get_clients()
                     await asyncio.to_thread(
-                        exchange.update_leverage, new_lev, coin.upper(), is_cross=True
+                        exchange.update_leverage, new_lev, coin.upper(), is_cross=False
                     )
                     logger.info("Updated HL leverage for %s: %dx → %dx (position active)", coin.upper(), old_lev, new_lev)
             except Exception as e:

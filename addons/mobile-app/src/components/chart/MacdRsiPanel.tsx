@@ -80,6 +80,8 @@ export const MacdRsiPanel = memo(function MacdRsiPanel({
         borderColor: "rgba(42,46,57,0.5)",
         timeVisible: true,
         secondsVisible: false,
+        barSpacing: 6,
+        rightOffset: 5,
       },
       handleScroll: { vertTouchDrag: false, horzTouchDrag: true, pressedMouseMove: true },
       handleScale: { axisPressedMouseMove: true, pinch: true },

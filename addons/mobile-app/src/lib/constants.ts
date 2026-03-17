@@ -77,8 +77,8 @@ export const TAB_ITEMS = [
 
 export const SUPERTREND_CONFIG = {
   atrPeriod: 10,
-  multiplier: 2.0,
-  source: "close" as const,
+  multiplier: 4.0,
+  source: "hl2" as const,
 } as const;
 
 export const SQUEEZE_CONFIG = {

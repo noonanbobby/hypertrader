@@ -77,6 +77,8 @@ export const SqueezePanel = memo(function SqueezePanel({
       timeScale: {
         borderColor: "rgba(42,46,57,0.5)",
         visible: false,
+        barSpacing: 6,
+        rightOffset: 5,
       },
       handleScroll: { vertTouchDrag: false, horzTouchDrag: true, pressedMouseMove: true },
       handleScale: { axisPressedMouseMove: true, pinch: true },

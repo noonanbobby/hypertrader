@@ -53,9 +53,17 @@ export function ChartContainer({
     };
   }, []);
 
+  const scrollAllToRealTime = useCallback(() => {
+    chartsRef.current.forEach((chart) => {
+      if (chart) chart.timeScale().scrollToRealTime();
+    });
+  }, []);
+
   const handlePriceChartReady = useCallback((chart: IChartApi) => {
     chartsRef.current[0] = chart;
     chart.timeScale().subscribeVisibleLogicalRangeChange(syncTimeScale(0));
+    // Scroll to latest bar after a short delay for data to settle
+    setTimeout(() => chart.timeScale().scrollToRealTime(), 100);
   }, [syncTimeScale]);
 
   const handleSqueezeChartReady = useCallback((chart: IChartApi) => {
@@ -115,7 +123,7 @@ export function ChartContainer({
         }}
       >
         <span style={{ fontSize: "9px", color: "#787b86", fontFamily: "'JetBrains Mono', monospace" }}>
-          SQZMOM_LB 20 2 20 1.5
+          SQZMOM_LB · BB 20/2 · KC 20/1.5
         </span>
       </div>
 
@@ -141,7 +149,7 @@ export function ChartContainer({
         }}
       >
         <span style={{ fontSize: "9px", color: "#787b86", fontFamily: "'JetBrains Mono', monospace" }}>
-          MACD+RSI 12 26 9 14
+          ADX+DI · Len 15 · Th 15
         </span>
         <span style={{ fontSize: "8px", color: "#42a5f5", fontFamily: "'JetBrains Mono', monospace" }}>● RSI</span>
         <span style={{ fontSize: "8px", color: "#ff9800", fontFamily: "'JetBrains Mono', monospace" }}>● Sig</span>

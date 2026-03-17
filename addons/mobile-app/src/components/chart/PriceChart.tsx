@@ -70,6 +70,7 @@ export const PriceChart = memo(function PriceChart({
         timeVisible: true,
         secondsVisible: false,
         barSpacing: 6,
+        rightOffset: 5,
         visible: false, // hide on price panel, show on bottom MACD panel only
       },
       handleScroll: {
@@ -169,14 +170,12 @@ export const PriceChart = memo(function PriceChart({
     );
   }, [candles]);
 
-  // Update supertrend — MUTUALLY EXCLUSIVE lines using NaN gaps
+  // Update supertrend — each direction only shows during its own period
+  // Green line only during bullish, red line only during bearish
+  // Transition points are duplicated so lines connect at direction changes
   useEffect(() => {
     if (!greenLineRef.current || !redLineRef.current || supertrendPoints.length === 0) return;
 
-    // Build arrays where the inactive direction gets NaN (creates a gap)
-    // Each point exists in BOTH arrays, but with NaN value when not active.
-    // This ensures NO overlap — green only shows during bullish, red only during bearish.
-    const allTimes = supertrendPoints.map((p) => p.time);
     const greenData: LineData[] = [];
     const redData: LineData[] = [];
 
@@ -186,12 +185,16 @@ export const PriceChart = memo(function PriceChart({
 
       if (pt.direction === "bullish") {
         greenData.push({ time, value: pt.value });
-        // Only add a connecting point to red if the previous was also red (for continuity at transition)
+        // At direction change, add transition point to connect segments
         if (i > 0 && supertrendPoints[i - 1].direction === "bearish") {
-          // Add the transition point to green for continuity
+          // Bridge: end the red line at this point too
+          redData.push({ time, value: pt.value });
         }
       } else {
         redData.push({ time, value: pt.value });
+        if (i > 0 && supertrendPoints[i - 1].direction === "bullish") {
+          greenData.push({ time, value: pt.value });
+        }
       }
     }
 
