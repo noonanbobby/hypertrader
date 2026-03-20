@@ -1,0 +1,522 @@
+========================================================================================================================
+  FULL SYSTEM VALIDATION — EMA200+EMA50 Regime Classifier (No ADX)
+  6 Assets × 5 Years × 22 Stress Tests | Started: 04:38:33
+  Machine: 16 vCPUs, 32GB RAM | Pool: 12 workers
+========================================================================================================================
+
+========================================================================================================================
+  [04:38:33] PHASE 0 — DOWNLOADING FRESH DATA FOR ALL 6 ASSETS
+========================================================================================================================
+  [04:38:33] Downloading BTC 15m...
+  [04:39:00] BTC 15m: 182619 candles
+  [04:39:00] Downloading BTC 4h...
+  [04:39:02] BTC 4h: 11419 candles
+  [04:39:02] Downloading BTC 1d...
+  [04:39:02] BTC 1d: 1904 candles
+  [04:39:02] Downloading ETH 15m...
+  [04:39:29] ETH 15m: 182619 candles
+  [04:39:29] Downloading ETH 4h...
+  [04:39:30] ETH 4h: 11419 candles
+  [04:39:30] Downloading ETH 1d...
+  [04:39:30] ETH 1d: 1904 candles
+  [04:39:30] Downloading SOL 15m...
+  [04:39:58] SOL 15m: 182619 candles
+  [04:39:58] Downloading SOL 4h...
+  [04:40:00] SOL 4h: 11419 candles
+  [04:40:00] Downloading SOL 1d...
+  [04:40:00] SOL 1d: 1904 candles
+  [04:40:00] Downloading DOGE 15m...
+  [04:40:29] DOGE 15m: 182619 candles
+  [04:40:29] Downloading DOGE 4h...
+  [04:40:30] DOGE 4h: 11419 candles
+  [04:40:30] Downloading DOGE 1d...
+  [04:40:30] DOGE 1d: 1904 candles
+  [04:40:30] Downloading BNB 15m...
+  [04:40:57] BNB 15m: 182619 candles
+  [04:40:57] Downloading BNB 4h...
+  [04:40:58] BNB 4h: 11419 candles
+  [04:40:58] Downloading BNB 1d...
+  [04:40:58] BNB 1d: 1904 candles
+  [04:40:58] Downloading AVAX 15m...
+  [04:41:24] AVAX 15m: 182619 candles
+  [04:41:24] Downloading AVAX 4h...
+  [04:41:26] AVAX 4h: 11419 candles
+  [04:41:26] Downloading AVAX 1d...
+  [04:41:26] AVAX 1d: 1904 candles
+  [04:41:26] All data downloaded. [174s]
+
+========================================================================================================================
+  [04:41:26] PHASE 1 — FULL SYSTEM REVALIDATION WITH NEW EMA200+EMA50 CLASSIFIER
+========================================================================================================================
+
+  Asset        PF        P&L    MDD%  Sharpe  Trades    WR%      Long$     Short$  Bull%  Bear%  Flat%
+  ────────────────────────────────────────────────────────────────────────────────────────────────────
+  BTC        2.54 $  1876.12   42.9%    1.32     152  36.8% $  1627.15 $   248.98  41.0%  32.0%  27.0%
+  ETH        1.86 $  1307.21   25.6%    1.28     139  33.1% $   443.85 $   863.36  35.7%  34.8%  29.5%
+  SOL        1.79 $  1253.43   27.6%    0.91     144  38.2% $   -39.35 $  1292.79  32.3%  37.5%  30.2%
+  DOGE       0.90 $  -215.38  120.9%   -0.31     168  29.8% $    58.71 $  -274.09  25.7%  47.8%  26.6%
+  BNB        1.32 $   350.60   44.0%    0.54     125  32.0% $   140.70 $   209.91  41.2%  31.3%  27.5%
+  AVAX       1.13 $   293.17   46.8%    0.24     155  36.8% $   489.06 $  -195.89  23.9%  46.5%  29.7%
+
+  COMBINED PORTFOLIO:
+    PF: 1.49 | P&L: $4865.17 | MDD: 105.2% | Sharpe: 1.36
+    Trades: 883 | WR: 34.4%
+    Long P&L: $2720.11 | Short P&L: $2145.06
+    Monthly win rate: 32/56 (57%)
+
+  YEAR-BY-YEAR P&L:
+    2021: $    -38.33
+    2022: $   2193.45
+    2023: $    -42.51
+    2024: $   1352.67
+    2025: $   1288.98
+    2026: $    110.91
+
+  COMPARISON vs OLD CLASSIFIER (PF 2.12, $8,241):
+    PF: 1.49 vs 2.12 (-0.63)
+    P&L: $4865.17 vs $8,241 ($-3375.83)
+
+  REGIME DISTRIBUTION (avg across assets): Bull 33.3% | Bear 38.3% | Flat 28.4%
+    PASS
+
+  [04:41:29] Running 500 bootstrap iterations...
+    % profitable: 100.0%
+    Median PF: 1.49
+    Worst case PF: 1.07
+    PF 5th/25th/50th/75th/95th: 1.26 / 1.38 / 1.49 / 1.61 / 1.77
+
+    t-statistic: 3.060
+    p-value: 0.002280
+    95% CI on mean trade P&L: [$1.98, $9.04]
+    95% CI on PF (bootstrap): [1.23, 1.81]
+    Significant at 95%: YES
+
+  [04:41:29] Parameter robustness ±30% (500 combinations)...
+    Profitable: 500/500 (100.0%)
+  [04:55:08] Phase 1 complete. [996s]
+
+========================================================================================================================
+  [04:55:08] STRESS TEST 7 — Monte Carlo Parameter Robustness (2000 LHS combinations)
+========================================================================================================================
+  Testing 2000 parameter combinations across 6 assets...
+  [04:59:17] 1/2000 done (248s)
+  [05:02:14] 81/2000 done (426s)
+  [05:03:25] 241/2000 done (497s)
+  [05:07:33] 321/2000 done (745s)
+  [05:09:20] 401/2000 done (852s)
+  [05:11:42] 561/2000 done (993s)
+  [05:15:50] 641/2000 done (1242s)
+  [05:16:26] 721/2000 done (1278s)
+  [05:19:58] 881/2000 done (1490s)
+  [05:23:32] 961/2000 done (1703s)
+  [05:24:07] 1121/2000 done (1739s)
+  [05:28:15] 1201/2000 done (1987s)
+  [05:30:37] 1281/2000 done (2128s)
+  [05:31:08] 1421/2000 done (2159s)
+  [05:32:23] 1441/2000 done (2235s)
+  [05:36:32] 1521/2000 done (2483s)
+  [05:37:45] 1601/2000 done (2556s)
+  [05:38:16] 1741/2000 done (2588s)
+  [05:40:40] 1761/2000 done (2731s)
+  [05:43:07] 1841/2000 done (2879s)
+
+  RESULTS (2000 valid of 2000):
+    % Profitable: 2000/2000 (100.0%)
+    PF distribution: 5th=1.22 25th=1.31 50th=1.42 75th=1.56 95th=1.81
+    Worst PF: 1.09 | Best PF: 2.53
+
+  SENSITIVITY ANALYSIS (correlation of parameter value with PF):
+    ema200_period       : r = -0.196 
+    ema50_period        : r = -0.046 
+    ema50_lookback      : r = -0.138 
+    st4h_atr            : r = +0.010 
+    st4h_mult           : r = +0.249 
+    ema_fast            : r = +0.052 
+    ema_slow            : r = -0.103 
+    vol_mult            : r = +0.700 *** HIGH
+
+  Worst combination: PF=1.09, P&L=$853.11
+    Params: {'ema200_period': 250, 'ema50_period': 64, 'ema50_lookback': 8, 'st4h_atr': 8, 'st4h_mult': np.float64(2.8), 'ema_fast': 25, 'ema_slow': 69, 'vol_mult': np.float64(2.0)}
+  [05:43:30] Stress Test 7 complete. [3898s]
+
+========================================================================================================================
+  [05:43:30] STRESS TEST 8 — Most Recent 12 Months (March 2025 - March 2026)
+========================================================================================================================
+  BTC      PF=2.51 P&L=$487.22 Sharpe=2.13 MDD=18.2% Trades=47
+  ETH      PF=1.45 P&L=$219.33 Sharpe=1.19 MDD=37.6% Trades=39
+  SOL      PF=1.35 P&L=$163.64 Sharpe=0.49 MDD=28.5% Trades=44
+  DOGE     PF=1.28 P&L=$202.58 Sharpe=1.14 MDD=29.8% Trades=49
+  BNB      PF=1.42 P&L=$130.70 Sharpe=0.84 MDD=25.0% Trades=34
+  AVAX     PF=1.13 P&L=$111.16 Sharpe=0.23 MDD=42.1% Trades=45
+
+  COMBINED: PF=1.42 P&L=$1314.63 Sharpe=1.68
+
+  Monthly P&L breakdown:
+    2025-03: $      9.70 [WIN]
+    2025-04: $    196.93 [WIN]
+    2025-05: $     60.54 [WIN]
+    2025-06: $     39.29 [WIN]
+    2025-07: $    128.11 [WIN]
+    2025-08: $    -82.40 [LOSS]
+    2025-09: $    418.73 [WIN]
+    2025-10: $      4.28 [WIN]
+    2025-11: $    510.00 [WIN]
+    2025-12: $    -81.46 [LOSS]
+    2026-01: $   -200.30 [LOSS]
+    2026-02: $    380.81 [WIN]
+    2026-03: $    -69.61 [LOSS]
+  [05:43:42] Stress Test 8 complete. [3909s]
+
+========================================================================================================================
+  [05:43:42] STRESS TEST 9 — Worst Case Sequence Compounding (10,000 MC simulations)
+========================================================================================================================
+  Starting equity: $5000 | Monthly compounding: 25.0% of equity
+  56 months of returns, 10000 simulations
+
+  Median final equity: $6352.32
+  Mean final equity:   $6352.32
+  Worst 1%:            $6352.32
+  Best 1%:             $6352.32
+  P(below $4000):      0.0%
+  P(below $3000):      0.0%
+  P(below $2500):      0.0%
+  P(below $1000):      0.0%
+
+  Deterministic worst (all losses first): $6352.32
+  Deterministic best (all wins first):    $6352.32
+  [05:43:54] Stress Test 9 complete. [3922s]
+
+========================================================================================================================
+  [05:43:54] STRESS TEST 10 — Live Regime Check (All 6 Assets)
+========================================================================================================================
+
+  BTC:
+    Price: $70,806.71 | EMA200: $87,258.71 (-18.9%)
+    EMA50: $72,781.31 vs 5d ago $72,805.90 (FALLING)
+    Regime: BEAR | 4H ST: BEAR | Signal: SHORT candidate
+
+  ETH:
+    Price: $2,196.24 | EMA200: $2,822.00 (-22.2%)
+    EMA50: $2,217.06 vs 5d ago $2,210.06 (RISING)
+    Regime: FLAT | 4H ST: BEAR | Signal: FLAT — no position
+
+  SOL:
+    Price: $89.91 | EMA200: $129.60 (-30.6%)
+    EMA50: $93.97 vs 5d ago $94.28 (FALLING)
+    Regime: BEAR | 4H ST: BEAR | Signal: SHORT candidate
+
+  DOGE:
+    Price: $0.09 | EMA200: $0.14 (-33.4%)
+    EMA50: $0.10 vs 5d ago $0.10 (FALLING)
+    Regime: BEAR | 4H ST: BEAR | Signal: SHORT candidate
+
+  BNB:
+    Price: $648.78 | EMA200: $791.72 (-18.1%)
+    EMA50: $679.47 vs 5d ago $682.89 (FALLING)
+    Regime: BEAR | 4H ST: BEAR | Signal: SHORT candidate
+
+  AVAX:
+    Price: $9.62 | EMA200: $14.64 (-34.3%)
+    EMA50: $9.95 vs 5d ago $9.94 (RISING)
+    Regime: FLAT | 4H ST: BEAR | Signal: FLAT — no position
+
+  [05:43:56] Stress Test 10 complete. [3923s]
+
+========================================================================================================================
+  [05:43:56] STRESS TEST 11 — Survivorship Bias & DOGE Dependency
+========================================================================================================================
+
+  Per-asset P&L: BTC=$1876, ETH=$1307, SOL=$1253, DOGE=$-215, BNB=$351, AVAX=$293
+  Total P&L: $4865.15
+  DOGE contribution: $-215.38 (-4.4% of total)
+
+  Without DOGE entirely:  $5080.53 (PF=1.66)
+  Without DOGE rally:     $4865.15
+  DOGE replaced w/ median: $4587.37
+
+  VERDICT: DOGE is NOT an outsized contributor
+    System DOES survive without DOGE
+  [05:44:08] Stress Test 11 complete. [3935s]
+
+========================================================================================================================
+  [05:44:08] STRESS TEST 12 — Bear Market Isolation
+========================================================================================================================
+  BTC      PF=1.23 P&L=$248.98 WR=32% Trades=129 BearPeriods=207 AvgDur=3d
+  ETH      PF=1.63 P&L=$863.36 WR=32% Trades=126 BearPeriods=98 AvgDur=7d
+  SOL      PF=1.84 P&L=$1292.79 WR=38% Trades=140 BearPeriods=139 AvgDur=5d
+  DOGE     PF=0.88 P&L=$-274.09 WR=30% Trades=166 BearPeriods=124 AvgDur=7d
+  BNB      PF=1.22 P&L=$209.91 WR=32% Trades=108 BearPeriods=230 AvgDur=2d
+  AVAX     PF=0.91 P&L=$-195.89 WR=36% Trades=153 BearPeriods=176 AvgDur=5d
+
+  COMBINED BEAR: PF=1.23 P&L=$2145.06 WR=33%
+    Largest winner: $454.94 | Largest loser: $-137.71
+    LUNA crash: 7 trades, P&L=$192.57
+    FTX collapse: 3 trades, P&L=$597.87
+    Aug 2024 crash: 5 trades, P&L=$437.54
+  [05:44:20] Stress Test 12 complete. [3948s]
+
+========================================================================================================================
+  [05:44:20] STRESS TEST 13 — Transaction Cost Break-Even
+========================================================================================================================
+
+      Fee%      BTC PF    BTC P&L     ETH PF    ETH P&L     SOL PF    SOL P&L    DOGE PF   DOGE P&L     BNB PF    BNB P&L    AVAX PF   AVAX P&L    Port PF   Port P&L
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    0.010%       2.65 $     1943       1.93 $     1368       1.85 $     1316       0.94 $     -142       1.38 $      405       1.16 $      361       1.54 $     5251
+    0.020%       2.62 $     1924       1.91 $     1351       1.84 $     1298       0.93 $     -163       1.37 $      390       1.15 $      342       1.53 $     5141
+    0.030%       2.59 $     1905       1.89 $     1333       1.82 $     1280       0.92 $     -184       1.35 $      374       1.14 $      322       1.51 $     5031
+    0.045%       2.54 $     1876       1.86 $     1307       1.79 $     1253       0.90 $     -215       1.32 $      351       1.13 $      293       1.49 $     4865
+    0.060%       2.50 $     1848       1.84 $     1281       1.77 $     1226       0.89 $     -247       1.29 $      327       1.12 $      264       1.47 $     4700
+    0.080%       2.44 $     1810       1.80 $     1246       1.74 $     1190       0.87 $     -289       1.26 $      296       1.10 $      225       1.44 $     4479
+    0.100%       2.38 $     1772       1.77 $     1212       1.70 $     1154       0.86 $     -331       1.23 $      265       1.08 $      187       1.41 $     4258
+    0.150%       2.25 $     1677       1.69 $     1125       1.63 $     1064       0.82 $     -436       1.15 $      187       1.04 $       90       1.35 $     3706
+    0.200%       2.12 $     1582       1.61 $     1038       1.55 $      974       0.78 $     -541       1.09 $      108       1.00 $       -7       1.29 $     3154
+
+  Break-even fee levels:
+    BTC: > 0.200% (still profitable)
+    ETH: > 0.200% (still profitable)
+    SOL: > 0.200% (still profitable)
+    DOGE: 0.010%
+    BNB: > 0.200% (still profitable)
+    AVAX: 0.200%
+  [05:46:10] Stress Test 13 complete. [4058s]
+
+========================================================================================================================
+  [05:46:10] STRESS TEST 14 — Leverage Optimization
+========================================================================================================================
+
+    Lev       PF        P&L     MDD%   Sharpe   Liquidations
+  ────────────────────────────────────────────────────────────
+     1x     1.49 $   486.52     0.0%     1.36              0
+     2x     1.49 $   973.03     0.0%     1.36              0
+     3x     1.49 $  1459.55     0.0%     1.36              0
+     5x     1.49 $  2432.58     0.0%     1.36              0
+     7x     1.49 $  3405.62     0.0%     1.36              0
+    10x     1.49 $  4865.17     0.0%     1.36              1
+    15x     1.49 $  7297.75     0.0%     1.36              2
+    20x     1.49 $  9730.33     0.0%     1.36             11
+
+  Sharpe-optimal leverage: 1x (Sharpe=1.36)
+  Kelly criterion: f* = 0.113 → Kelly leverage = 1.1x
+  Half-Kelly (recommended): 0.6x
+  [05:48:00] Stress Test 14 complete. [4168s]
+
+========================================================================================================================
+  [05:48:00] STRESS TEST 15 — True Out-of-Sample (Last 20%)
+========================================================================================================================
+  Original params     : PF=1.50 P&L=$1491.73 Sharpe=1.91 Trades=253
+  Varied params       : PF=1.48 P&L=$1430.37 Sharpe=1.95 Trades=250
+  [05:48:24] Stress Test 15 complete. [4191s]
+
+========================================================================================================================
+  [05:48:24] STRESS TEST 16 — Drawdown Recovery Analysis
+========================================================================================================================
+
+  Found 68 drawdown periods > 1%
+
+    #   Depth%  Duration(days)     Bars
+  ────────────────────────────────────────
+    1    42.9%          255.2d    24496
+    2    37.6%          295.8d    28394
+    3    34.9%           11.1d     1070
+    4    25.9%           37.1d     3561
+    5    15.9%           19.0d     1827
+    6    15.7%          122.0d    11713
+    7    10.4%          154.1d    14792
+    8     8.9%            4.1d      395
+    9     8.8%          152.4d    14631
+   10     8.1%           91.5d     8781
+
+  Deepest drawdown: 42.9% lasting 255 days
+  Longest underwater: 296 days (37.6% deep)
+  [05:48:36] Stress Test 16 complete. [4204s]
+
+========================================================================================================================
+  [05:48:36] STRESS TEST 17 — Regime Transition Whipsaw Cost
+========================================================================================================================
+  Total whipsaw periods detected: 217302
+  Losses from quick trades (<12h): $7672.60 (77.5% of total losses)
+
+  Testing minimum 3-day regime duration requirement...
+  With 3-day minimum: PF=1.45 P&L=$3545.46 Trades=661
+  [05:49:03] Stress Test 17 complete. [4231s]
+
+========================================================================================================================
+  [05:49:03] STRESS TEST 18 — Multi-Timeframe Signal Conflict Analysis
+========================================================================================================================
+  BTC: Daily BULL + 4H BEAR: 28862 bars | Daily BEAR + 4H BULL: 21110 bars
+  ETH: Daily BULL + 4H BEAR: 23012 bars | Daily BEAR + 4H BULL: 25942 bars
+  SOL: Daily BULL + 4H BEAR: 22352 bars | Daily BEAR + 4H BULL: 24538 bars
+  DOGE: Daily BULL + 4H BEAR: 18563 bars | Daily BEAR + 4H BULL: 33025 bars
+  BNB: Daily BULL + 4H BEAR: 27978 bars | Daily BEAR + 4H BULL: 20900 bars
+  AVAX: Daily BULL + 4H BEAR: 14484 bars | Daily BEAR + 4H BULL: 30256 bars
+
+  Without filter: PF=1.49 P&L=$4865.17 Trades=883
+  With 4H agreement: PF=1.84 P&L=$5969.75 Trades=658
+
+  VERDICT: 4H agreement filter IMPROVES results
+  [05:49:17] Stress Test 18 complete. [4244s]
+
+========================================================================================================================
+  [05:49:17] STRESS TEST 19 — Kelly Position Sizing
+========================================================================================================================
+  BTC      WR=36.8% W/L=4.36 Kelly=0.223 Half-Kelly=0.112
+  ETH      WR=33.1% W/L=3.77 Kelly=0.153 Half-Kelly=0.077
+  SOL      WR=38.2% W/L=2.90 Kelly=0.169 Half-Kelly=0.085
+  DOGE     WR=29.8% W/L=2.13 Kelly=-0.031 Half-Kelly=-0.016
+  BNB      WR=32.0% W/L=2.81 Kelly=0.078 Half-Kelly=0.039
+  AVAX     WR=36.8% W/L=1.94 Kelly=0.042 Half-Kelly=0.021
+
+  Fixed $125/trade: PF=1.49 P&L=$4865.17 Sharpe=1.36
+  Half-Kelly sized:  PF=1.87 P&L=$1734.02 Sharpe=1.50
+  [05:49:42] Stress Test 19 complete. [4269s]
+
+========================================================================================================================
+  [05:49:42] STRESS TEST 20 — Full Realistic Simulation (All Friction Combined)
+========================================================================================================================
+
+  ALL FRICTION COMBINED:
+    Fees: 0.115% per side | Funding: 0.03%/8h | Signal delay: 1 bar
+    Regime misclass: 3% | Leverage: 1x
+
+    PF: 0.94 | P&L: $-175.13 | Sharpe: -0.58 | MDD: 0.0%
+    Trades: 3866 | WR: 39.7%
+
+  VERDICT: FAILS under realistic conditions
+  [05:50:02] Stress Test 20 complete. [4290s]
+
+========================================================================================================================
+  [05:50:02] STRESS TEST 21 — Multiple Testing Bias Correction
+========================================================================================================================
+
+  Original t-statistic: 3.060
+  Original p-value: 0.002280
+  Number of strategies tested: 2000
+
+  White's Reality Check p-value: 0.0000
+  Bonferroni-corrected p-value: 1.000000
+
+  Still significant at 5% (Bonferroni): NO
+  Still significant at 5% (Reality Check): YES
+  [05:50:14] Stress Test 21 complete. [4302s]
+
+========================================================================================================================
+  [05:50:14] STRESS TEST 22 — Specific Black Swan Events
+========================================================================================================================
+
+  LUNA crash (May 7-13 2022):
+    BTC    Position: SHORT  P&L: $  -64.41 | Asset move: -19.8%
+    BTC    Position: SHORT  P&L: $  -11.51 | Asset move: -19.8%
+    ETH    Position: SHORT  P&L: $   85.29 | Asset move: -27.5%
+    ETH    Position: SHORT  P&L: $  -10.52 | Asset move: -27.5%
+    ETH    Position: SHORT  P&L: $  -67.93 | Asset move: -27.5%
+    SOL    Position: SHORT  P&L: $  109.99 | Asset move: -45.9%
+    DOGE   Position: FLAT   P&L: $    0.00 | Asset move: -34.7%
+    BNB    Position: FLAT   P&L: $    0.00 | Asset move: -29.8%
+    AVAX   Position: SHORT  P&L: $  151.66 | Asset move: -47.9%
+    Total event P&L: $192.57
+
+  FTX collapse (Nov 7-11 2022):
+    BTC    Position: FLAT   P&L: $    0.00 | Asset move: -15.9%
+    ETH    Position: FLAT   P&L: $    0.00 | Asset move: -17.4%
+    SOL    Position: SHORT  P&L: $   17.93 | Asset move: -47.5%
+    SOL    Position: SHORT  P&L: $  454.94 | Asset move: -47.5%
+    DOGE   Position: FLAT   P&L: $    0.00 | Asset move: -22.5%
+    BNB    Position: FLAT   P&L: $    0.00 | Asset move: -9.9%
+    AVAX   Position: SHORT  P&L: $  125.00 | Asset move: -16.5%
+    Total event P&L: $597.87
+
+  Aug 2024 crash (Aug 4-5 2024):
+    BTC    Position: SHORT  P&L: $  103.71 | Asset move: -9.5%
+    ETH    Position: SHORT  P&L: $  201.72 | Asset move: -15.0%
+    SOL    Position: SHORT  P&L: $   -5.84 | Asset move: -6.4%
+    SOL    Position: SHORT  P&L: $   46.96 | Asset move: -6.4%
+    DOGE   Position: FLAT   P&L: $    0.00 | Asset move: -10.5%
+    BNB    Position: SHORT  P&L: $   91.01 | Asset move: -10.4%
+    AVAX   Position: FLAT   P&L: $    0.00 | Asset move: -11.6%
+    Total event P&L: $437.54
+
+  Mar 2025 downturn:
+    BTC    Position: SHORT  P&L: $  -15.60 | Asset move: -2.1%
+    BTC    Position: SHORT  P&L: $   -3.02 | Asset move: -2.1%
+    BTC    Position: SHORT  P&L: $  -10.33 | Asset move: -2.1%
+    BTC    Position: SHORT  P&L: $  -11.74 | Asset move: -2.1%
+    BTC    Position: SHORT  P&L: $   -5.05 | Asset move: -2.1%
+    BTC    Position: SHORT  P&L: $   -7.26 | Asset move: -2.1%
+    BTC    Position: SHORT  P&L: $   -5.11 | Asset move: -2.1%
+    BTC    Position: SHORT  P&L: $    2.90 | Asset move: -2.1%
+    ETH    Position: SHORT  P&L: $  -26.44 | Asset move: -13.8%
+    ETH    Position: SHORT  P&L: $    7.26 | Asset move: -13.8%
+    ETH    Position: SHORT  P&L: $  -26.60 | Asset move: -13.8%
+    ETH    Position: SHORT  P&L: $   61.33 | Asset move: -13.8%
+    ETH    Position: SHORT  P&L: $  -32.69 | Asset move: -13.8%
+    ETH    Position: SHORT  P&L: $  -27.86 | Asset move: -13.8%
+    ETH    Position: SHORT  P&L: $  -11.16 | Asset move: -13.8%
+    ETH    Position: SHORT  P&L: $   -9.46 | Asset move: -13.8%
+    SOL    Position: SHORT  P&L: $   59.36 | Asset move: -14.8%
+    DOGE   Position: SHORT  P&L: $  -20.24 | Asset move: -17.0%
+    DOGE   Position: SHORT  P&L: $  -85.27 | Asset move: -17.0%
+    DOGE   Position: SHORT  P&L: $  102.18 | Asset move: -17.0%
+    DOGE   Position: SHORT  P&L: $   48.08 | Asset move: -17.0%
+    DOGE   Position: SHORT  P&L: $  -49.98 | Asset move: -17.0%
+    DOGE   Position: SHORT  P&L: $  -15.59 | Asset move: -17.0%
+    BNB    Position: SHORT  P&L: $  -19.66 | Asset move: +6.3%
+    BNB    Position: SHORT  P&L: $  -11.85 | Asset move: +6.3%
+    BNB    Position: SHORT  P&L: $    1.68 | Asset move: +6.3%
+    AVAX   Position: SHORT  P&L: $  -25.21 | Asset move: -14.6%
+    AVAX   Position: SHORT  P&L: $   36.39 | Asset move: -14.6%
+    AVAX   Position: SHORT  P&L: $  -36.84 | Asset move: -14.6%
+    Total event P&L: $-137.77
+
+  Maximum single-event loss: $-85.27
+  [05:50:27] Stress Test 22 complete. [4314s]
+
+========================================================================================================================
+  [05:50:27] PHASE 4 — FINAL SCORING & DEPLOYMENT DECISION
+========================================================================================================================
+
+  ASSET RANKING TABLE:
+  Rank Asset       Score     PF  Sharpe   MDD%  Robust        P&L
+  ────────────────────────────────────────────────────────────
+     1 BTC          40.8   2.54    1.32  42.9%    100% $  1876.12
+     2 ETH          40.7   1.86    1.28  25.6%    100% $  1307.21
+     3 SOL          40.5   1.79    0.91  27.6%    100% $  1253.43
+     4 BNB          38.8   1.32    0.54  44.0%    100% $   350.60
+     5 AVAX         31.1   1.13    0.24  46.8%     78% $   293.17
+     6 DOGE          4.5   0.90   -0.31 120.9%     14% $  -215.38
+
+  ================================================================================
+  FINAL SYSTEM SPECIFICATION
+  ================================================================================
+  Regime Classifier: EMA200 + EMA50 slope (5-bar lookback)
+    BULL: Daily close > EMA200 AND EMA50(current) > EMA50(5 bars ago)
+    BEAR: Daily close < EMA200 AND EMA50(current) < EMA50(5 bars ago)
+    FLAT: Everything else — no position
+  Bull Strategy: MTF Pyramid (ST 4H ATR10 x3.0, ST 15m ATR10 x2.0, RSI14)
+  Bear Strategy: EMA(21/55) crossover short with volume confirmation
+  Leverage: 1x (Sharpe-optimal)
+  Position sizing: Fixed $125 per trade
+  Maximum acceptable fees: ~0.06% (based on break-even analysis)
+  Assets to trade: BTC, ETH, SOL, BNB, AVAX
+  Assets to DROP: DOGE
+
+  ================================================================================
+  GO / NO-GO DEPLOYMENT DECISION
+  ================================================================================
+
+  DECISION: *** NO-GO ***
+  System needs improvements before deployment
+
+  Conditions MET:
+    + Parameter robustness 100% > 60%
+    + 5/6 assets profitable
+  Conditions FAILED:
+    - Portfolio PF 1.49 < 1.5
+    - FAILS under realistic friction (Test 20)
+    - NOT significant after Bonferroni correction
+
+========================================================================================================================
+  ALL 22 STRESS TESTS COMPLETE
+  Total time: 81.2 minutes
+  Results saved to: /tmp/discovery/final_validation.json
+  Completion timestamp: 05:59:44
+========================================================================================================================
