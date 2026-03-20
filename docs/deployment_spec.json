@@ -1,0 +1,300 @@
+{
+  "deployment": "HyperTrader Regime MTF v3",
+  "generated": "2026-03-20",
+  "pine_script_path": "/opt/hypertrader/addons/hypertrader_regime_mtf_v3.pine",
+  "source_engine": "/home/ubuntu/hypertrader-engine/src/",
+  "baseline_config": "/tmp/discovery/rust_baseline_config.json",
+
+  "strategy_specification": {
+    "regime_classifier": {
+      "timeframe": "Daily (1D)",
+      "type": "ema_dual (legacy)",
+      "source_file": "regime.rs::classify_ema_dual",
+      "ema200": {
+        "period": 200,
+        "source": "daily close",
+        "seed": "SMA of first 200 bars",
+        "formula": "k=2/(200+1); out[i] = close[i]*k + out[i-1]*(1-k)"
+      },
+      "ema50": {
+        "period": 50,
+        "source": "daily close",
+        "seed": "SMA of first 50 bars"
+      },
+      "rising_definition": {
+        "formula": "ema50[today] > ema50[today - lookback]",
+        "lookback": 5,
+        "comparison": "current value vs N bars ago (not slope)"
+      },
+      "bull_condition": "15m_close > daily_ema200 AND ema50_rising",
+      "bear_condition": "15m_close <= daily_ema200 AND ema50_falling",
+      "flat_condition": "everything else"
+    },
+
+    "long_entry": {
+      "name": "MTF Pyramid Pullback",
+      "timeframe": "15m",
+      "source_file": "signals.rs::sig_mtf_pyramid",
+      "conditions": [
+        {"id": 1, "code": "c[i] > d_ema200_al[i]", "english": "15m close above daily EMA200"},
+        {"id": 2, "code": "st4h_dir_al[i] == 1.0", "english": "4H SuperTrend direction is bullish"},
+        {"id": 3, "code": "st15_dir[i] == 1.0", "english": "15m SuperTrend direction is bullish"},
+        {"id": 4, "code": "dist = (c[i]-sl)/sl; dist>=0 && dist<=0.005", "english": "Price within 0.5% above 15m SuperTrend band"},
+        {"id": 5, "code": "rsi[i-lb] < 45 within 2 bars AND rsi[i] > rsi[i-1]", "english": "RSI dipped below 45 recently and is now recovering"}
+      ],
+      "exit_conditions": [
+        {"code": "st4h_dir != 1.0", "english": "4H SuperTrend no longer bullish"},
+        {"code": "c[i] <= d_ema200", "english": "Price dropped below daily EMA200"}
+      ],
+      "signal_behavior": "Stateful: once 1.0, stays 1.0 until exit conditions",
+      "regime_gate": "Only active when regime == 1 (BULL)"
+    },
+
+    "short_entry": {
+      "name": "EMA Crossover with Volume",
+      "timeframe": "15m",
+      "source_file": "signals.rs::sig_ema_short",
+      "conditions": [
+        {"id": 1, "code": "f[i] < s[i]", "english": "Fast EMA(21) below Slow EMA(55)"},
+        {"id": 2, "code": "f[i-1] >= s[i-1]", "english": "Previous bar fast was above/equal slow (crossover moment)"},
+        {"id": 3, "code": "v[i] >= 2.0 * vs[i]", "english": "Volume >= 2x 20-bar SMA of volume"},
+        {"id": 4, "code": "c[i] < f[i]", "english": "Close below fast EMA"}
+      ],
+      "exit_conditions": [
+        {"code": "f[i] > s[i]", "english": "Fast EMA crosses back above slow EMA"}
+      ],
+      "signal_behavior": "Stateful: once -1.0, stays -1.0 until fast > slow",
+      "regime_gate": "Only active when regime == 2 (BEAR)"
+    },
+
+    "regime_transition_rule": {
+      "code": "if regime[i] != regime[i-1] && combined[i-1] != 0.0 { combined[i] = 0.0; }",
+      "english": "Force close any open position on regime change"
+    },
+
+    "supertrend_4h": {
+      "role": "Long entry filter (condition 2)",
+      "atr_period": 10,
+      "multiplier": 3.0,
+      "source": "hl2 = (high + low) / 2.0",
+      "atr_method": "RMA (Wilder's smoothing), SMA-seeded",
+      "direction_convention": "1.0 = bullish, -1.0 = bearish"
+    },
+
+    "supertrend_15m": {
+      "role": "Long entry filter (condition 3) and near-band check (condition 4)",
+      "atr_period": 10,
+      "multiplier": 2.0,
+      "source": "hl2",
+      "atr_method": "RMA, SMA-seeded"
+    },
+
+    "execution_model": {
+      "source_file": "simulator.rs",
+      "signal_delay": 0,
+      "execution": "sig_idx = i - 1 (signal from previous bar determines current bar)",
+      "entry_exit_price": "opens[i] with slippage",
+      "slippage": 0.0005,
+      "implication": "Pine alert fires on signal bar; bot executes on NEXT bar's open"
+    }
+  },
+
+  "parameter_table": {
+    "ema200_period":         {"value": 200,   "source": "config.json → params.ema200_period",        "pine_line": 17},
+    "ema50_period":          {"value": 50,    "source": "config.json → params.ema50_period",         "pine_line": 18},
+    "ema50_rising_lookback": {"value": 5,     "source": "config.json → params.ema50_rising_lookback","pine_line": 19},
+    "st_4h_atr_period":      {"value": 10,    "source": "config.json → params.st_4h_atr_period",    "pine_line": 22},
+    "st_4h_multiplier":      {"value": 3.0,   "source": "config.json → params.st_4h_multiplier",    "pine_line": 23},
+    "st_15m_atr_period":     {"value": 10,    "source": "config.json → params.st_15m_atr_period",   "pine_line": 24},
+    "st_15m_multiplier":     {"value": 2.0,   "source": "config.json → params.st_15m_multiplier",   "pine_line": 25},
+    "near_band_pct":         {"value": 0.005, "source": "config.json → params.near_band_pct",       "pine_line": 26},
+    "rsi_period":            {"value": 14,    "source": "config.json → params.rsi_period",           "pine_line": 27},
+    "rsi_threshold":         {"value": 45.0,  "source": "config.json → params.rsi_threshold",        "pine_line": 28},
+    "rsi_lookback":          {"value": 2,     "source": "config.json → params.rsi_lookback",         "pine_line": 29},
+    "ema_fast":              {"value": 21,    "source": "config.json → params.ema_fast",             "pine_line": 32},
+    "ema_slow":              {"value": 55,    "source": "config.json → params.ema_slow",             "pine_line": 33},
+    "vol_mult":              {"value": 2.0,   "source": "config.json → params.vol_mult",             "pine_line": 34},
+    "vol_sma_period":        {"value": 20,    "source": "config.json → params.vol_sma_period",       "pine_line": 35}
+  },
+
+  "formula_audit": {
+    "ema_calculation": {
+      "rust": "SMA seed for first N bars, then k=2/(N+1) exponential smoothing",
+      "pine": "ta.ema() — identical SMA-seeded formula",
+      "match": true
+    },
+    "rsi_calculation": {
+      "rust": "Wilder's smoothing (RMA), SMA-seeded gains/losses",
+      "pine": "ta.rsi() — identical Wilder's method",
+      "match": true
+    },
+    "supertrend_source": {
+      "rust": "hl2 = (h[i] + l[i]) / 2.0",
+      "pine": "ta.supertrend() — uses hl2 by default",
+      "match": true
+    },
+    "supertrend_atr": {
+      "rust": "RMA (Wilder's smoothing), SMA-seeded",
+      "pine": "ta.atr() / ta.supertrend() — uses RMA internally",
+      "match": true
+    },
+    "supertrend_direction_logic": {
+      "rust": "if prev_dir==-1 && close > prev_fd then 1; elif prev_dir==1 && close < prev_fu then -1; else prev_dir",
+      "pine": "ta.supertrend() — identical logic internally, returns -1 for bullish, +1 for bearish (inverted convention)",
+      "pine_conversion": "st_dir < 0 ? 1.0 : -1.0",
+      "match": true
+    },
+    "alignment_method": {
+      "rust": "align_htf: for each 15m bar, find most recent HTF bar where ts_hi[j+1] <= ts_lo[i]",
+      "pine": "request.security with barmerge.lookahead_off — equivalent confirmed-bar alignment",
+      "match": true
+    }
+  },
+
+  "parameter_mismatches": 0,
+  "formula_mismatches": 0,
+  "audit_result": "All parameters and formulas match. Indicator is faithful to backtest.",
+
+  "known_minor_differences": [
+    {
+      "item": "EMA warm-up on live charts",
+      "description": "Pine recalculates from the chart's first available bar (typically ~20k bars on 15m). The Rust engine processes from the dataset start. With 200-period EMA this means the SMA seed covers different data. After the first ~400 bars of EMA convergence, values are identical. Impact: negligible on recent bars.",
+      "material": false
+    },
+    {
+      "item": "Intrabar regime flicker",
+      "description": "On a live chart, regime uses real-time close which changes intra-bar. The Rust engine uses confirmed bar closes only. Since alerts fire on bar close, the actual signal is identical. Visual display may flicker during the bar.",
+      "material": false
+    }
+  ],
+
+  "verification_trades": {
+    "first_btc_long": {
+      "entry_ts": "2020-07-22T01:15:00",
+      "entry_price": 9366.33,
+      "exit_ts": "2020-08-02T08:15:00",
+      "exit_price": 11322.67,
+      "pnl": 256.29
+    },
+    "first_btc_short": {
+      "entry_ts": "2021-05-19T01:30:00",
+      "entry_price": 41472.59,
+      "exit_ts": "2021-05-20T05:00:00",
+      "exit_price": 39445.24,
+      "pnl": 60.11
+    }
+  },
+
+  "alert_configuration": {
+    "total_alerts": 9,
+    "per_asset": 3,
+    "trigger": "Once Per Bar Close",
+    "charts": [
+      {
+        "asset": "BTCUSDT.P",
+        "timeframe": "15m",
+        "alerts": [
+          {
+            "type": "BUY",
+            "condition": "HyperTrader Regime MTF v3 → Buy Signal (Long Entry)",
+            "trigger": "Once Per Bar Close",
+            "message": "{\"secret\": \"[YOUR_SECRET]\", \"strategy\": \"BTC Regime MTF\", \"action\": \"buy\", \"symbol\": \"BTCUSDT.P\", \"price\": \"{{close}}\", \"message\": \"MTF Pyramid long entry — regime BULL\"}"
+          },
+          {
+            "type": "SELL",
+            "condition": "HyperTrader Regime MTF v3 → Sell Signal (Short Entry)",
+            "trigger": "Once Per Bar Close",
+            "message": "{\"secret\": \"[YOUR_SECRET]\", \"strategy\": \"BTC Regime MTF\", \"action\": \"sell\", \"symbol\": \"BTCUSDT.P\", \"price\": \"{{close}}\", \"message\": \"EMA cross short entry — regime BEAR\"}"
+          },
+          {
+            "type": "CLOSE",
+            "condition": "HyperTrader Regime MTF v3 → Close Signal",
+            "trigger": "Once Per Bar Close",
+            "message": "{\"secret\": \"[YOUR_SECRET]\", \"strategy\": \"BTC Regime MTF\", \"action\": \"close\", \"symbol\": \"BTCUSDT.P\", \"price\": \"{{close}}\", \"message\": \"Exit signal — close position\"}"
+          }
+        ]
+      },
+      {
+        "asset": "ETHUSDT.P",
+        "timeframe": "15m",
+        "alerts": [
+          {
+            "type": "BUY",
+            "condition": "HyperTrader Regime MTF v3 → Buy Signal (Long Entry)",
+            "trigger": "Once Per Bar Close",
+            "message": "{\"secret\": \"[YOUR_SECRET]\", \"strategy\": \"ETH Regime MTF\", \"action\": \"buy\", \"symbol\": \"ETHUSDT.P\", \"price\": \"{{close}}\", \"message\": \"MTF Pyramid long entry — regime BULL\"}"
+          },
+          {
+            "type": "SELL",
+            "condition": "HyperTrader Regime MTF v3 → Sell Signal (Short Entry)",
+            "trigger": "Once Per Bar Close",
+            "message": "{\"secret\": \"[YOUR_SECRET]\", \"strategy\": \"ETH Regime MTF\", \"action\": \"sell\", \"symbol\": \"ETHUSDT.P\", \"price\": \"{{close}}\", \"message\": \"EMA cross short entry — regime BEAR\"}"
+          },
+          {
+            "type": "CLOSE",
+            "condition": "HyperTrader Regime MTF v3 → Close Signal",
+            "trigger": "Once Per Bar Close",
+            "message": "{\"secret\": \"[YOUR_SECRET]\", \"strategy\": \"ETH Regime MTF\", \"action\": \"close\", \"symbol\": \"ETHUSDT.P\", \"price\": \"{{close}}\", \"message\": \"Exit signal — close position\"}"
+          }
+        ]
+      },
+      {
+        "asset": "SOLUSDT.P",
+        "timeframe": "15m",
+        "alerts": [
+          {
+            "type": "BUY",
+            "condition": "HyperTrader Regime MTF v3 → Buy Signal (Long Entry)",
+            "trigger": "Once Per Bar Close",
+            "message": "{\"secret\": \"[YOUR_SECRET]\", \"strategy\": \"SOL Regime MTF\", \"action\": \"buy\", \"symbol\": \"SOLUSDT.P\", \"price\": \"{{close}}\", \"message\": \"MTF Pyramid long entry — regime BULL\"}"
+          },
+          {
+            "type": "SELL",
+            "condition": "HyperTrader Regime MTF v3 → Sell Signal (Short Entry)",
+            "trigger": "Once Per Bar Close",
+            "message": "{\"secret\": \"[YOUR_SECRET]\", \"strategy\": \"SOL Regime MTF\", \"action\": \"sell\", \"symbol\": \"SOLUSDT.P\", \"price\": \"{{close}}\", \"message\": \"EMA cross short entry — regime BEAR\"}"
+          },
+          {
+            "type": "CLOSE",
+            "condition": "HyperTrader Regime MTF v3 → Close Signal",
+            "trigger": "Once Per Bar Close",
+            "message": "{\"secret\": \"[YOUR_SECRET]\", \"strategy\": \"SOL Regime MTF\", \"action\": \"close\", \"symbol\": \"SOLUSDT.P\", \"price\": \"{{close}}\", \"message\": \"Exit signal — close position\"}"
+          }
+        ]
+      }
+    ]
+  },
+
+  "bot_configuration": {
+    "asset_configs": [
+      {"asset": "BTC", "leverage": 10, "margin": 125, "margin_mode": "isolated"},
+      {"asset": "ETH", "leverage": 10, "margin": 125, "margin_mode": "isolated"},
+      {"asset": "SOL", "leverage": 5,  "margin": 125, "margin_mode": "isolated"}
+    ],
+    "fixed_ratio_sizing": {
+      "starting_equity": 1000,
+      "base_margin": 125,
+      "delta": 1000,
+      "cap_N": 4,
+      "max_margin": 500,
+      "formula": "N = floor(0.5 + 0.5 * sqrt(1 + 8 * max(equity - 1000, 0) / 1000))"
+    },
+    "fees": {
+      "maker_rate": 0.00045,
+      "slippage": 0.0005,
+      "funding_rate_per_8h": 0.0001
+    },
+    "reconciler": {
+      "on_startup": "Check current Hyperliquid positions vs indicator state; warn if mismatch",
+      "on_signal": "Verify position opened/closed matches webhook action",
+      "heartbeat": "Every 15 minutes, confirm bot is running and connected"
+    },
+    "telegram_alerts": [
+      "Trade opened (direction, asset, price, margin)",
+      "Trade closed (direction, asset, entry/exit price, P&L)",
+      "Regime change (asset, old regime → new regime)",
+      "Liquidation warning (unrealized loss > 80% of margin)",
+      "Daily P&L summary at 00:00 UTC"
+    ]
+  }
+}
