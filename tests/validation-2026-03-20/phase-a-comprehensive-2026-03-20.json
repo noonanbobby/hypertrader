@@ -1,0 +1,838 @@
+{
+  "test1_ls": {
+    "portfolio": {
+      "trades": 588,
+      "pnl": 16919.68,
+      "pf": 3.23,
+      "sharpe": 1.8,
+      "mdd_pct": 14.1
+    },
+    "asset_stats": {
+      "BTC": {
+        "trades": 210,
+        "pnl": 6169.08,
+        "wr": 39.0,
+        "pf": 3.85,
+        "sharpe": 1.65,
+        "mdd": 471.26,
+        "mdd_pct": 20.1,
+        "fees": 118.13,
+        "funding": 239.71,
+        "avg_bars": 292.2,
+        "long_pnl": 6163.74,
+        "short_pnl": 5.34,
+        "regime_bull_pct": 46.3,
+        "regime_bear_pct": 28.9,
+        "regime_flat_pct": 24.9,
+        "n_bars": 217672
+      },
+      "ETH": {
+        "trades": 191,
+        "pnl": 5616.96,
+        "wr": 34.0,
+        "pf": 3.33,
+        "sharpe": 1.52,
+        "mdd": 368.19,
+        "mdd_pct": 27.5,
+        "fees": 107.44,
+        "funding": 194.54,
+        "avg_bars": 260.7,
+        "long_pnl": 4938.21,
+        "short_pnl": 678.75,
+        "regime_bull_pct": 42.2,
+        "regime_bear_pct": 29.7,
+        "regime_flat_pct": 28.1,
+        "n_bars": 217672
+      },
+      "SOL": {
+        "trades": 187,
+        "pnl": 5133.63,
+        "wr": 38.0,
+        "pf": 2.7,
+        "sharpe": 1.0,
+        "mdd": 685.79,
+        "mdd_pct": 62.9,
+        "fees": 105.19,
+        "funding": 132.77,
+        "avg_bars": 181.8,
+        "long_pnl": 4034.43,
+        "short_pnl": 1099.2,
+        "regime_bull_pct": 35.1,
+        "regime_bear_pct": 35.0,
+        "regime_flat_pct": 29.9,
+        "n_bars": 196299
+      }
+    },
+    "yearly_pnl": {
+      "2020": 1731.3853800729346,
+      "2021": 5893.437226072401,
+      "2022": 1658.1670073222551,
+      "2023": 2860.1491138508127,
+      "2024": 2824.14323577968,
+      "2025": 1742.7224123345093,
+      "2026": 209.67438579490047
+    },
+    "monthly_wr": "50/68",
+    "total_fees": 330.76,
+    "total_funding": 567.02
+  },
+  "test2_direction": {
+    "decision": "LONG+SHORT",
+    "reason": "short side contributes meaningful P&L",
+    "long_only_pf": 6.215765520594694,
+    "long_only_pnl": 15136.388795526636,
+    "long_only_sharpe": 6.7351452118400035,
+    "short_pnl": 1783.2899657008586,
+    "ls_2022": 1658.1670073222551,
+    "lo_2022": -182.7240446600047
+  },
+  "test3_stats": {
+    "bootstrap": {
+      "n_iterations": 500,
+      "pct_profitable": 100.0,
+      "median_pf": 3.17,
+      "worst_pf": 1.82,
+      "percentiles": {
+        "p5": 2.33,
+        "p25": 2.82,
+        "p50": 3.17,
+        "p75": 3.69,
+        "p95": 4.33
+      }
+    },
+    "robustness": {
+      "n_combos": 500,
+      "profitable": 493,
+      "profitable_pct": 98.6,
+      "median_pf": 2.73,
+      "worst_pf": 0.84
+    },
+    "t_stat": 4.8679,
+    "p_value": 7.3e-07,
+    "ci_low": 17.19,
+    "ci_high": 40.36,
+    "pf_ci": [
+      2.34,
+      4.37
+    ],
+    "bonferroni_100": 7.3e-05,
+    "bonferroni_500": 0.000363,
+    "verdict": "statistically real"
+  },
+  "test4a_fat": {
+    "results": [
+      {
+        "removed": 1,
+        "pnl": 15171.78227467322,
+        "pf": 2.9991480042135312,
+        "profitable": true
+      },
+      {
+        "removed": 3,
+        "pnl": 12702.758183452102,
+        "pf": 2.6738108424379123,
+        "profitable": true
+      },
+      {
+        "removed": 5,
+        "pnl": 11090.331103746516,
+        "pf": 2.4613453377282686,
+        "profitable": true
+      },
+      {
+        "removed": 10,
+        "pnl": 7847.836347991663,
+        "pf": 2.0340898708170965,
+        "profitable": true
+      },
+      {
+        "removed": 20,
+        "pnl": 4396.959784107311,
+        "pf": 1.5793764514851383,
+        "profitable": true
+      }
+    ],
+    "top10_pct_gross_profit": 37.0,
+    "fragility": "LOW"
+  },
+  "test4b_fees": {
+    "results": [
+      {
+        "fee_rate": 0.0002,
+        "portfolio_pf": 3.29,
+        "portfolio_pnl": 17103.43,
+        "btc_pf": 3.94,
+        "eth_pf": 3.39,
+        "sol_pf": 2.75
+      },
+      {
+        "fee_rate": 0.0003,
+        "portfolio_pf": 3.26,
+        "portfolio_pnl": 17029.93,
+        "btc_pf": 3.9,
+        "eth_pf": 3.36,
+        "sol_pf": 2.73
+      },
+      {
+        "fee_rate": 0.00045,
+        "portfolio_pf": 3.23,
+        "portfolio_pnl": 16919.68,
+        "btc_pf": 3.85,
+        "eth_pf": 3.33,
+        "sol_pf": 2.7
+      },
+      {
+        "fee_rate": 0.0006,
+        "portfolio_pf": 3.19,
+        "portfolio_pnl": 16809.43,
+        "btc_pf": 3.8,
+        "eth_pf": 3.29,
+        "sol_pf": 2.68
+      },
+      {
+        "fee_rate": 0.0008,
+        "portfolio_pf": 3.15,
+        "portfolio_pnl": 16662.43,
+        "btc_pf": 3.74,
+        "eth_pf": 3.24,
+        "sol_pf": 2.65
+      },
+      {
+        "fee_rate": 0.001,
+        "portfolio_pf": 3.11,
+        "portfolio_pnl": 16515.43,
+        "btc_pf": 3.68,
+        "eth_pf": 3.19,
+        "sol_pf": 2.62
+      },
+      {
+        "fee_rate": 0.0012,
+        "portfolio_pf": 3.06,
+        "portfolio_pnl": 16368.43,
+        "btc_pf": 3.62,
+        "eth_pf": 3.15,
+        "sol_pf": 2.59
+      },
+      {
+        "fee_rate": 0.0015,
+        "portfolio_pf": 3.0,
+        "portfolio_pnl": 16147.93,
+        "btc_pf": 3.53,
+        "eth_pf": 3.08,
+        "sol_pf": 2.54
+      }
+    ],
+    "breakeven_fee": 0.225,
+    "safety_margin": 5.0,
+    "verdict": "SAFE"
+  },
+  "test4c_slippage": {
+    "results": [
+      {
+        "slippage": 0.0005,
+        "portfolio_pf": 3.23,
+        "portfolio_pnl": 16919.68
+      },
+      {
+        "slippage": 0.001,
+        "portfolio_pf": 3.01,
+        "portfolio_pnl": 16170.96
+      },
+      {
+        "slippage": 0.002,
+        "portfolio_pf": 2.63,
+        "portfolio_pnl": 14672.63
+      }
+    ],
+    "breakeven_slippage": 0.004
+  },
+  "test4d_delay": {
+    "results": [
+      {
+        "delay": 1,
+        "portfolio_pf": 3.23,
+        "portfolio_pnl": 16919.68,
+        "trades": 588,
+        "sharpe": 1.8
+      },
+      {
+        "delay": 2,
+        "portfolio_pf": 3.24,
+        "portfolio_pnl": 16791.21,
+        "trades": 588,
+        "sharpe": 1.78
+      },
+      {
+        "delay": 3,
+        "portfolio_pf": 3.04,
+        "portfolio_pnl": 16235.16,
+        "trades": 588,
+        "sharpe": 1.74
+      }
+    ],
+    "pf_below_15": ">3",
+    "pf_below_10": ">3"
+  },
+  "test5_friction": {
+    "clean": {
+      "pf": 3.23,
+      "pnl": 16919.68,
+      "sharpe": 1.8,
+      "mdd_pct": 14.1,
+      "trades": 588
+    },
+    "5a": {
+      "pf": 2.89,
+      "pnl": 15422.54,
+      "sharpe": 1.69,
+      "mdd_pct": 14.1,
+      "trades": 613
+    },
+    "5b": {
+      "pf": 3.02,
+      "pnl": 15492.31,
+      "sharpe": 1.71,
+      "mdd_pct": 14.4,
+      "trades": 555
+    },
+    "5c": {
+      "pf": 2.73,
+      "pnl": 14357.4,
+      "sharpe": 1.64,
+      "mdd_pct": 14.2,
+      "trades": 587
+    },
+    "edge_retained_pct": 84.9,
+    "5c_yearly": {
+      "2020": 1515.2254127304154,
+      "2021": 4956.165932231987,
+      "2022": 1537.1551702357308,
+      "2023": 2515.694250080344,
+      "2024": 2420.0060283248754,
+      "2025": 1278.6142232645825,
+      "2026": 134.5431994757421
+    }
+  },
+  "test6a_walkforward": {
+    "periods": [
+      {
+        "period": 0,
+        "train_start": "2020-07-22",
+        "train_end": "2021-07-22",
+        "test_start": "2021-07-22",
+        "test_end": "2021-10-20",
+        "oos_pf": 4.472061181288305,
+        "oos_pnl": 1344.516277881759,
+        "oos_trades": 17
+      },
+      {
+        "period": 1,
+        "train_start": "2020-10-20",
+        "train_end": "2021-10-20",
+        "test_start": "2021-10-20",
+        "test_end": "2022-01-18",
+        "oos_pf": 3.226602451373347,
+        "oos_pnl": 705.4769794954015,
+        "oos_trades": 18
+      },
+      {
+        "period": 2,
+        "train_start": "2021-01-18",
+        "train_end": "2022-01-18",
+        "test_start": "2022-01-18",
+        "test_end": "2022-04-18",
+        "oos_pf": 1.8443622052320305,
+        "oos_pnl": 561.0915035575684,
+        "oos_trades": 44
+      },
+      {
+        "period": 3,
+        "train_start": "2021-04-18",
+        "train_end": "2022-04-18",
+        "test_start": "2022-04-18",
+        "test_end": "2022-07-17",
+        "oos_pf": 3.1903269256374087,
+        "oos_pnl": 745.3675048410804,
+        "oos_trades": 36
+      },
+      {
+        "period": 4,
+        "train_start": "2021-07-17",
+        "train_end": "2022-07-17",
+        "test_start": "2022-07-17",
+        "test_end": "2022-10-15",
+        "oos_pf": 0.49321974872254243,
+        "oos_pnl": -175.6575077069854,
+        "oos_trades": 22
+      },
+      {
+        "period": 5,
+        "train_start": "2021-10-15",
+        "train_end": "2022-10-15",
+        "test_start": "2022-10-15",
+        "test_end": "2023-01-13",
+        "oos_pf": 3.186374153628252,
+        "oos_pnl": 600.0549327812519,
+        "oos_trades": 33
+      },
+      {
+        "period": 6,
+        "train_start": "2022-01-13",
+        "train_end": "2023-01-13",
+        "test_start": "2023-01-13",
+        "test_end": "2023-04-13",
+        "oos_pf": 2.7535067959465893,
+        "oos_pnl": 327.06547124827915,
+        "oos_trades": 15
+      },
+      {
+        "period": 7,
+        "train_start": "2022-04-13",
+        "train_end": "2023-04-13",
+        "test_start": "2023-04-13",
+        "test_end": "2023-07-12",
+        "oos_pf": 2.1064666320683614,
+        "oos_pnl": 320.6959535548548,
+        "oos_trades": 19
+      },
+      {
+        "period": 8,
+        "train_start": "2022-07-12",
+        "train_end": "2023-07-12",
+        "test_start": "2023-07-12",
+        "test_end": "2023-10-10",
+        "oos_pf": 0.17693101544080178,
+        "oos_pnl": -421.9386087131407,
+        "oos_trades": 34
+      },
+      {
+        "period": 9,
+        "train_start": "2022-10-10",
+        "train_end": "2023-10-10",
+        "test_start": "2023-10-10",
+        "test_end": "2024-01-08",
+        "oos_pf": 14.185031617977964,
+        "oos_pnl": 2648.84656053415,
+        "oos_trades": 17
+      },
+      {
+        "period": 10,
+        "train_start": "2023-01-08",
+        "train_end": "2024-01-08",
+        "test_start": "2024-01-08",
+        "test_end": "2024-04-07",
+        "oos_pf": 18.994024590551305,
+        "oos_pnl": 1598.865400455598,
+        "oos_trades": 12
+      },
+      {
+        "period": 11,
+        "train_start": "2023-04-08",
+        "train_end": "2024-04-07",
+        "test_start": "2024-04-07",
+        "test_end": "2024-07-06",
+        "oos_pf": 2.689986812245972,
+        "oos_pnl": 271.7959305389812,
+        "oos_trades": 12
+      },
+      {
+        "period": 12,
+        "train_start": "2023-07-07",
+        "train_end": "2024-07-06",
+        "test_start": "2024-07-06",
+        "test_end": "2024-10-04",
+        "oos_pf": 1.0789973970807463,
+        "oos_pnl": 47.99827579950123,
+        "oos_trades": 63
+      },
+      {
+        "period": 13,
+        "train_start": "2023-10-05",
+        "train_end": "2024-10-04",
+        "test_start": "2024-10-04",
+        "test_end": "2025-01-02",
+        "oos_pf": 4.68001415389434,
+        "oos_pnl": 905.4836289855983,
+        "oos_trades": 20
+      },
+      {
+        "period": 14,
+        "train_start": "2024-01-03",
+        "train_end": "2025-01-02",
+        "test_start": "2025-01-02",
+        "test_end": "2025-04-02",
+        "oos_pf": 1.8756934479372234,
+        "oos_pnl": 302.1546903243394,
+        "oos_trades": 39
+      },
+      {
+        "period": 15,
+        "train_start": "2024-04-02",
+        "train_end": "2025-04-02",
+        "test_start": "2025-04-02",
+        "test_end": "2025-07-01",
+        "oos_pf": 1.0152431646960658,
+        "oos_pnl": 5.096748214212399,
+        "oos_trades": 23
+      },
+      {
+        "period": 16,
+        "train_start": "2024-07-01",
+        "train_end": "2025-07-01",
+        "test_start": "2025-07-01",
+        "test_end": "2025-09-29",
+        "oos_pf": 6.248120885867792,
+        "oos_pnl": 924.0345247106188,
+        "oos_trades": 19
+      },
+      {
+        "period": 17,
+        "train_start": "2024-09-29",
+        "train_end": "2025-09-29",
+        "test_start": "2025-09-29",
+        "test_end": "2025-12-28",
+        "oos_pf": 2.4052523388432854,
+        "oos_pnl": 535.2815881922603,
+        "oos_trades": 47
+      }
+    ],
+    "aggregate_oos_pf": 2.92,
+    "aggregate_oos_pnl": 11246.23,
+    "aggregate_oos_sharpe": 3.55,
+    "periods_profitable": "16/18",
+    "degradation_pct": 9.6,
+    "verdict": "ACCEPTABLE"
+  },
+  "test6b_temporal": {
+    "yearly": {
+      "2020": {
+        "pnl": 1731.3853800729348,
+        "pf": 7.455605679490592,
+        "trades": 14,
+        "wr": 42.857142857142854,
+        "profitable": true
+      },
+      "2021": {
+        "pnl": 5893.437226072402,
+        "pf": 4.752214630263406,
+        "trades": 76,
+        "wr": 40.78947368421053,
+        "profitable": true
+      },
+      "2022": {
+        "pnl": 1658.1670073222551,
+        "pf": 1.976212898508804,
+        "trades": 139,
+        "wr": 43.16546762589928,
+        "profitable": true
+      },
+      "2023": {
+        "pnl": 2860.1491138508127,
+        "pf": 3.3747155059405833,
+        "trades": 86,
+        "wr": 31.3953488372093,
+        "profitable": true
+      },
+      "2024": {
+        "pnl": 2824.143235779679,
+        "pf": 3.5596538914633626,
+        "trades": 107,
+        "wr": 33.64485981308411,
+        "profitable": true
+      },
+      "2025": {
+        "pnl": 1742.7224123345095,
+        "pf": 2.3828510335835946,
+        "trades": 129,
+        "wr": 35.65891472868217,
+        "profitable": true
+      },
+      "2026": {
+        "pnl": 209.67438579490056,
+        "pf": 1.4334693441258228,
+        "trades": 37,
+        "wr": 32.432432432432435,
+        "profitable": true
+      }
+    },
+    "years_profitable": "7/7",
+    "pnl_2021_pct": 34.8,
+    "flag_year": null,
+    "half_years": {
+      "H2 2020": 1731.3853800729346,
+      "H1 2021": 3642.170176152574,
+      "H2 2021": 2251.2670499198275,
+      "H1 2022": 1165.783636070106,
+      "H2 2022": 492.3833712521486,
+      "H1 2023": 490.2368832254319,
+      "H2 2023": 2369.9122306253807,
+      "H1 2024": 1870.6613309945797,
+      "H2 2024": 953.4819047850999,
+      "H1 2025": 307.25143853855184,
+      "H2 2025": 1435.4709737959574,
+      "H1 2026": 209.67438579490047
+    }
+  },
+  "test6c_recent": {
+    "cutoff": "2025-03-12",
+    "pf": 2.23,
+    "pnl": 1763.32,
+    "sharpe": 4.08,
+    "mdd_pct": 9.4,
+    "trades": 135,
+    "avg_annual_pnl": 3001.41,
+    "edge_trend": "DECAYING"
+  },
+  "test6d_blackswan": [
+    {
+      "name": "COVID crash",
+      "start": "2020-03-12",
+      "end": "2020-03-13",
+      "assets": {
+        "BTC": {
+          "position": "FLAT",
+          "pnl": 0,
+          "regime": "FLAT"
+        },
+        "ETH": {
+          "position": "FLAT",
+          "pnl": 0,
+          "regime": "FLAT"
+        },
+        "SOL": {
+          "position": "FLAT",
+          "pnl": 0,
+          "regime": "FLAT"
+        }
+      },
+      "portfolio_pnl": 0,
+      "caught": true
+    },
+    {
+      "name": "LUNA/Terra collapse",
+      "start": "2022-05-07",
+      "end": "2022-05-13",
+      "assets": {
+        "BTC": {
+          "position": "SHORT",
+          "pnl": -77.98,
+          "regime": "BEAR"
+        },
+        "ETH": {
+          "position": "SHORT",
+          "pnl": -59.19,
+          "regime": "BEAR"
+        },
+        "SOL": {
+          "position": "SHORT",
+          "pnl": 28.02,
+          "regime": "BEAR"
+        }
+      },
+      "portfolio_pnl": -109.15,
+      "caught": true
+    },
+    {
+      "name": "FTX collapse",
+      "start": "2022-11-07",
+      "end": "2022-11-11",
+      "assets": {
+        "BTC": {
+          "position": "SHORT",
+          "pnl": 1.61,
+          "regime": "BEAR"
+        },
+        "ETH": {
+          "position": "SHORT",
+          "pnl": -61.53,
+          "regime": "BEAR"
+        },
+        "SOL": {
+          "position": "SHORT",
+          "pnl": 489.46,
+          "regime": "BEAR"
+        }
+      },
+      "portfolio_pnl": 429.55,
+      "caught": true
+    },
+    {
+      "name": "August 2024 crash",
+      "start": "2024-08-04",
+      "end": "2024-08-05",
+      "assets": {
+        "BTC": {
+          "position": "SHORT",
+          "pnl": 102.79,
+          "regime": "BEAR"
+        },
+        "ETH": {
+          "position": "SHORT",
+          "pnl": 167.06,
+          "regime": "BEAR"
+        },
+        "SOL": {
+          "position": "SHORT",
+          "pnl": 39.15,
+          "regime": "BEAR"
+        }
+      },
+      "portfolio_pnl": 309.0,
+      "caught": true
+    }
+  ],
+  "test7a_streaks": {
+    "longest_streak": 16,
+    "longest_streak_dates": "2024-08-15 to 2024-08-21",
+    "longest_streak_loss": -151.24,
+    "streak_distribution": {
+      "1": 34,
+      "2": 30,
+      "3": 20,
+      "4": 12,
+      "5": 7,
+      "6": 3,
+      "7": 6,
+      "8": 3,
+      "11": 3,
+      "16": 1
+    },
+    "expected_longest": 14.0,
+    "verdict": "NORMAL",
+    "max_streak_loss": -206.21
+  },
+  "test7b_drawdown": {
+    "total_events": 10,
+    "top5": [
+      {
+        "peak_date": "2020-08-19",
+        "trough_date": "2020-10-26",
+        "recovery_date": "2020-10-29",
+        "depth": 158.70131108503665,
+        "depth_pct": 6.809236237491952,
+        "days": 71
+      },
+      {
+        "peak_date": "2021-05-12",
+        "trough_date": "2021-07-19",
+        "recovery_date": "2021-08-25",
+        "depth": 442.92361066038484,
+        "depth_pct": 6.077075887958223,
+        "days": 105
+      },
+      {
+        "peak_date": "2023-06-06",
+        "trough_date": "2023-10-14",
+        "recovery_date": "2023-11-14",
+        "depth": 466.3673531887107,
+        "depth_pct": 4.070245269886219,
+        "days": 161
+      },
+      {
+        "peak_date": "2021-11-12",
+        "trough_date": "2022-01-20",
+        "recovery_date": "2022-01-23",
+        "depth": 307.4853359702993,
+        "depth_pct": 3.3028701825691558,
+        "days": 72
+      },
+      {
+        "peak_date": "2022-02-22",
+        "trough_date": "2022-04-24",
+        "recovery_date": "2022-06-12",
+        "depth": 307.04603567546656,
+        "depth_pct": 3.105234789887275,
+        "days": 110
+      }
+    ],
+    "longest_underwater_days": 161,
+    "avg_recovery_days": 84.0,
+    "any_gt_25pct": false,
+    "any_gt_6mo": false
+  },
+  "test7c_tail": {
+    "var_95": -62.06,
+    "cvar_95": -89.11,
+    "var_99": -114.13,
+    "cvar_99": -131.27,
+    "ann_return_pct": 200.1,
+    "mdd_pct": 6.8,
+    "calmar": 29.39,
+    "calmar_verdict": "EXCEEDS"
+  },
+  "test7d_benchmark": {
+    "strategy": {
+      "final_equity": 19420.0,
+      "total_return": 677.0,
+      "ann_return": 120.1,
+      "sharpe": 1.8,
+      "mdd": 14.1,
+      "calmar": 29.39
+    },
+    "buy_hold": {
+      "final_equity": 36236.0,
+      "total_return": 1349.0,
+      "ann_return": 238.2,
+      "sharpe": 1.03,
+      "mdd": 90.1,
+      "calmar": 2.65
+    },
+    "ema_cross": {
+      "final_equity": 28293.0,
+      "total_return": 1032.0,
+      "ann_return": 182.1,
+      "sharpe": 5.0,
+      "mdd": 4.1,
+      "calmar": 44.36
+    },
+    "alpha_bh": -16816.0,
+    "alpha_ema": -8874.0,
+    "verdict": "MATCHES"
+  },
+  "test8_reconciliation": {
+    "config_consistent": true,
+    "trade_count_anomaly": false,
+    "pnl_coherent": true
+  },
+  "final_verdict": {
+    "decision": "GO",
+    "direction": "LONG+SHORT",
+    "fail_conditions": [],
+    "clean_baseline": {
+      "pf": 3.23,
+      "pnl": 16919.68,
+      "sharpe": 1.8,
+      "mdd_pct": 14.1,
+      "trades": 588
+    },
+    "friction_5c": {
+      "pf": 2.73,
+      "pnl": 14357.4,
+      "sharpe": 1.64,
+      "mdd_pct": 14.2
+    },
+    "edge_retained_pct": 84.9,
+    "walkforward": {
+      "oos_pf": 2.92,
+      "degradation_pct": 9.6
+    },
+    "statistical": {
+      "p_value": 7.3e-07,
+      "bonferroni_100": 7.3e-05,
+      "bootstrap_worst_pf": 1.82,
+      "robustness_pct": 98.6
+    },
+    "risk": {
+      "cvar_95": -89.11,
+      "calmar": 29.39,
+      "max_streak_loss": -206.21,
+      "fee_safety_margin": 5.0
+    },
+    "benchmark": {
+      "alpha_bh": -16816.0,
+      "alpha_ema": -8874.0,
+      "verdict": "MATCHES"
+    },
+    "total_runtime_seconds": 15.4
+  }
+}

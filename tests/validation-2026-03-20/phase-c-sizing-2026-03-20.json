@@ -1,0 +1,873 @@
+{
+  "test0_sol": {
+    "config_a": {
+      "pnl": 17018.04,
+      "pf": 3.08,
+      "sharpe": 1.78,
+      "mdd_pct": 4.9,
+      "liqs": 9
+    },
+    "config_b": {
+      "pnl": 14421.46,
+      "pf": 3.23,
+      "sharpe": 1.87,
+      "mdd_pct": 5.3,
+      "liqs": 4
+    },
+    "decision": "B",
+    "sol_leverage": "5x"
+  },
+  "test1_sizing": {
+    "0 (flat $125)": {
+      "final_equity": 16921.46,
+      "total_pnl": 14421.46,
+      "pf": 3.23,
+      "sharpe": 1.87,
+      "mdd_pct": 5.3,
+      "mdd_dollar": 444.16,
+      "trades": 596,
+      "skipped": 0,
+      "ruin": false,
+      "ruin_date": "",
+      "peak_margin": 125.0,
+      "liquidations": 4,
+      "yearly": {
+        "2020": {
+          "pnl": 1731.39,
+          "trades": 14,
+          "liqs": 0,
+          "start_eq": 2500.0,
+          "end_eq": 4231.39
+        },
+        "2021": {
+          "pnl": 5243.64,
+          "trades": 83,
+          "liqs": 4,
+          "start_eq": 4231.39,
+          "end_eq": 9475.03
+        },
+        "2022": {
+          "pnl": 1102.85,
+          "trades": 139,
+          "liqs": 0,
+          "start_eq": 9475.03,
+          "end_eq": 10577.88
+        },
+        "2023": {
+          "pnl": 2102.62,
+          "trades": 87,
+          "liqs": 0,
+          "start_eq": 10577.88,
+          "end_eq": 12680.5
+        },
+        "2024": {
+          "pnl": 2574.01,
+          "trades": 107,
+          "liqs": 0,
+          "start_eq": 12680.5,
+          "end_eq": 15254.51
+        },
+        "2025": {
+          "pnl": 1465.44,
+          "trades": 129,
+          "liqs": 0,
+          "start_eq": 15254.51,
+          "end_eq": 16719.96
+        },
+        "2026": {
+          "pnl": 201.5,
+          "trades": 37,
+          "liqs": 0,
+          "start_eq": 16719.96,
+          "end_eq": 16921.46
+        }
+      }
+    },
+    "1A (d=500)": {
+      "final_equity": 55054.68,
+      "total_pnl": 52554.68,
+      "pf": 3.07,
+      "sharpe": 1.84,
+      "mdd_pct": 8.5,
+      "mdd_dollar": 1776.65,
+      "trades": 596,
+      "skipped": 0,
+      "ruin": false,
+      "ruin_date": "",
+      "peak_margin": 500.0,
+      "liquidations": 4,
+      "yearly": {
+        "2020": {
+          "pnl": 2958.33,
+          "trades": 14,
+          "liqs": 0,
+          "start_eq": 2500.0,
+          "end_eq": 5458.33
+        },
+        "2021": {
+          "pnl": 19810.65,
+          "trades": 83,
+          "liqs": 4,
+          "start_eq": 5458.33,
+          "end_eq": 25268.97
+        },
+        "2022": {
+          "pnl": 4411.41,
+          "trades": 139,
+          "liqs": 0,
+          "start_eq": 25268.97,
+          "end_eq": 29680.38
+        },
+        "2023": {
+          "pnl": 8410.48,
+          "trades": 87,
+          "liqs": 0,
+          "start_eq": 29680.38,
+          "end_eq": 38090.87
+        },
+        "2024": {
+          "pnl": 10296.04,
+          "trades": 107,
+          "liqs": 0,
+          "start_eq": 38090.87,
+          "end_eq": 48386.91
+        },
+        "2025": {
+          "pnl": 5861.77,
+          "trades": 129,
+          "liqs": 0,
+          "start_eq": 48386.91,
+          "end_eq": 54248.68
+        },
+        "2026": {
+          "pnl": 806.0,
+          "trades": 37,
+          "liqs": 0,
+          "start_eq": 54248.68,
+          "end_eq": 55054.68
+        }
+      }
+    },
+    "1B (d=750)": {
+      "final_equity": 52002.96,
+      "total_pnl": 49502.96,
+      "pf": 2.96,
+      "sharpe": 1.85,
+      "mdd_pct": 9.9,
+      "mdd_dollar": 1776.65,
+      "trades": 596,
+      "skipped": 0,
+      "ruin": false,
+      "ruin_date": "",
+      "peak_margin": 500.0,
+      "liquidations": 4,
+      "yearly": {
+        "2020": {
+          "pnl": 1898.92,
+          "trades": 14,
+          "liqs": 0,
+          "start_eq": 2500.0,
+          "end_eq": 4398.92
+        },
+        "2021": {
+          "pnl": 17818.33,
+          "trades": 83,
+          "liqs": 4,
+          "start_eq": 4398.92,
+          "end_eq": 22217.25
+        },
+        "2022": {
+          "pnl": 4411.41,
+          "trades": 139,
+          "liqs": 0,
+          "start_eq": 22217.25,
+          "end_eq": 26628.66
+        },
+        "2023": {
+          "pnl": 8410.48,
+          "trades": 87,
+          "liqs": 0,
+          "start_eq": 26628.66,
+          "end_eq": 35039.14
+        },
+        "2024": {
+          "pnl": 10296.04,
+          "trades": 107,
+          "liqs": 0,
+          "start_eq": 35039.14,
+          "end_eq": 45335.19
+        },
+        "2025": {
+          "pnl": 5861.77,
+          "trades": 129,
+          "liqs": 0,
+          "start_eq": 45335.19,
+          "end_eq": 51196.96
+        },
+        "2026": {
+          "pnl": 806.0,
+          "trades": 37,
+          "liqs": 0,
+          "start_eq": 51196.96,
+          "end_eq": 52002.96
+        }
+      }
+    },
+    "1C (d=1000)": {
+      "final_equity": 52190.48,
+      "total_pnl": 49690.48,
+      "pf": 2.98,
+      "sharpe": 1.86,
+      "mdd_pct": 9.8,
+      "mdd_dollar": 1776.65,
+      "trades": 596,
+      "skipped": 0,
+      "ruin": false,
+      "ruin_date": "",
+      "peak_margin": 500.0,
+      "liquidations": 4,
+      "yearly": {
+        "2020": {
+          "pnl": 2086.44,
+          "trades": 14,
+          "liqs": 0,
+          "start_eq": 2500.0,
+          "end_eq": 4586.44
+        },
+        "2021": {
+          "pnl": 17818.33,
+          "trades": 83,
+          "liqs": 4,
+          "start_eq": 4586.44,
+          "end_eq": 22404.77
+        },
+        "2022": {
+          "pnl": 4411.41,
+          "trades": 139,
+          "liqs": 0,
+          "start_eq": 22404.77,
+          "end_eq": 26816.18
+        },
+        "2023": {
+          "pnl": 8410.48,
+          "trades": 87,
+          "liqs": 0,
+          "start_eq": 26816.18,
+          "end_eq": 35226.67
+        },
+        "2024": {
+          "pnl": 10296.04,
+          "trades": 107,
+          "liqs": 0,
+          "start_eq": 35226.67,
+          "end_eq": 45522.71
+        },
+        "2025": {
+          "pnl": 5861.77,
+          "trades": 129,
+          "liqs": 0,
+          "start_eq": 45522.71,
+          "end_eq": 51384.48
+        },
+        "2026": {
+          "pnl": 806.0,
+          "trades": 37,
+          "liqs": 0,
+          "start_eq": 51384.48,
+          "end_eq": 52190.48
+        }
+      }
+    },
+    "1D (d=1500)": {
+      "final_equity": 49903.99,
+      "total_pnl": 47403.99,
+      "pf": 2.91,
+      "sharpe": 1.83,
+      "mdd_pct": 11.2,
+      "mdd_dollar": 1776.65,
+      "trades": 596,
+      "skipped": 0,
+      "ruin": false,
+      "ruin_date": "",
+      "peak_margin": 500.0,
+      "liquidations": 4,
+      "yearly": {
+        "2020": {
+          "pnl": 1786.35,
+          "trades": 14,
+          "liqs": 0,
+          "start_eq": 2500.0,
+          "end_eq": 4286.35
+        },
+        "2021": {
+          "pnl": 15831.93,
+          "trades": 83,
+          "liqs": 4,
+          "start_eq": 4286.35,
+          "end_eq": 20118.28
+        },
+        "2022": {
+          "pnl": 4411.41,
+          "trades": 139,
+          "liqs": 0,
+          "start_eq": 20118.28,
+          "end_eq": 24529.69
+        },
+        "2023": {
+          "pnl": 8410.48,
+          "trades": 87,
+          "liqs": 0,
+          "start_eq": 24529.69,
+          "end_eq": 32940.17
+        },
+        "2024": {
+          "pnl": 10296.04,
+          "trades": 107,
+          "liqs": 0,
+          "start_eq": 32940.17,
+          "end_eq": 43236.21
+        },
+        "2025": {
+          "pnl": 5861.77,
+          "trades": 129,
+          "liqs": 0,
+          "start_eq": 43236.21,
+          "end_eq": 49097.98
+        },
+        "2026": {
+          "pnl": 806.0,
+          "trades": 37,
+          "liqs": 0,
+          "start_eq": 49097.98,
+          "end_eq": 49903.99
+        }
+      }
+    },
+    "2A (aggr)": {
+      "final_equity": 46481.2,
+      "total_pnl": 43981.2,
+      "pf": 2.95,
+      "sharpe": 1.87,
+      "mdd_pct": 10.1,
+      "mdd_dollar": 1598.98,
+      "trades": 596,
+      "skipped": 0,
+      "ruin": false,
+      "ruin_date": "",
+      "peak_margin": 450,
+      "liquidations": 4,
+      "yearly": {
+        "2020": {
+          "pnl": 1987.77,
+          "trades": 14,
+          "liqs": 0,
+          "start_eq": 2500.0,
+          "end_eq": 4487.77
+        },
+        "2021": {
+          "pnl": 15186.29,
+          "trades": 83,
+          "liqs": 4,
+          "start_eq": 4487.77,
+          "end_eq": 19674.06
+        },
+        "2022": {
+          "pnl": 3970.27,
+          "trades": 139,
+          "liqs": 0,
+          "start_eq": 19674.06,
+          "end_eq": 23644.33
+        },
+        "2023": {
+          "pnl": 7569.44,
+          "trades": 87,
+          "liqs": 0,
+          "start_eq": 23644.33,
+          "end_eq": 31213.76
+        },
+        "2024": {
+          "pnl": 9266.44,
+          "trades": 107,
+          "liqs": 0,
+          "start_eq": 31213.76,
+          "end_eq": 40480.2
+        },
+        "2025": {
+          "pnl": 5275.59,
+          "trades": 129,
+          "liqs": 0,
+          "start_eq": 40480.2,
+          "end_eq": 45755.79
+        },
+        "2026": {
+          "pnl": 725.4,
+          "trades": 37,
+          "liqs": 0,
+          "start_eq": 45755.79,
+          "end_eq": 46481.2
+        }
+      }
+    },
+    "2B (cons)": {
+      "final_equity": 34549.01,
+      "total_pnl": 32049.01,
+      "pf": 2.92,
+      "sharpe": 1.86,
+      "mdd_pct": 8.7,
+      "mdd_dollar": 977.16,
+      "trades": 596,
+      "skipped": 0,
+      "ruin": false,
+      "ruin_date": "",
+      "peak_margin": 350,
+      "liquidations": 4,
+      "yearly": {
+        "2020": {
+          "pnl": 1805.96,
+          "trades": 14,
+          "liqs": 0,
+          "start_eq": 2500.0,
+          "end_eq": 4305.96
+        },
+        "2021": {
+          "pnl": 9393.05,
+          "trades": 83,
+          "liqs": 4,
+          "start_eq": 4305.96,
+          "end_eq": 13699.01
+        },
+        "2022": {
+          "pnl": 3087.99,
+          "trades": 139,
+          "liqs": 0,
+          "start_eq": 13699.01,
+          "end_eq": 16787.0
+        },
+        "2023": {
+          "pnl": 5887.34,
+          "trades": 87,
+          "liqs": 0,
+          "start_eq": 16787.0,
+          "end_eq": 22674.34
+        },
+        "2024": {
+          "pnl": 7207.23,
+          "trades": 107,
+          "liqs": 0,
+          "start_eq": 22674.34,
+          "end_eq": 29881.57
+        },
+        "2025": {
+          "pnl": 4103.24,
+          "trades": 129,
+          "liqs": 0,
+          "start_eq": 29881.57,
+          "end_eq": 33984.81
+        },
+        "2026": {
+          "pnl": 564.2,
+          "trades": 37,
+          "liqs": 0,
+          "start_eq": 33984.81,
+          "end_eq": 34549.01
+        }
+      }
+    },
+    "2C (wide)": {
+      "final_equity": 33948.42,
+      "total_pnl": 31448.42,
+      "pf": 2.9,
+      "sharpe": 1.86,
+      "mdd_pct": 9.3,
+      "mdd_dollar": 977.16,
+      "trades": 596,
+      "skipped": 0,
+      "ruin": false,
+      "ruin_date": "",
+      "peak_margin": 350,
+      "liquidations": 4,
+      "yearly": {
+        "2020": {
+          "pnl": 1731.39,
+          "trades": 14,
+          "liqs": 0,
+          "start_eq": 2500.0,
+          "end_eq": 4231.39
+        },
+        "2021": {
+          "pnl": 8867.03,
+          "trades": 83,
+          "liqs": 4,
+          "start_eq": 4231.39,
+          "end_eq": 13098.42
+        },
+        "2022": {
+          "pnl": 3087.99,
+          "trades": 139,
+          "liqs": 0,
+          "start_eq": 13098.42,
+          "end_eq": 16186.4
+        },
+        "2023": {
+          "pnl": 5887.34,
+          "trades": 87,
+          "liqs": 0,
+          "start_eq": 16186.4,
+          "end_eq": 22073.74
+        },
+        "2024": {
+          "pnl": 7207.23,
+          "trades": 107,
+          "liqs": 0,
+          "start_eq": 22073.74,
+          "end_eq": 29280.97
+        },
+        "2025": {
+          "pnl": 4103.24,
+          "trades": 129,
+          "liqs": 0,
+          "start_eq": 29280.97,
+          "end_eq": 33384.21
+        },
+        "2026": {
+          "pnl": 564.2,
+          "trades": 37,
+          "liqs": 0,
+          "start_eq": 33384.21,
+          "end_eq": 33948.42
+        }
+      }
+    },
+    "3 (ATR-gate)": {
+      "final_equity": 38628.39,
+      "total_pnl": 36128.39,
+      "pf": 2.94,
+      "sharpe": 1.79,
+      "mdd_pct": 9.9,
+      "mdd_dollar": 1226.72,
+      "trades": 596,
+      "skipped": 0,
+      "ruin": false,
+      "ruin_date": "",
+      "peak_margin": 450,
+      "liquidations": 4,
+      "yearly": {
+        "2020": {
+          "pnl": 1815.89,
+          "trades": 14,
+          "liqs": 0,
+          "start_eq": 2500.0,
+          "end_eq": 4315.89
+        },
+        "2021": {
+          "pnl": 8617.22,
+          "trades": 83,
+          "liqs": 4,
+          "start_eq": 4315.89,
+          "end_eq": 12933.12
+        },
+        "2022": {
+          "pnl": 3970.27,
+          "trades": 139,
+          "liqs": 0,
+          "start_eq": 12933.12,
+          "end_eq": 16903.38
+        },
+        "2023": {
+          "pnl": 7041.04,
+          "trades": 87,
+          "liqs": 0,
+          "start_eq": 16903.38,
+          "end_eq": 23944.42
+        },
+        "2024": {
+          "pnl": 8754.74,
+          "trades": 107,
+          "liqs": 0,
+          "start_eq": 23944.42,
+          "end_eq": 32699.16
+        },
+        "2025": {
+          "pnl": 5080.6,
+          "trades": 129,
+          "liqs": 0,
+          "start_eq": 32699.16,
+          "end_eq": 37779.76
+        },
+        "2026": {
+          "pnl": 848.63,
+          "trades": 37,
+          "liqs": 0,
+          "start_eq": 37779.76,
+          "end_eq": 38628.39
+        }
+      }
+    }
+  },
+  "test2_mc": {
+    "0 (flat $125)": {
+      "median_final_eq": 16921.46,
+      "p5": 16921.46,
+      "p95": 16921.46,
+      "pct_ruin": 0.0,
+      "median_mdd": 6.8,
+      "spread_ratio": 0.0
+    },
+    "1A (d=500)": {
+      "median_final_eq": 55741.37,
+      "p5": 54321.62,
+      "p95": 56624.23,
+      "pct_ruin": 0.0,
+      "median_mdd": 12.4,
+      "spread_ratio": 0.04
+    },
+    "1B (d=750)": {
+      "median_final_eq": 54284.42,
+      "p5": 53051.24,
+      "p95": 55174.03,
+      "pct_ruin": 0.0,
+      "median_mdd": 11.7,
+      "spread_ratio": 0.04
+    },
+    "1C (d=1000)": {
+      "median_final_eq": 52762.98,
+      "p5": 51393.02,
+      "p95": 53667.56,
+      "pct_ruin": 0.0,
+      "median_mdd": 11.1,
+      "spread_ratio": 0.04
+    },
+    "1D (d=1500)": {
+      "median_final_eq": 49766.95,
+      "p5": 48422.09,
+      "p95": 50685.34,
+      "pct_ruin": 0.0,
+      "median_mdd": 9.9,
+      "spread_ratio": 0.05
+    },
+    "2A (aggr)": {
+      "median_final_eq": 46873.26,
+      "p5": 46260.64,
+      "p95": 47392.68,
+      "pct_ruin": 0.0,
+      "median_mdd": 10.1,
+      "spread_ratio": 0.02
+    },
+    "2B (cons)": {
+      "median_final_eq": 34895.31,
+      "p5": 34458.98,
+      "p95": 35276.13,
+      "pct_ruin": 0.0,
+      "median_mdd": 8.3,
+      "spread_ratio": 0.02
+    },
+    "2C (wide)": {
+      "median_final_eq": 34444.04,
+      "p5": 33826.66,
+      "p95": 34872.24,
+      "pct_ruin": 0.0,
+      "median_mdd": 8.1,
+      "spread_ratio": 0.03
+    },
+    "3 (ATR-gate)": {
+      "median_final_eq": 16921.46,
+      "p5": 16921.46,
+      "p95": 16921.46,
+      "pct_ruin": 0.0,
+      "median_mdd": 6.8,
+      "spread_ratio": 0.0
+    }
+  },
+  "test3_yearly": {
+    "0 (flat $125)": {
+      "2020": {
+        "pnl": 1731.39,
+        "trades": 14,
+        "liqs": 0,
+        "start_eq": 2500.0,
+        "end_eq": 4231.39
+      },
+      "2021": {
+        "pnl": 5243.64,
+        "trades": 83,
+        "liqs": 4,
+        "start_eq": 4231.39,
+        "end_eq": 9475.03
+      },
+      "2022": {
+        "pnl": 1102.85,
+        "trades": 139,
+        "liqs": 0,
+        "start_eq": 9475.03,
+        "end_eq": 10577.88
+      },
+      "2023": {
+        "pnl": 2102.62,
+        "trades": 87,
+        "liqs": 0,
+        "start_eq": 10577.88,
+        "end_eq": 12680.5
+      },
+      "2024": {
+        "pnl": 2574.01,
+        "trades": 107,
+        "liqs": 0,
+        "start_eq": 12680.5,
+        "end_eq": 15254.51
+      },
+      "2025": {
+        "pnl": 1465.44,
+        "trades": 129,
+        "liqs": 0,
+        "start_eq": 15254.51,
+        "end_eq": 16719.96
+      },
+      "2026": {
+        "pnl": 201.5,
+        "trades": 37,
+        "liqs": 0,
+        "start_eq": 16719.96,
+        "end_eq": 16921.46
+      }
+    },
+    "2A (aggr)": {
+      "2020": {
+        "pnl": 1987.77,
+        "trades": 14,
+        "liqs": 0,
+        "start_eq": 2500.0,
+        "end_eq": 4487.77
+      },
+      "2021": {
+        "pnl": 15186.29,
+        "trades": 83,
+        "liqs": 4,
+        "start_eq": 4487.77,
+        "end_eq": 19674.06
+      },
+      "2022": {
+        "pnl": 3970.27,
+        "trades": 139,
+        "liqs": 0,
+        "start_eq": 19674.06,
+        "end_eq": 23644.33
+      },
+      "2023": {
+        "pnl": 7569.44,
+        "trades": 87,
+        "liqs": 0,
+        "start_eq": 23644.33,
+        "end_eq": 31213.76
+      },
+      "2024": {
+        "pnl": 9266.44,
+        "trades": 107,
+        "liqs": 0,
+        "start_eq": 31213.76,
+        "end_eq": 40480.2
+      },
+      "2025": {
+        "pnl": 5275.59,
+        "trades": 129,
+        "liqs": 0,
+        "start_eq": 40480.2,
+        "end_eq": 45755.79
+      },
+      "2026": {
+        "pnl": 725.4,
+        "trades": 37,
+        "liqs": 0,
+        "start_eq": 45755.79,
+        "end_eq": 46481.2
+      }
+    },
+    "1C (d=1000)": {
+      "2020": {
+        "pnl": 2086.44,
+        "trades": 14,
+        "liqs": 0,
+        "start_eq": 2500.0,
+        "end_eq": 4586.44
+      },
+      "2021": {
+        "pnl": 17818.33,
+        "trades": 83,
+        "liqs": 4,
+        "start_eq": 4586.44,
+        "end_eq": 22404.77
+      },
+      "2022": {
+        "pnl": 4411.41,
+        "trades": 139,
+        "liqs": 0,
+        "start_eq": 22404.77,
+        "end_eq": 26816.18
+      },
+      "2023": {
+        "pnl": 8410.48,
+        "trades": 87,
+        "liqs": 0,
+        "start_eq": 26816.18,
+        "end_eq": 35226.67
+      },
+      "2024": {
+        "pnl": 10296.04,
+        "trades": 107,
+        "liqs": 0,
+        "start_eq": 35226.67,
+        "end_eq": 45522.71
+      },
+      "2025": {
+        "pnl": 5861.77,
+        "trades": 129,
+        "liqs": 0,
+        "start_eq": 45522.71,
+        "end_eq": 51384.48
+      },
+      "2026": {
+        "pnl": 806.0,
+        "trades": 37,
+        "liqs": 0,
+        "start_eq": 51384.48,
+        "end_eq": 52190.48
+      }
+    }
+  },
+  "test4_friction": {
+    "method": "0 (flat $125)",
+    "flat_friction": {
+      "pnl": 11949.94,
+      "pf": 2.63,
+      "sharpe": 1.67,
+      "mdd_pct": 9.7,
+      "liqs": 9
+    },
+    "dynamic_friction": {
+      "pnl": 11949.94,
+      "pf": 2.63,
+      "sharpe": 1.67,
+      "mdd_pct": 9.7,
+      "liqs": 9
+    },
+    "pass": true,
+    "new_liqs": 0
+  },
+  "final_summary": {
+    "sol_leverage": "5x",
+    "recommended_method": "0 (flat $125)",
+    "final_equity": 16921.46,
+    "total_pnl": 14421.46,
+    "pf": 3.23,
+    "sharpe": 1.87,
+    "mdd_pct": 5.3,
+    "mdd_dollar": 444.16,
+    "mc_5th": 16921.46,
+    "mc_ruin": 0.0,
+    "friction_pf": 2.63,
+    "friction_pass": true,
+    "edge_retained": 82.9,
+    "deployment_ready": true,
+    "runtime": 5.1,
+    "total_abc_runtime": 23.3
+  }
+}

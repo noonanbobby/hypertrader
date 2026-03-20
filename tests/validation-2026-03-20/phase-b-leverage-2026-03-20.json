@@ -1,0 +1,196 @@
+{
+  "test0": {
+    "trades": 596,
+    "pnl": 17018.04,
+    "pf": 3.08,
+    "sharpe": 1.79,
+    "mdd_pct": 14.1,
+    "liquidations": 9,
+    "mdd_dollar": 474.58,
+    "worst_month": -346.53,
+    "worst_trade": -125.0
+  },
+  "test1_20x": {
+    "trades": 646,
+    "pnl": 33349.02,
+    "pf": 2.76,
+    "sharpe": 1.73,
+    "mdd_pct": 10.906238609548815,
+    "mdd_dollar": 1066.67,
+    "liquidations": 66,
+    "liq_btc": 10,
+    "liq_eth": 16,
+    "liq_sol": 40,
+    "worst_month": -783.14,
+    "worst_trade": -125.0,
+    "verdict": "NOT VIABLE (66 liquidations)",
+    "yearly": {
+      "2020": 3435.3885454448805,
+      "2021": 11684.382346438995,
+      "2022": 3187.1668822796178,
+      "2023": 5646.513411991288,
+      "2024": 5543.461953676965,
+      "2025": 3421.2196621365592,
+      "2026": 430.89092916905156
+    }
+  },
+  "test2_15x": {
+    "trades": 610,
+    "pnl": 25272.57,
+    "pf": 2.94,
+    "sharpe": 1.75,
+    "mdd_pct": 8.668995165025443,
+    "mdd_dollar": 753.8,
+    "liquidations": 25,
+    "liq_btc": 3,
+    "liq_eth": 3,
+    "liq_sol": 19,
+    "worst_month": -559.2,
+    "worst_trade": -125.0,
+    "verdict": "NOT VIABLE (25 liquidations)"
+  },
+  "test3_signal": {
+    "total": 596,
+    "strong": 33,
+    "normal": 563,
+    "strong_pf": 1.21,
+    "normal_pf": 3.21,
+    "strong_avg": 3.42,
+    "normal_avg": 30.03,
+    "t_stat": -1.029,
+    "p_value": 0.3041,
+    "significance": "NOT SIGNIFICANT",
+    "flags": [
+      "STRONG signals are NOT better \u2014 dynamic leverage is unjustified"
+    ]
+  },
+  "test4_dynamic": {
+    "rule_a": {
+      "trades": 596,
+      "pnl": 17018.04,
+      "pf": 3.08,
+      "sharpe": 1.79,
+      "mdd_pct": 14.1,
+      "mdd_dollar": 474.58,
+      "liquidations": 9,
+      "liq_cost": 1125,
+      "worst_month": -346.53,
+      "worst_trade": -125.0
+    },
+    "rule_b": {
+      "trades": 596,
+      "pnl": 17386.74,
+      "pf": 3.06,
+      "sharpe": 1.81,
+      "mdd_pct": 6.8,
+      "mdd_dollar": 479.18,
+      "liquidations": 10,
+      "liq_cost": 1250,
+      "worst_month": -346.53,
+      "worst_trade": -125.0
+    },
+    "rule_c": {
+      "trades": 596,
+      "pnl": 17199.43,
+      "pf": 3.07,
+      "sharpe": 1.79,
+      "mdd_pct": 6.8,
+      "mdd_dollar": 476.88,
+      "liquidations": 9,
+      "liq_cost": 1125,
+      "worst_month": -346.53,
+      "worst_trade": -125.0
+    },
+    "rule_b_new_liqs": [
+      {
+        "date": "2022-05-11",
+        "asset": "BTC",
+        "direction": "short",
+        "pnl_10x": -65.46,
+        "outcome_high": "LIQUIDATED (-$125)",
+        "was_strong": true
+      }
+    ],
+    "rule_c_new_liqs": [],
+    "recommended": "A",
+    "rb_acceptable": false,
+    "rc_acceptable": true
+  },
+  "test5_friction": {
+    "leverage": 10.0,
+    "label": "Rule A (10x)",
+    "pf": 2.58,
+    "pnl": 14372.0,
+    "sharpe": 1.64,
+    "mdd_pct": 14.2,
+    "liquidations": 15,
+    "pass": true
+  },
+  "test6_sol": {
+    "sol_results": {
+      "10x": {
+        "trades": 194,
+        "pnl": 5268.79,
+        "pf": 2.48,
+        "sharpe": 1.01,
+        "mdd_pct": 61.2,
+        "liqs": 8
+      },
+      "15x": {
+        "trades": 204,
+        "pnl": 7702.05,
+        "pf": 2.32,
+        "sharpe": 0.97,
+        "mdd_pct": 81.5,
+        "liqs": 19
+      },
+      "20x": {
+        "trades": 223,
+        "pnl": 10138.33,
+        "pf": 2.18,
+        "sharpe": 0.95,
+        "mdd_pct": 95.2,
+        "liqs": 40
+      },
+      "5x": {
+        "trades": 189,
+        "pnl": 2534.86,
+        "pf": 2.48,
+        "sharpe": 0.98,
+        "mdd_pct": 53.2,
+        "liqs": 2
+      },
+      "7x": {
+        "trades": 191,
+        "pnl": 3595.25,
+        "pf": 2.41,
+        "sharpe": 0.99,
+        "mdd_pct": 63.0,
+        "liqs": 4
+      }
+    },
+    "sol_liq_free": "5x",
+    "btc_max_safe": "10x",
+    "eth_max_safe": "10x",
+    "sol_needs_lower": true
+  },
+  "final_summary": {
+    "flat_20x_viable": false,
+    "flat_15x_viable": false,
+    "dyn_10_20_viable": false,
+    "dyn_10_15_viable": true,
+    "per_asset_needed": true,
+    "recommended_rule": "A",
+    "final_leverage_spec": "BTC: 10x | ETH: 10x | SOL: 5x",
+    "signal_strength": {
+      "strong_count": 33,
+      "strong_pct": 5.5,
+      "strong_pf": 1.21,
+      "normal_pf": 3.21,
+      "significant": "NOT SIGNIFICANT"
+    },
+    "friction_pass": true,
+    "friction_pf": 2.58,
+    "runtime_seconds": 2.8
+  }
+}

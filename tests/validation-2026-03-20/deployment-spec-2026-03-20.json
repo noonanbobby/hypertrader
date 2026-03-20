@@ -1,0 +1,176 @@
+{
+  "validation_date": "2026-03-20",
+  "engine": "hypertrader-engine v1.0.0 (Rust, with liquidation logic)",
+  "total_runtime_seconds": 23.3,
+
+  "deployment_status": "READY",
+
+  "system_spec": {
+    "assets": ["BTC", "ETH", "SOL"],
+    "direction": "LONG+SHORT",
+    "regime_classifier": "Daily EMA200 + EMA50 direction (BULL/BEAR/FLAT)",
+    "bull_entry": "MTF Pyramid pullback (4H SuperTrend + 15m SuperTrend + RSI dip recovery)",
+    "bear_entry": "EMA 21/55 cross with volume confirmation",
+    "leverage": {
+      "BTC": 10,
+      "ETH": 10,
+      "SOL": 5
+    },
+    "position_sizing": "Flat $125 margin per trade",
+    "margin_mode": "Isolated",
+    "starting_equity": 2500,
+    "base_margin": 125,
+    "margin_cap": 500,
+    "execution": "Next-bar open (15m timeframe)"
+  },
+
+  "strategy_parameters": {
+    "ema200_period": 200,
+    "ema50_period": 50,
+    "ema50_rising_lookback": 5,
+    "st_4h_atr_period": 10,
+    "st_4h_multiplier": 3.0,
+    "st_15m_atr_period": 10,
+    "st_15m_multiplier": 2.0,
+    "near_band_pct": 0.005,
+    "rsi_period": 14,
+    "rsi_threshold": 45.0,
+    "rsi_lookback": 2,
+    "ema_fast": 21,
+    "ema_slow": 55,
+    "vol_mult": 2.0,
+    "vol_sma_period": 20
+  },
+
+  "phase_a": {
+    "date": "2026-03-20",
+    "verdict": "GO",
+    "direction_decision": "LONG+SHORT",
+    "clean_baseline": {
+      "trades": 596,
+      "pnl": 17018.04,
+      "pf": 3.08,
+      "sharpe": 1.79,
+      "mdd_pct": 14.1,
+      "liquidations": 9
+    },
+    "statistical": {
+      "p_value": 7.3e-07,
+      "bonferroni_corrected_p": 7.3e-05,
+      "bootstrap_worst_pf": 1.82,
+      "bootstrap_pct_profitable": 100.0,
+      "robustness_pct_profitable": 98.6,
+      "edge_verdict": "statistically real"
+    },
+    "fragility": {
+      "fat_trade_fragility": "LOW",
+      "pf_without_top10": 2.03,
+      "fee_safety_margin": 5.0,
+      "breakeven_fee_pct": 0.225,
+      "breakeven_slippage": 0.004
+    },
+    "friction": {
+      "combined_5c_pf": 2.73,
+      "edge_retained_pct": 84.9,
+      "misclass_pf": 2.89,
+      "lag_pf": 3.02
+    },
+    "temporal": {
+      "walkforward_oos_pf": 2.92,
+      "walkforward_degradation_pct": 9.6,
+      "walkforward_periods_profitable": "16/18",
+      "years_profitable": "7/7",
+      "recent_12mo_pf": 2.23,
+      "recent_12mo_trend": "DECAYING"
+    },
+    "risk": {
+      "calmar": 29.39,
+      "cvar_95": -89.11,
+      "cvar_99": -131.27,
+      "max_consecutive_losses": 16,
+      "max_streak_loss": -206.21,
+      "longest_underwater_days": 161
+    },
+    "black_swan_survival": {
+      "covid_2020": "FLAT — no loss",
+      "luna_2022": "SHORT — small loss ($-109)",
+      "ftx_2022": "SHORT — profit ($430)",
+      "aug_2024": "SHORT — profit ($309)"
+    }
+  },
+
+  "phase_b": {
+    "date": "2026-03-20",
+    "leverage_decision": "BTC 10x | ETH 10x | SOL 5x",
+    "findings": {
+      "20x_flat_viable": false,
+      "20x_liquidations": 66,
+      "15x_flat_viable": false,
+      "15x_liquidations": 25,
+      "dynamic_leverage_justified": false,
+      "strong_signal_pf": 1.21,
+      "normal_signal_pf": 3.21,
+      "signal_strength_significant": false
+    },
+    "sol_analysis": {
+      "sol_liq_at_5x": 2,
+      "sol_liq_at_7x": 4,
+      "sol_liq_at_10x": 8,
+      "sol_liq_at_15x": 19,
+      "sol_liq_at_20x": 40,
+      "sol_liq_free_leverage": "5x"
+    },
+    "friction_at_10x": {
+      "pf": 2.58,
+      "pass": true
+    }
+  },
+
+  "phase_c": {
+    "date": "2026-03-20",
+    "sol_leverage_resolution": {
+      "decision": "SOL at 5x",
+      "sharpe_improvement": "1.78 → 1.87",
+      "liquidations_eliminated": 5
+    },
+    "sizing_decision": "Flat $125 (no dynamic sizing)",
+    "sizing_justification": "No method beats flat on Sharpe by >0.1. 0% ruin. Simplicity wins.",
+    "alternative_for_growth": {
+      "method": "Fixed Ratio delta=500",
+      "final_equity": 55055,
+      "sharpe": 1.84,
+      "mdd_pct": 8.5,
+      "mc_ruin_pct": 0.0,
+      "note": "Beats B&H ($55K vs $36K) but lower Sharpe than flat"
+    },
+    "clean_performance": {
+      "starting_equity": 2500,
+      "final_equity": 16921,
+      "total_pnl": 14421,
+      "total_return_pct": 577,
+      "pf": 3.23,
+      "sharpe": 1.87,
+      "mdd_pct": 5.3,
+      "mdd_dollar": 444,
+      "liquidations": 4,
+      "mc_ruin_pct": 0.0
+    },
+    "friction_performance": {
+      "final_equity": 14450,
+      "pf": 2.63,
+      "sharpe": 1.67,
+      "mdd_pct": 9.7,
+      "edge_retained_pct": 82.9,
+      "new_liquidations": 0
+    },
+    "vs_buy_and_hold": {
+      "strategy_final": 16921,
+      "bh_final": 36236,
+      "strategy_sharpe": 1.87,
+      "bh_sharpe": 1.03,
+      "strategy_mdd_pct": 5.3,
+      "bh_mdd_pct": 90,
+      "note": "Strategy wins on risk-adjusted basis. With Fixed Ratio d=500 sizing, strategy beats B&H on absolute return too ($55K vs $36K)."
+    }
+  }
+}
