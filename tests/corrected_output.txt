@@ -1,0 +1,127 @@
+========================================================================================================================
+  CORRECTED VALIDATION — Phase 1 + ST20 Only
+  Started: 00:58:32
+========================================================================================================================
+
+  FIXES APPLIED:
+    1. Portfolio equity: align by timestamp and SUM (not concatenate)
+    2. ST20 misclass: only flip ACTIVE bars (1→{2,0}, 2→{1,0}), never FLAT
+    3. ST14 leverage: use P&L/MDD/liquidations, not Sharpe
+    4. MTF Pyramid near-band: 0.5% (was 0.1%)
+    5. Data start: 2020-01-01 (200-day EMA warmup)
+    6. Slippage: 0.0005 (was 0.0001)
+    7. ST16 drawdown: uses corrected portfolio equity curve
+    8. Bootstrap: 2-week block resampling (was individual trades)
+
+
+========================================================================================================================
+  [00:58:32] PHASE 0 — DOWNLOADING FRESH DATA FOR ALL 6 ASSETS
+========================================================================================================================
+  [00:58:32] Downloading BTC 15m...
+  [00:59:06] BTC 15m: 217672 candles
+  [00:59:06] Downloading BTC 4h...
+  [00:59:08] BTC 4h: 13614 candles
+  [00:59:08] Downloading BTC 1d...
+  [00:59:08] BTC 1d: 2270 candles
+  [00:59:08] Downloading ETH 15m...
+  [00:59:41] ETH 15m: 217672 candles
+  [00:59:41] Downloading ETH 4h...
+  [00:59:43] ETH 4h: 13614 candles
+  [00:59:43] Downloading ETH 1d...
+  [00:59:44] ETH 1d: 2270 candles
+  [00:59:44] Downloading SOL 15m...
+  [01:00:17] SOL 15m: 196299 candles
+  [01:00:17] Downloading SOL 4h...
+  [01:00:19] SOL 4h: 12276 candles
+  [01:00:19] Downloading SOL 1d...
+  [01:00:20] SOL 1d: 2047 candles
+  [01:00:20] Downloading DOGE 15m...
+  [01:00:53] DOGE 15m: 217672 candles
+  [01:00:53] Downloading DOGE 4h...
+  [01:00:55] DOGE 4h: 13614 candles
+  [01:00:55] Downloading DOGE 1d...
+  [01:00:55] DOGE 1d: 2270 candles
+  [01:00:55] Downloading BNB 15m...
+  [01:01:29] BNB 15m: 217672 candles
+  [01:01:29] Downloading BNB 4h...
+  [01:01:31] BNB 4h: 13614 candles
+  [01:01:31] Downloading BNB 1d...
+  [01:01:31] BNB 1d: 2270 candles
+  [01:01:31] Downloading AVAX 15m...
+  [01:01:59] AVAX 15m: 192265 candles
+  [01:01:59] Downloading AVAX 4h...
+  [01:02:01] AVAX 4h: 12024 candles
+  [01:02:01] Downloading AVAX 1d...
+  [01:02:02] AVAX 1d: 2005 candles
+  [01:02:02] All data downloaded. [209s]
+
+========================================================================================================================
+  [01:02:02] PHASE 1 — FULL SYSTEM REVALIDATION WITH NEW EMA200+EMA50 CLASSIFIER
+========================================================================================================================
+
+  Asset        PF        P&L    MDD%  Sharpe  Trades    WR%      Long$     Short$  Bull%  Bear%  Flat%
+  ────────────────────────────────────────────────────────────────────────────────────────────────────
+  BTC        3.85 $  6169.08   20.1%    1.65     210  39.0% $  6163.74 $     5.34  46.3%  28.9%  24.9%
+  ETH        3.33 $  5616.96   27.5%    1.52     191  34.0% $  4938.21 $   678.75  42.2%  29.7%  28.1%
+  SOL        2.70 $  5133.63   62.9%    1.00     187  38.0% $  4034.43 $  1099.20  35.1%  35.0%  29.9%
+  DOGE       2.34 $  5287.15   48.6%    0.55     231  29.4% $  5927.24 $  -640.09  32.2%  43.3%  24.4%
+  BNB        3.75 $  5867.82   32.7%    0.73     192  37.0% $  5735.83 $   131.99  47.0%  26.8%  26.2%
+  AVAX       1.19 $   697.08   81.7%    0.26     198  31.8% $  1170.76 $  -473.68  24.6%  46.8%  28.6%
+
+  COMBINED PORTFOLIO:
+    PF: 2.65 | P&L: $28771.73 | MDD: 18.8% | Sharpe: 1.55
+    Trades: 1209 | WR: 34.7%
+    Long P&L: $27970.22 | Short P&L: $801.51
+    Monthly win rate: 40/68 (59%)
+
+  YEAR-BY-YEAR P&L:
+    2020: $   2631.50
+    2021: $  15115.11
+    2022: $   1569.28
+    2023: $   3145.19
+    2024: $   3868.60
+    2025: $   2404.54
+    2026: $     37.49
+
+  COMPARISON vs OLD CLASSIFIER (PF 2.12, $8,241):
+    PF: 2.65 vs 2.12 (+0.53)
+    P&L: $28771.73 vs $8,241 ($+20530.73)
+
+  REGIME DISTRIBUTION (avg across assets): Bull 37.9% | Bear 35.1% | Flat 27.0%
+    PASS
+
+  [01:02:05] Running 500 bootstrap iterations (2-week block resampling)...
+    % profitable: 100.0%
+    Median PF: 2.62
+    Worst case PF: 1.44
+    PF 5th/25th/50th/75th/95th: 1.94 / 2.29 / 2.62 / 2.96 / 3.63
+
+    t-statistic: 4.314
+    p-value: 0.000017
+    95% CI on mean trade P&L: [$12.97, $34.62]
+    95% CI on PF (bootstrap): [1.82, 3.86]
+    Significant at 95%: YES
+
+  [01:02:05] Parameter robustness ±30% (500 combinations)...
+    Profitable: 500/500 (100.0%)
+  [01:17:08] Phase 1 complete. [1115s]
+
+========================================================================================================================
+  [01:17:08] STRESS TEST 20 — Full Realistic Simulation (All Friction Combined)
+========================================================================================================================
+
+  ALL FRICTION COMBINED:
+    Fees: 0.115% per side | Funding: 0.03%/8h | Signal delay: 1 bar
+    Regime misclass: 3% | Leverage: 10x
+
+    PF: 0.99 | P&L: $-637.71 | Sharpe: -0.06 | MDD: 0.0%
+    Trades: 8851 | WR: 39.6%
+
+  VERDICT: FAILS under realistic conditions
+  [01:17:31] Stress Test 20 complete. [1139s]
+
+========================================================================================================================
+  CORRECTED VALIDATION COMPLETE
+  Results saved to: /tmp/discovery/corrected_results.json
+  Total time: 19.0 minutes
+========================================================================================================================
