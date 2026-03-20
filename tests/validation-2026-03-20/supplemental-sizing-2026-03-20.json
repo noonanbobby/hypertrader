@@ -1,0 +1,431 @@
+{
+  "test1": {
+    "1000_Flat": {
+      "final_equity": 15421.46,
+      "total_pnl": 14421.46,
+      "return_pct": 1442.1,
+      "pf": 3.23,
+      "sharpe": 1.85,
+      "mdd_pct": 6.5,
+      "mdd_dollar": 444.16,
+      "trades": 596,
+      "skipped": 0,
+      "ruin": false,
+      "ruin_date": "",
+      "peak_margin": 125.0,
+      "liquidations": 4,
+      "min_equity": 1000,
+      "min_equity_date": "",
+      "total_injected": 0
+    },
+    "1000_1A": {
+      "final_equity": 53554.68,
+      "total_pnl": 52554.68,
+      "return_pct": 5255.5,
+      "pf": 3.07,
+      "sharpe": 1.82,
+      "mdd_pct": 12.9,
+      "mdd_dollar": 1776.65,
+      "trades": 596,
+      "skipped": 0,
+      "ruin": false,
+      "ruin_date": "",
+      "peak_margin": 500.0,
+      "liquidations": 4,
+      "min_equity": 1000,
+      "min_equity_date": "",
+      "total_injected": 0
+    },
+    "5000_Flat": {
+      "final_equity": 19421.46,
+      "total_pnl": 14421.46,
+      "return_pct": 288.4,
+      "pf": 3.23,
+      "sharpe": 1.85,
+      "mdd_pct": 4.1,
+      "mdd_dollar": 444.16,
+      "trades": 596,
+      "skipped": 0,
+      "ruin": false,
+      "ruin_date": "",
+      "peak_margin": 125.0,
+      "liquidations": 4,
+      "min_equity": 5000,
+      "min_equity_date": "",
+      "total_injected": 0
+    },
+    "5000_1A": {
+      "final_equity": 57554.68,
+      "total_pnl": 52554.68,
+      "return_pct": 1051.1,
+      "pf": 3.07,
+      "sharpe": 1.82,
+      "mdd_pct": 7.6,
+      "mdd_dollar": 1776.65,
+      "trades": 596,
+      "skipped": 0,
+      "ruin": false,
+      "ruin_date": "",
+      "peak_margin": 500.0,
+      "liquidations": 4,
+      "min_equity": 5000,
+      "min_equity_date": "",
+      "total_injected": 0
+    },
+    "10000_Flat": {
+      "final_equity": 24421.46,
+      "total_pnl": 14421.46,
+      "return_pct": 144.2,
+      "pf": 3.23,
+      "sharpe": 1.85,
+      "mdd_pct": 2.8,
+      "mdd_dollar": 444.16,
+      "trades": 596,
+      "skipped": 0,
+      "ruin": false,
+      "ruin_date": "",
+      "peak_margin": 125.0,
+      "liquidations": 4,
+      "min_equity": 10000,
+      "min_equity_date": "",
+      "total_injected": 0
+    },
+    "10000_1A": {
+      "final_equity": 62554.68,
+      "total_pnl": 52554.68,
+      "return_pct": 525.5,
+      "pf": 3.07,
+      "sharpe": 1.82,
+      "mdd_pct": 6.2,
+      "mdd_dollar": 1776.65,
+      "trades": 596,
+      "skipped": 0,
+      "ruin": false,
+      "ruin_date": "",
+      "peak_margin": 500.0,
+      "liquidations": 4,
+      "min_equity": 10000,
+      "min_equity_date": "",
+      "total_injected": 0
+    },
+    "25000_Flat": {
+      "final_equity": 39421.46,
+      "total_pnl": 14421.46,
+      "return_pct": 57.7,
+      "pf": 3.23,
+      "sharpe": 1.85,
+      "mdd_pct": 1.4,
+      "mdd_dollar": 444.16,
+      "trades": 596,
+      "skipped": 0,
+      "ruin": false,
+      "ruin_date": "",
+      "peak_margin": 125.0,
+      "liquidations": 4,
+      "min_equity": 25000,
+      "min_equity_date": "",
+      "total_injected": 0
+    },
+    "25000_1A": {
+      "final_equity": 77554.68,
+      "total_pnl": 52554.68,
+      "return_pct": 210.2,
+      "pf": 3.07,
+      "sharpe": 1.82,
+      "mdd_pct": 4.1,
+      "mdd_dollar": 1776.65,
+      "trades": 596,
+      "skipped": 0,
+      "ruin": false,
+      "ruin_date": "",
+      "peak_margin": 500.0,
+      "liquidations": 4,
+      "min_equity": 25000,
+      "min_equity_date": "",
+      "total_injected": 0
+    }
+  },
+  "test2_mc": {
+    "1000": {
+      "pct_ruin": 0.0,
+      "median_final": 54241.37,
+      "p5": 52821.62,
+      "p95": 55124.23,
+      "worst": 51391.76,
+      "median_mdd": 19.9
+    },
+    "5000": {
+      "pct_ruin": 0.0,
+      "median_final": 58241.37,
+      "p5": 56821.62,
+      "p95": 59124.23,
+      "worst": 55391.76,
+      "median_mdd": 8.7
+    },
+    "10000": {
+      "pct_ruin": 0.0,
+      "median_final": 63241.37,
+      "p5": 61821.62,
+      "p95": 64124.23,
+      "worst": 60391.76,
+      "median_mdd": 5.8
+    },
+    "25000": {
+      "pct_ruin": 0.0,
+      "median_final": 78241.37,
+      "p5": 76821.62,
+      "p95": 79124.23,
+      "worst": 75391.76,
+      "median_mdd": 3.3
+    }
+  },
+  "test2_min_safe": 1000,
+  "test4_injection": {
+    "A": {
+      "start": 1000,
+      "monthly": 250,
+      "total_injected": 17250,
+      "final_equity": 70804.68,
+      "trading_pnl": 52554.68,
+      "total_return_pct": 288.0
+    },
+    "B": {
+      "start": 1000,
+      "monthly": 500,
+      "total_injected": 34500,
+      "final_equity": 88054.68,
+      "trading_pnl": 52554.68,
+      "total_return_pct": 148.0
+    },
+    "C": {
+      "start": 5000,
+      "monthly": 500,
+      "total_injected": 34500,
+      "final_equity": 92054.68,
+      "trading_pnl": 52554.68,
+      "total_return_pct": 133.0
+    },
+    "D": {
+      "start": 5000,
+      "monthly": 1000,
+      "total_injected": 69000,
+      "final_equity": 126554.68,
+      "trading_pnl": 52554.68,
+      "total_return_pct": 71.0
+    },
+    "E": {
+      "start": 10000,
+      "monthly": 1000,
+      "total_injected": 69000,
+      "final_equity": 131554.68,
+      "trading_pnl": 52554.68,
+      "total_return_pct": 66.5
+    }
+  },
+  "test5_friction": {
+    "1000": {
+      "clean_pnl": 52554.68,
+      "friction_pnl": 44796.43,
+      "edge_retained": 85.2,
+      "friction_pf": 2.52,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "5000": {
+      "clean_pnl": 52554.68,
+      "friction_pnl": 44796.43,
+      "edge_retained": 85.2,
+      "friction_pf": 2.52,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "10000": {
+      "clean_pnl": 52554.68,
+      "friction_pnl": 44796.43,
+      "edge_retained": 85.2,
+      "friction_pf": 2.52,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "25000": {
+      "clean_pnl": 52554.68,
+      "friction_pnl": 44796.43,
+      "edge_retained": 85.2,
+      "friction_pf": 2.52,
+      "new_liqs": 0,
+      "ruin": false
+    }
+  },
+  "test6_funding": {
+    "rates": [
+      {
+        "rate": 0.0001,
+        "pf": 3.08,
+        "pnl": 17018.04,
+        "btc": 6132.28,
+        "eth": 5616.96,
+        "sol": 5268.79
+      },
+      {
+        "rate": 0.0002,
+        "pf": 2.98,
+        "pnl": 16453.9,
+        "btc": 5892.64,
+        "eth": 5422.42,
+        "sol": 5138.84
+      },
+      {
+        "rate": 0.0003,
+        "pf": 2.89,
+        "pnl": 15889.77,
+        "btc": 5653.01,
+        "eth": 5227.88,
+        "sol": 5008.89
+      },
+      {
+        "rate": 0.0004,
+        "pf": 2.79,
+        "pnl": 15325.64,
+        "btc": 5413.37,
+        "eth": 5033.33,
+        "sol": 4878.93
+      },
+      {
+        "rate": 0.0005,
+        "pf": 2.7,
+        "pnl": 14761.51,
+        "btc": 5173.73,
+        "eth": 4838.79,
+        "sol": 4748.98
+      },
+      {
+        "rate": 0.0008,
+        "pf": 2.43,
+        "pnl": 13069.11,
+        "btc": 4454.82,
+        "eth": 4255.16,
+        "sol": 4359.12
+      },
+      {
+        "rate": 0.001,
+        "pf": 2.27,
+        "pnl": 11940.84,
+        "btc": 3975.55,
+        "eth": 3866.08,
+        "sol": 4099.22
+      },
+      {
+        "rate": 0.0015,
+        "pf": 1.89,
+        "pnl": 9120.18,
+        "btc": 2777.37,
+        "eth": 2893.36,
+        "sol": 3449.45
+      }
+    ],
+    "breakeven": 0.3,
+    "safety_margin": 30.0
+  },
+  "test7_misclass": {
+    "levels": [
+      {
+        "pct": 0.0,
+        "pf": 3.08,
+        "pnl": 17018.04,
+        "trades": 596,
+        "sharpe": 1.79,
+        "mdd_pct": 14.1
+      },
+      {
+        "pct": 1.0,
+        "pf": 2.82,
+        "pnl": 15533.8,
+        "trades": 576,
+        "sharpe": 1.72,
+        "mdd_pct": 14.4
+      },
+      {
+        "pct": 3.0,
+        "pf": 2.58,
+        "pnl": 14372.0,
+        "trades": 601,
+        "sharpe": 1.64,
+        "mdd_pct": 14.2
+      },
+      {
+        "pct": 5.0,
+        "pf": 2.57,
+        "pnl": 14280.8,
+        "trades": 611,
+        "sharpe": 1.66,
+        "mdd_pct": 14.2
+      },
+      {
+        "pct": 7.000000000000001,
+        "pf": 2.36,
+        "pnl": 13224.55,
+        "trades": 642,
+        "sharpe": 1.63,
+        "mdd_pct": 14.2
+      },
+      {
+        "pct": 10.0,
+        "pf": 2.17,
+        "pnl": 11649.48,
+        "trades": 671,
+        "sharpe": 1.78,
+        "mdd_pct": 13.6
+      },
+      {
+        "pct": 15.0,
+        "pf": 2.07,
+        "pnl": 10477.53,
+        "trades": 697,
+        "sharpe": 1.92,
+        "mdd_pct": 13.7
+      },
+      {
+        "pct": 20.0,
+        "pf": 1.87,
+        "pnl": 8774.39,
+        "trades": 731,
+        "sharpe": 1.79,
+        "mdd_pct": 14.6
+      }
+    ],
+    "breakeven": 25,
+    "safety_margin": 8.3,
+    "verdict": "ROBUST"
+  },
+  "final_summary": {
+    "viability": {
+      "1000": {
+        "viable": true,
+        "mc_ruin": 0.0,
+        "friction_pf": 2.52
+      },
+      "5000": {
+        "viable": true,
+        "mc_ruin": 0.0,
+        "friction_pf": 2.52
+      },
+      "10000": {
+        "viable": true,
+        "mc_ruin": 0.0,
+        "friction_pf": 2.52
+      },
+      "25000": {
+        "viable": true,
+        "mc_ruin": 0.0,
+        "friction_pf": 2.52
+      }
+    },
+    "min_safe_equity": 1000,
+    "funding_breakeven": 0.3,
+    "funding_safety": 30.0,
+    "misclass_breakeven": 25,
+    "misclass_safety": 8.3,
+    "misclass_verdict": "ROBUST",
+    "runtime": 11.7
+  }
+}

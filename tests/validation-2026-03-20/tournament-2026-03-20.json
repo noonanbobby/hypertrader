@@ -1,0 +1,681 @@
+{
+  "benchmark": {
+    "pf": 3.25,
+    "pnl": 15233.98,
+    "sharpe": 1.8,
+    "mdd_pct": 14.1,
+    "trades": 464
+  },
+  "block1_long": {
+    "total_combos": 966,
+    "family_results": {
+      "ema_crossover": {
+        "best_pf": 1.3,
+        "best_pnl": 11236.73,
+        "best_params": "fast_period=50, slow_period=144",
+        "combos": 198,
+        "pct_profitable": 87.9
+      },
+      "supertrend_flip": {
+        "best_pf": 1.08,
+        "best_pnl": 4220.4,
+        "best_params": "atr_period=5, multiplier=4.5",
+        "combos": 108,
+        "pct_profitable": 43.5
+      },
+      "supertrend_pullback": {
+        "best_pf": 0.99,
+        "best_pnl": -680.49,
+        "best_params": "atr_period=9, multiplier=4.0, pullback_pct=0.03",
+        "combos": 175,
+        "pct_profitable": 0.0
+      },
+      "rsi_extreme": {
+        "best_pf": 1.17,
+        "best_pnl": 6872.35,
+        "best_params": "entry_threshold=40, rsi_period=25",
+        "combos": 64,
+        "pct_profitable": 56.2
+      },
+      "bollinger_bounce": {
+        "best_pf": 0,
+        "best_pnl": 0,
+        "best_params": "N/A",
+        "combos": 96,
+        "pct_profitable": 5.2
+      },
+      "donchian_breakout": {
+        "best_pf": 1.04,
+        "best_pnl": 2271.81,
+        "best_params": "period=50",
+        "combos": 10,
+        "pct_profitable": 30.0
+      },
+      "macd_crossover": {
+        "best_pf": 0,
+        "best_pnl": 0,
+        "best_params": "N/A",
+        "combos": 100,
+        "pct_profitable": 0.0
+      },
+      "hull_ma_crossover": {
+        "best_pf": 0,
+        "best_pnl": 0,
+        "best_params": "N/A",
+        "combos": 43,
+        "pct_profitable": 0.0
+      },
+      "chandelier_reversal": {
+        "best_pf": 0.99,
+        "best_pnl": -614.14,
+        "best_params": "atr_period=10, multiplier=4.0",
+        "combos": 30,
+        "pct_profitable": 0.0
+      },
+      "stochastic_extreme": {
+        "best_pf": 0,
+        "best_pnl": 0,
+        "best_params": "N/A",
+        "combos": 75,
+        "pct_profitable": 0.0
+      },
+      "cci_extreme": {
+        "best_pf": 0,
+        "best_pnl": 0,
+        "best_params": "N/A",
+        "combos": 36,
+        "pct_profitable": 0.0
+      },
+      "keltner_pullback": {
+        "best_pf": 0,
+        "best_pnl": 0,
+        "best_params": "N/A",
+        "combos": 25,
+        "pct_profitable": 0.0
+      },
+      "vwap_reversion": {
+        "best_pf": 0,
+        "best_pnl": 0,
+        "best_params": "N/A",
+        "combos": 6,
+        "pct_profitable": 0.0
+      }
+    },
+    "top10": [
+      {
+        "family": "ema_crossover",
+        "params": {
+          "strategy.long_entry.params.fast_period": 50,
+          "strategy.long_entry.params.slow_period": 144
+        },
+        "pf": 1.3,
+        "pnl": 11236.73,
+        "sharpe": 1.35,
+        "trades": 3021
+      },
+      {
+        "family": "ema_crossover",
+        "params": {
+          "strategy.long_entry.params.fast_period": 45,
+          "strategy.long_entry.params.slow_period": 144
+        },
+        "pf": 1.29,
+        "pnl": 10914.27,
+        "sharpe": 1.31,
+        "trades": 3092
+      },
+      {
+        "family": "ema_crossover",
+        "params": {
+          "strategy.long_entry.params.fast_period": 40,
+          "strategy.long_entry.params.slow_period": 144
+        },
+        "pf": 1.27,
+        "pnl": 10377.48,
+        "sharpe": 1.28,
+        "trades": 3158
+      },
+      {
+        "family": "ema_crossover",
+        "params": {
+          "strategy.long_entry.params.fast_period": 35,
+          "strategy.long_entry.params.slow_period": 144
+        },
+        "pf": 1.26,
+        "pnl": 10067.16,
+        "sharpe": 1.25,
+        "trades": 3229
+      },
+      {
+        "family": "ema_crossover",
+        "params": {
+          "strategy.long_entry.params.fast_period": 45,
+          "strategy.long_entry.params.slow_period": 120
+        },
+        "pf": 1.26,
+        "pnl": 10313.95,
+        "sharpe": 1.28,
+        "trades": 3179
+      },
+      {
+        "family": "ema_crossover",
+        "params": {
+          "strategy.long_entry.params.fast_period": 50,
+          "strategy.long_entry.params.slow_period": 120
+        },
+        "pf": 1.26,
+        "pnl": 10269.83,
+        "sharpe": 1.26,
+        "trades": 3136
+      },
+      {
+        "family": "ema_crossover",
+        "params": {
+          "strategy.long_entry.params.fast_period": 40,
+          "strategy.long_entry.params.slow_period": 120
+        },
+        "pf": 1.25,
+        "pnl": 9920.16,
+        "sharpe": 1.21,
+        "trades": 3258
+      },
+      {
+        "family": "ema_crossover",
+        "params": {
+          "strategy.long_entry.params.fast_period": 45,
+          "strategy.long_entry.params.slow_period": 100
+        },
+        "pf": 1.24,
+        "pnl": 9830.63,
+        "sharpe": 1.17,
+        "trades": 3324
+      },
+      {
+        "family": "ema_crossover",
+        "params": {
+          "strategy.long_entry.params.fast_period": 50,
+          "strategy.long_entry.params.slow_period": 89
+        },
+        "pf": 1.24,
+        "pnl": 9793.71,
+        "sharpe": 1.17,
+        "trades": 3327
+      },
+      {
+        "family": "ema_crossover",
+        "params": {
+          "strategy.long_entry.params.fast_period": 50,
+          "strategy.long_entry.params.slow_period": 100
+        },
+        "pf": 1.24,
+        "pnl": 9771.55,
+        "sharpe": 1.16,
+        "trades": 3251
+      }
+    ]
+  },
+  "block2_short": {
+    "total_combos": 966,
+    "top5": [
+      {
+        "family": "bollinger_bounce",
+        "params": {
+          "strategy.short_entry.params.bb_period": 10,
+          "strategy.short_entry.params.bb_std": 3.0,
+          "strategy.short_entry.params.rsi_threshold": 25
+        },
+        "pf": 1.21,
+        "pnl": 5964.47,
+        "sharpe": 1.32,
+        "trades": 2540
+      },
+      {
+        "family": "bollinger_bounce",
+        "params": {
+          "strategy.short_entry.params.bb_period": 10,
+          "strategy.short_entry.params.bb_std": 3.0,
+          "strategy.short_entry.params.rsi_threshold": 30
+        },
+        "pf": 1.21,
+        "pnl": 5964.47,
+        "sharpe": 1.32,
+        "trades": 2540
+      },
+      {
+        "family": "bollinger_bounce",
+        "params": {
+          "strategy.short_entry.params.bb_period": 10,
+          "strategy.short_entry.params.bb_std": 3.0,
+          "strategy.short_entry.params.rsi_threshold": 35
+        },
+        "pf": 1.21,
+        "pnl": 5964.47,
+        "sharpe": 1.32,
+        "trades": 2540
+      },
+      {
+        "family": "bollinger_bounce",
+        "params": {
+          "strategy.short_entry.params.bb_period": 10,
+          "strategy.short_entry.params.bb_std": 3.0,
+          "strategy.short_entry.params.rsi_threshold": 40
+        },
+        "pf": 1.21,
+        "pnl": 5964.47,
+        "sharpe": 1.32,
+        "trades": 2540
+      },
+      {
+        "family": "rsi_extreme",
+        "params": {
+          "strategy.short_entry.params.entry_threshold": 15,
+          "strategy.short_entry.params.rsi_period": 21
+        },
+        "pf": 1.19,
+        "pnl": 5407.87,
+        "sharpe": 1.07,
+        "trades": 2589
+      }
+    ]
+  },
+  "block3_exit": {
+    "total_combos": 350,
+    "top5": [
+      {
+        "family": "current",
+        "params": {
+          "strategy.exit.type": "current"
+        },
+        "pf": 1.12,
+        "pnl": 5029.74,
+        "sharpe": 0.81,
+        "trades": 3668
+      },
+      {
+        "family": "ema_cross_exit",
+        "params": {
+          "strategy.exit.params.fast_period": 21,
+          "strategy.exit.params.slow_period": 55
+        },
+        "pf": 1.1,
+        "pnl": 5268.18,
+        "sharpe": 0.69,
+        "trades": 4325
+      },
+      {
+        "family": "time_exit",
+        "params": {
+          "strategy.exit.params.max_bars": 500
+        },
+        "pf": 1.16,
+        "pnl": 8088.67,
+        "sharpe": 0.57,
+        "trades": 1270
+      },
+      {
+        "family": "time_exit",
+        "params": {
+          "strategy.exit.params.max_bars": 150
+        },
+        "pf": 1.08,
+        "pnl": 5287.93,
+        "sharpe": 0.45,
+        "trades": 2961
+      },
+      {
+        "family": "time_exit",
+        "params": {
+          "strategy.exit.params.max_bars": 250
+        },
+        "pf": 1.1,
+        "pnl": 5913.58,
+        "sharpe": 0.43,
+        "trades": 2049
+      }
+    ]
+  },
+  "block4_regime": [
+    {
+      "name": "ema_dual",
+      "pf": 1.12,
+      "pnl": 5029.74,
+      "sharpe": 0.81,
+      "trades": 3668
+    },
+    {
+      "name": "ema_single",
+      "pf": 1.06,
+      "pnl": 2962.5,
+      "sharpe": 0.4,
+      "trades": 4760
+    },
+    {
+      "name": "ema_dual_4h_override",
+      "pf": 1.37,
+      "pnl": 10205.97,
+      "sharpe": 1.75,
+      "trades": 2543
+    }
+  ],
+  "block5_filters": [
+    {
+      "vol": 1.0,
+      "adx": 0,
+      "st_agree": true,
+      "pf": 1.37,
+      "pnl": 10205.97,
+      "sharpe": 1.75,
+      "trades": 2543
+    },
+    {
+      "vol": 1.0,
+      "adx": 20,
+      "st_agree": true,
+      "pf": 1.14,
+      "pnl": 4527.68,
+      "sharpe": 0.87,
+      "trades": 3814
+    },
+    {
+      "vol": 1.0,
+      "adx": 0,
+      "st_agree": false,
+      "pf": 1.12,
+      "pnl": 5029.74,
+      "sharpe": 0.81,
+      "trades": 3668
+    },
+    {
+      "vol": 1.0,
+      "adx": 20,
+      "st_agree": false,
+      "pf": 0.99,
+      "pnl": -646.87,
+      "sharpe": -0.12,
+      "trades": 5313
+    },
+    {
+      "vol": 2.0,
+      "adx": 20,
+      "st_agree": true,
+      "pf": 0.7,
+      "pnl": -6630.49,
+      "sharpe": -3.8,
+      "trades": 5414
+    }
+  ],
+  "block6_grand": {
+    "tested": 27,
+    "valid": 18,
+    "top10": [
+      {
+        "long": "ema_crossover",
+        "short": "bollinger_bounce",
+        "exit": "current",
+        "long_params": {
+          "fast_period": 50,
+          "slow_period": 144
+        },
+        "short_params": {
+          "bb_period": 10,
+          "bb_std": 3.0,
+          "rsi_threshold": 25
+        },
+        "exit_params": {
+          "type": "current"
+        },
+        "pf": 1.78,
+        "pnl": 10556.03,
+        "sharpe": 2.13,
+        "mdd_pct": 16.3,
+        "trades": 887
+      },
+      {
+        "long": "ema_crossover",
+        "short": "bollinger_bounce",
+        "exit": "current",
+        "long_params": {
+          "fast_period": 50,
+          "slow_period": 144
+        },
+        "short_params": {
+          "bb_period": 10,
+          "bb_std": 3.0,
+          "rsi_threshold": 30
+        },
+        "exit_params": {
+          "type": "current"
+        },
+        "pf": 1.78,
+        "pnl": 10556.03,
+        "sharpe": 2.13,
+        "mdd_pct": 16.3,
+        "trades": 887
+      },
+      {
+        "long": "ema_crossover",
+        "short": "bollinger_bounce",
+        "exit": "current",
+        "long_params": {
+          "fast_period": 50,
+          "slow_period": 144
+        },
+        "short_params": {
+          "bb_period": 10,
+          "bb_std": 3.0,
+          "rsi_threshold": 35
+        },
+        "exit_params": {
+          "type": "current"
+        },
+        "pf": 1.78,
+        "pnl": 10556.03,
+        "sharpe": 2.13,
+        "mdd_pct": 16.3,
+        "trades": 887
+      },
+      {
+        "long": "ema_crossover",
+        "short": "bollinger_bounce",
+        "exit": "current",
+        "long_params": {
+          "fast_period": 40,
+          "slow_period": 144
+        },
+        "short_params": {
+          "bb_period": 10,
+          "bb_std": 3.0,
+          "rsi_threshold": 25
+        },
+        "exit_params": {
+          "type": "current"
+        },
+        "pf": 1.67,
+        "pnl": 9793.36,
+        "sharpe": 2.08,
+        "mdd_pct": 16.9,
+        "trades": 1006
+      },
+      {
+        "long": "ema_crossover",
+        "short": "bollinger_bounce",
+        "exit": "current",
+        "long_params": {
+          "fast_period": 40,
+          "slow_period": 144
+        },
+        "short_params": {
+          "bb_period": 10,
+          "bb_std": 3.0,
+          "rsi_threshold": 30
+        },
+        "exit_params": {
+          "type": "current"
+        },
+        "pf": 1.67,
+        "pnl": 9793.36,
+        "sharpe": 2.08,
+        "mdd_pct": 16.9,
+        "trades": 1006
+      },
+      {
+        "long": "ema_crossover",
+        "short": "bollinger_bounce",
+        "exit": "current",
+        "long_params": {
+          "fast_period": 40,
+          "slow_period": 144
+        },
+        "short_params": {
+          "bb_period": 10,
+          "bb_std": 3.0,
+          "rsi_threshold": 35
+        },
+        "exit_params": {
+          "type": "current"
+        },
+        "pf": 1.67,
+        "pnl": 9793.36,
+        "sharpe": 2.08,
+        "mdd_pct": 16.9,
+        "trades": 1006
+      },
+      {
+        "long": "ema_crossover",
+        "short": "bollinger_bounce",
+        "exit": "current",
+        "long_params": {
+          "fast_period": 45,
+          "slow_period": 144
+        },
+        "short_params": {
+          "bb_period": 10,
+          "bb_std": 3.0,
+          "rsi_threshold": 25
+        },
+        "exit_params": {
+          "type": "current"
+        },
+        "pf": 1.74,
+        "pnl": 10289.22,
+        "sharpe": 2.07,
+        "mdd_pct": 15.5,
+        "trades": 944
+      },
+      {
+        "long": "ema_crossover",
+        "short": "bollinger_bounce",
+        "exit": "current",
+        "long_params": {
+          "fast_period": 45,
+          "slow_period": 144
+        },
+        "short_params": {
+          "bb_period": 10,
+          "bb_std": 3.0,
+          "rsi_threshold": 30
+        },
+        "exit_params": {
+          "type": "current"
+        },
+        "pf": 1.74,
+        "pnl": 10289.22,
+        "sharpe": 2.07,
+        "mdd_pct": 15.5,
+        "trades": 944
+      },
+      {
+        "long": "ema_crossover",
+        "short": "bollinger_bounce",
+        "exit": "current",
+        "long_params": {
+          "fast_period": 45,
+          "slow_period": 144
+        },
+        "short_params": {
+          "bb_period": 10,
+          "bb_std": 3.0,
+          "rsi_threshold": 35
+        },
+        "exit_params": {
+          "type": "current"
+        },
+        "pf": 1.74,
+        "pnl": 10289.22,
+        "sharpe": 2.07,
+        "mdd_pct": 15.5,
+        "trades": 944
+      },
+      {
+        "long": "ema_crossover",
+        "short": "bollinger_bounce",
+        "exit": "time_exit",
+        "long_params": {
+          "fast_period": 50,
+          "slow_period": 144
+        },
+        "short_params": {
+          "bb_period": 10,
+          "bb_std": 3.0,
+          "rsi_threshold": 25
+        },
+        "exit_params": {
+          "max_bars": 500
+        },
+        "pf": 1.41,
+        "pnl": 9506.8,
+        "sharpe": 1.16,
+        "mdd_pct": 33.1,
+        "trades": 577
+      }
+    ],
+    "current_rank": 10
+  },
+  "block9_surface": {
+    "tests": 4,
+    "pass": 4,
+    "all_pass": true
+  },
+  "whites_check": {
+    "total_configs": 2332,
+    "raw_p": 0.0,
+    "corrected_p": 0.0,
+    "significant": true
+  },
+  "block10_holdout": {
+    "current": {
+      "pf": 2.26,
+      "pnl": 1784.05,
+      "sharpe": 2.4,
+      "mdd_pct": 18.5,
+      "trades": 132
+    },
+    "finalist": {
+      "pf": 1.63,
+      "pnl": 1063.64,
+      "sharpe": 2.62,
+      "mdd_pct": 19.5,
+      "trades": 145
+    },
+    "beats_pf": false,
+    "beats_sharpe": true,
+    "beats_pnl": false,
+    "verdict": "DEPLOY CURRENT (conservative)"
+  },
+  "final": {
+    "total_configs": 2332,
+    "runtime_seconds": 59.9,
+    "recommendation": "DEPLOY CURRENT SYSTEM",
+    "deployment": null,
+    "holdout_current": {
+      "pf": 2.26,
+      "sharpe": 2.4,
+      "pnl": 1784.05
+    },
+    "holdout_finalist": {
+      "pf": 1.63,
+      "sharpe": 2.62,
+      "pnl": 1063.64
+    }
+  }
+}

@@ -1,0 +1,1570 @@
+{
+  "test1_grid": {
+    "1000_0": {
+      "final_equity": 15421.46,
+      "total_pnl": 14421.46,
+      "pf": 3.23,
+      "sharpe": 1.87,
+      "mdd_pct": 6.5,
+      "mdd_dollar": 444.16,
+      "peak_n": 1,
+      "months_at_cap": 0,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "1000_250": {
+      "final_equity": 56549.41,
+      "total_pnl": 55549.41,
+      "pf": 3.16,
+      "sharpe": 1.83,
+      "mdd_pct": 14.6,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 66,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "1000_500": {
+      "final_equity": 53554.68,
+      "total_pnl": 52554.68,
+      "pf": 3.07,
+      "sharpe": 1.84,
+      "mdd_pct": 12.9,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 63,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "1000_750": {
+      "final_equity": 50502.96,
+      "total_pnl": 49502.96,
+      "pf": 2.96,
+      "sharpe": 1.85,
+      "mdd_pct": 12.9,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 63,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "1000_1000": {
+      "final_equity": 50690.48,
+      "total_pnl": 49690.48,
+      "pf": 2.98,
+      "sharpe": 1.86,
+      "mdd_pct": 10.7,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 63,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "1000_1250": {
+      "final_equity": 50171.29,
+      "total_pnl": 49171.29,
+      "pf": 2.98,
+      "sharpe": 1.85,
+      "mdd_pct": 11.0,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 62,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "1000_1500": {
+      "final_equity": 48403.99,
+      "total_pnl": 47403.99,
+      "pf": 2.91,
+      "sharpe": 1.83,
+      "mdd_pct": 12.4,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 60,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "1000_1750": {
+      "final_equity": 45138.12,
+      "total_pnl": 44138.12,
+      "pf": 2.87,
+      "sharpe": 1.83,
+      "mdd_pct": 12.2,
+      "mdd_dollar": 1408.69,
+      "peak_n": 4,
+      "months_at_cap": 57,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "1000_2000": {
+      "final_equity": 44568.7,
+      "total_pnl": 43568.7,
+      "pf": 2.87,
+      "sharpe": 1.83,
+      "mdd_pct": 11.8,
+      "mdd_dollar": 1395.93,
+      "peak_n": 4,
+      "months_at_cap": 54,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "5000_0": {
+      "final_equity": 19421.46,
+      "total_pnl": 14421.46,
+      "pf": 3.23,
+      "sharpe": 1.87,
+      "mdd_pct": 4.1,
+      "mdd_dollar": 444.16,
+      "peak_n": 1,
+      "months_at_cap": 0,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "5000_250": {
+      "final_equity": 60549.41,
+      "total_pnl": 55549.41,
+      "pf": 3.16,
+      "sharpe": 1.83,
+      "mdd_pct": 6.7,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 66,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "5000_500": {
+      "final_equity": 57554.68,
+      "total_pnl": 52554.68,
+      "pf": 3.07,
+      "sharpe": 1.84,
+      "mdd_pct": 7.6,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 63,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "5000_750": {
+      "final_equity": 54502.96,
+      "total_pnl": 49502.96,
+      "pf": 2.96,
+      "sharpe": 1.85,
+      "mdd_pct": 8.7,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 63,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "5000_1000": {
+      "final_equity": 54690.48,
+      "total_pnl": 49690.48,
+      "pf": 2.98,
+      "sharpe": 1.86,
+      "mdd_pct": 8.6,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 63,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "5000_1250": {
+      "final_equity": 54171.29,
+      "total_pnl": 49171.29,
+      "pf": 2.98,
+      "sharpe": 1.85,
+      "mdd_pct": 8.8,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 62,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "5000_1500": {
+      "final_equity": 52403.99,
+      "total_pnl": 47403.99,
+      "pf": 2.91,
+      "sharpe": 1.83,
+      "mdd_pct": 9.7,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 60,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "5000_1750": {
+      "final_equity": 49138.12,
+      "total_pnl": 44138.12,
+      "pf": 2.87,
+      "sharpe": 1.83,
+      "mdd_pct": 9.0,
+      "mdd_dollar": 1408.69,
+      "peak_n": 4,
+      "months_at_cap": 57,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "5000_2000": {
+      "final_equity": 48568.7,
+      "total_pnl": 43568.7,
+      "pf": 2.87,
+      "sharpe": 1.83,
+      "mdd_pct": 8.7,
+      "mdd_dollar": 1395.93,
+      "peak_n": 4,
+      "months_at_cap": 54,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "10000_0": {
+      "final_equity": 24421.46,
+      "total_pnl": 14421.46,
+      "pf": 3.23,
+      "sharpe": 1.87,
+      "mdd_pct": 2.8,
+      "mdd_dollar": 444.16,
+      "peak_n": 1,
+      "months_at_cap": 0,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "10000_250": {
+      "final_equity": 65549.41,
+      "total_pnl": 55549.41,
+      "pf": 3.16,
+      "sharpe": 1.83,
+      "mdd_pct": 5.6,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 66,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "10000_500": {
+      "final_equity": 62554.68,
+      "total_pnl": 52554.68,
+      "pf": 3.07,
+      "sharpe": 1.84,
+      "mdd_pct": 6.2,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 63,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "10000_750": {
+      "final_equity": 59502.96,
+      "total_pnl": 49502.96,
+      "pf": 2.96,
+      "sharpe": 1.85,
+      "mdd_pct": 7.0,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 63,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "10000_1000": {
+      "final_equity": 59690.48,
+      "total_pnl": 49690.48,
+      "pf": 2.98,
+      "sharpe": 1.86,
+      "mdd_pct": 6.9,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 63,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "10000_1250": {
+      "final_equity": 59171.29,
+      "total_pnl": 49171.29,
+      "pf": 2.98,
+      "sharpe": 1.85,
+      "mdd_pct": 7.1,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 62,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "10000_1500": {
+      "final_equity": 57403.99,
+      "total_pnl": 47403.99,
+      "pf": 2.91,
+      "sharpe": 1.83,
+      "mdd_pct": 7.6,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 60,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "10000_1750": {
+      "final_equity": 54138.12,
+      "total_pnl": 44138.12,
+      "pf": 2.87,
+      "sharpe": 1.83,
+      "mdd_pct": 6.8,
+      "mdd_dollar": 1408.69,
+      "peak_n": 4,
+      "months_at_cap": 57,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "10000_2000": {
+      "final_equity": 53568.7,
+      "total_pnl": 43568.7,
+      "pf": 2.87,
+      "sharpe": 1.83,
+      "mdd_pct": 6.6,
+      "mdd_dollar": 1395.93,
+      "peak_n": 4,
+      "months_at_cap": 54,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "25000_0": {
+      "final_equity": 39421.46,
+      "total_pnl": 14421.46,
+      "pf": 3.23,
+      "sharpe": 1.87,
+      "mdd_pct": 1.4,
+      "mdd_dollar": 444.16,
+      "peak_n": 1,
+      "months_at_cap": 0,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "25000_250": {
+      "final_equity": 80549.41,
+      "total_pnl": 55549.41,
+      "pf": 3.16,
+      "sharpe": 1.83,
+      "mdd_pct": 3.8,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 66,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "25000_500": {
+      "final_equity": 77554.68,
+      "total_pnl": 52554.68,
+      "pf": 3.07,
+      "sharpe": 1.84,
+      "mdd_pct": 4.1,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 63,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "25000_750": {
+      "final_equity": 74502.96,
+      "total_pnl": 49502.96,
+      "pf": 2.96,
+      "sharpe": 1.85,
+      "mdd_pct": 4.4,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 63,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "25000_1000": {
+      "final_equity": 74690.48,
+      "total_pnl": 49690.48,
+      "pf": 2.98,
+      "sharpe": 1.86,
+      "mdd_pct": 4.4,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 63,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "25000_1250": {
+      "final_equity": 74171.29,
+      "total_pnl": 49171.29,
+      "pf": 2.98,
+      "sharpe": 1.85,
+      "mdd_pct": 4.4,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 62,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "25000_1500": {
+      "final_equity": 72403.99,
+      "total_pnl": 47403.99,
+      "pf": 2.91,
+      "sharpe": 1.83,
+      "mdd_pct": 4.6,
+      "mdd_dollar": 1776.65,
+      "peak_n": 4,
+      "months_at_cap": 60,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "25000_1750": {
+      "final_equity": 69138.12,
+      "total_pnl": 44138.12,
+      "pf": 2.87,
+      "sharpe": 1.83,
+      "mdd_pct": 4.0,
+      "mdd_dollar": 1408.69,
+      "peak_n": 4,
+      "months_at_cap": 57,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    },
+    "25000_2000": {
+      "final_equity": 68568.7,
+      "total_pnl": 43568.7,
+      "pf": 2.87,
+      "sharpe": 1.83,
+      "mdd_pct": 3.8,
+      "mdd_dollar": 1395.93,
+      "peak_n": 4,
+      "months_at_cap": 54,
+      "trades": 596,
+      "skipped": 0,
+      "new_liqs": 0,
+      "ruin": false
+    }
+  },
+  "test2_mc": {
+    "1000_0": {
+      "pct_ruin": 0.0,
+      "median_final": 15421.0,
+      "p5": 15421.0,
+      "p95": 15421.0,
+      "median_mdd": 12.8
+    },
+    "1000_250": {
+      "pct_ruin": 0.0,
+      "median_final": 55814.0,
+      "p5": 54437.0,
+      "p95": 56679.0,
+      "median_mdd": 22.4
+    },
+    "1000_500": {
+      "pct_ruin": 0.0,
+      "median_final": 54241.0,
+      "p5": 52822.0,
+      "p95": 55124.0,
+      "median_mdd": 19.9
+    },
+    "1000_750": {
+      "pct_ruin": 0.0,
+      "median_final": 52784.0,
+      "p5": 51551.0,
+      "p95": 53674.0,
+      "median_mdd": 18.4
+    },
+    "1000_1000": {
+      "pct_ruin": 0.0,
+      "median_final": 51263.0,
+      "p5": 49893.0,
+      "p95": 52168.0,
+      "median_mdd": 16.8
+    },
+    "1000_1250": {
+      "pct_ruin": 0.0,
+      "median_final": 49823.0,
+      "p5": 48401.0,
+      "p95": 50702.0,
+      "median_mdd": 16.1
+    },
+    "1000_1500": {
+      "pct_ruin": 0.0,
+      "median_final": 48267.0,
+      "p5": 46922.0,
+      "p95": 49185.0,
+      "median_mdd": 15.5
+    },
+    "1000_1750": {
+      "pct_ruin": 0.0,
+      "median_final": 46829.0,
+      "p5": 45467.0,
+      "p95": 47674.0,
+      "median_mdd": 15.0
+    },
+    "1000_2000": {
+      "pct_ruin": 0.0,
+      "median_final": 45303.0,
+      "p5": 43863.0,
+      "p95": 46168.0,
+      "median_mdd": 14.5
+    },
+    "5000_0": {
+      "pct_ruin": 0.0,
+      "median_final": 19421.0,
+      "p5": 19421.0,
+      "p95": 19421.0,
+      "median_mdd": 4.2
+    },
+    "5000_250": {
+      "pct_ruin": 0.0,
+      "median_final": 59814.0,
+      "p5": 58437.0,
+      "p95": 60679.0,
+      "median_mdd": 9.3
+    },
+    "5000_500": {
+      "pct_ruin": 0.0,
+      "median_final": 58241.0,
+      "p5": 56822.0,
+      "p95": 59124.0,
+      "median_mdd": 8.7
+    },
+    "5000_750": {
+      "pct_ruin": 0.0,
+      "median_final": 56784.0,
+      "p5": 55551.0,
+      "p95": 57674.0,
+      "median_mdd": 8.3
+    },
+    "5000_1000": {
+      "pct_ruin": 0.0,
+      "median_final": 55263.0,
+      "p5": 53893.0,
+      "p95": 56168.0,
+      "median_mdd": 7.9
+    },
+    "5000_1250": {
+      "pct_ruin": 0.0,
+      "median_final": 53823.0,
+      "p5": 52401.0,
+      "p95": 54702.0,
+      "median_mdd": 7.5
+    },
+    "5000_1500": {
+      "pct_ruin": 0.0,
+      "median_final": 52267.0,
+      "p5": 50922.0,
+      "p95": 53185.0,
+      "median_mdd": 7.2
+    },
+    "5000_1750": {
+      "pct_ruin": 0.0,
+      "median_final": 50829.0,
+      "p5": 49467.0,
+      "p95": 51674.0,
+      "median_mdd": 6.9
+    },
+    "5000_2000": {
+      "pct_ruin": 0.0,
+      "median_final": 49303.0,
+      "p5": 47863.0,
+      "p95": 50168.0,
+      "median_mdd": 6.7
+    },
+    "10000_0": {
+      "pct_ruin": 0.0,
+      "median_final": 24421.0,
+      "p5": 24421.0,
+      "p95": 24421.0,
+      "median_mdd": 2.5
+    },
+    "10000_250": {
+      "pct_ruin": 0.0,
+      "median_final": 64814.0,
+      "p5": 63437.0,
+      "p95": 65679.0,
+      "median_mdd": 6.2
+    },
+    "10000_500": {
+      "pct_ruin": 0.0,
+      "median_final": 63241.0,
+      "p5": 61822.0,
+      "p95": 64124.0,
+      "median_mdd": 5.8
+    },
+    "10000_750": {
+      "pct_ruin": 0.0,
+      "median_final": 61784.0,
+      "p5": 60551.0,
+      "p95": 62674.0,
+      "median_mdd": 5.6
+    },
+    "10000_1000": {
+      "pct_ruin": 0.0,
+      "median_final": 60263.0,
+      "p5": 58893.0,
+      "p95": 61168.0,
+      "median_mdd": 5.4
+    },
+    "10000_1250": {
+      "pct_ruin": 0.0,
+      "median_final": 58823.0,
+      "p5": 57401.0,
+      "p95": 59702.0,
+      "median_mdd": 5.2
+    },
+    "10000_1500": {
+      "pct_ruin": 0.0,
+      "median_final": 57267.0,
+      "p5": 55922.0,
+      "p95": 58185.0,
+      "median_mdd": 5.0
+    },
+    "10000_1750": {
+      "pct_ruin": 0.0,
+      "median_final": 55829.0,
+      "p5": 54467.0,
+      "p95": 56674.0,
+      "median_mdd": 4.9
+    },
+    "10000_2000": {
+      "pct_ruin": 0.0,
+      "median_final": 54303.0,
+      "p5": 52863.0,
+      "p95": 55168.0,
+      "median_mdd": 4.7
+    },
+    "25000_0": {
+      "pct_ruin": 0.0,
+      "median_final": 39421.0,
+      "p5": 39421.0,
+      "p95": 39421.0,
+      "median_mdd": 1.2
+    },
+    "25000_250": {
+      "pct_ruin": 0.0,
+      "median_final": 79814.0,
+      "p5": 78437.0,
+      "p95": 80679.0,
+      "median_mdd": 3.3
+    },
+    "25000_500": {
+      "pct_ruin": 0.0,
+      "median_final": 78241.0,
+      "p5": 76822.0,
+      "p95": 79124.0,
+      "median_mdd": 3.3
+    },
+    "25000_750": {
+      "pct_ruin": 0.0,
+      "median_final": 76784.0,
+      "p5": 75551.0,
+      "p95": 77674.0,
+      "median_mdd": 3.2
+    },
+    "25000_1000": {
+      "pct_ruin": 0.0,
+      "median_final": 75263.0,
+      "p5": 73893.0,
+      "p95": 76168.0,
+      "median_mdd": 3.1
+    },
+    "25000_1250": {
+      "pct_ruin": 0.0,
+      "median_final": 73823.0,
+      "p5": 72401.0,
+      "p95": 74702.0,
+      "median_mdd": 3.0
+    },
+    "25000_1500": {
+      "pct_ruin": 0.0,
+      "median_final": 72267.0,
+      "p5": 70922.0,
+      "p95": 73185.0,
+      "median_mdd": 3.0
+    },
+    "25000_1750": {
+      "pct_ruin": 0.0,
+      "median_final": 70829.0,
+      "p5": 69467.0,
+      "p95": 71674.0,
+      "median_mdd": 2.9
+    },
+    "25000_2000": {
+      "pct_ruin": 0.0,
+      "median_final": 69303.0,
+      "p5": 67863.0,
+      "p95": 70168.0,
+      "median_mdd": 2.8
+    }
+  },
+  "test3_timeline": {
+    "250": {
+      "n2": "2020-07",
+      "n3": "2020-08",
+      "n4": "2020-10",
+      "profit_n2": 250,
+      "profit_n3": 750,
+      "profit_n4": 1500
+    },
+    "500": {
+      "n2": "2020-08",
+      "n3": "2020-11",
+      "n4": "2021-01",
+      "profit_n2": 500,
+      "profit_n3": 1500,
+      "profit_n4": 3000
+    },
+    "750": {
+      "n2": "2020-08",
+      "n3": "2021-01",
+      "n4": "2021-01",
+      "profit_n2": 750,
+      "profit_n3": 2250,
+      "profit_n4": 4500
+    },
+    "1000": {
+      "n2": "2020-10",
+      "n3": "2021-01",
+      "n4": "2021-01",
+      "profit_n2": 1000,
+      "profit_n3": 3000,
+      "profit_n4": 6000
+    },
+    "1250": {
+      "n2": "2020-11",
+      "n3": "2021-01",
+      "n4": "2021-02",
+      "profit_n2": 1250,
+      "profit_n3": 3750,
+      "profit_n4": 7500
+    },
+    "1500": {
+      "n2": "2020-12",
+      "n3": "2021-01",
+      "n4": "2021-04",
+      "profit_n2": 1500,
+      "profit_n3": 4500,
+      "profit_n4": 9000
+    },
+    "1750": {
+      "n2": "2021-01",
+      "n3": "2021-02",
+      "n4": "2021-05",
+      "profit_n2": 1750,
+      "profit_n3": 5250,
+      "profit_n4": 10500
+    },
+    "2000": {
+      "n2": "2021-01",
+      "n3": "2021-03",
+      "n4": "2021-10",
+      "profit_n2": 2000,
+      "profit_n3": 6000,
+      "profit_n4": 12000
+    }
+  },
+  "test4_fine": {
+    "coarse_best": 1000,
+    "optimal_delta": 800,
+    "optimal_sharpe": 1.86,
+    "smooth": true,
+    "fine_results": [
+      [
+        500,
+        {
+          "final_equity": 53554.68,
+          "total_pnl": 52554.68,
+          "pf": 3.07,
+          "sharpe": 1.84,
+          "mdd_pct": 12.9,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        525,
+        {
+          "final_equity": 53554.68,
+          "total_pnl": 52554.68,
+          "pf": 3.07,
+          "sharpe": 1.84,
+          "mdd_pct": 12.9,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        550,
+        {
+          "final_equity": 53554.68,
+          "total_pnl": 52554.68,
+          "pf": 3.07,
+          "sharpe": 1.84,
+          "mdd_pct": 12.9,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        575,
+        {
+          "final_equity": 53554.68,
+          "total_pnl": 52554.68,
+          "pf": 3.07,
+          "sharpe": 1.84,
+          "mdd_pct": 12.9,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        600,
+        {
+          "final_equity": 53554.68,
+          "total_pnl": 52554.68,
+          "pf": 3.07,
+          "sharpe": 1.84,
+          "mdd_pct": 12.9,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        625,
+        {
+          "final_equity": 53236.78,
+          "total_pnl": 52236.78,
+          "pf": 3.06,
+          "sharpe": 1.83,
+          "mdd_pct": 12.9,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        650,
+        {
+          "final_equity": 52989.9,
+          "total_pnl": 51989.9,
+          "pf": 3.05,
+          "sharpe": 1.82,
+          "mdd_pct": 12.9,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        675,
+        {
+          "final_equity": 52989.9,
+          "total_pnl": 51989.9,
+          "pf": 3.05,
+          "sharpe": 1.82,
+          "mdd_pct": 12.9,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        700,
+        {
+          "final_equity": 52872.08,
+          "total_pnl": 51872.08,
+          "pf": 3.05,
+          "sharpe": 1.82,
+          "mdd_pct": 12.9,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        725,
+        {
+          "final_equity": 50502.96,
+          "total_pnl": 49502.96,
+          "pf": 2.96,
+          "sharpe": 1.85,
+          "mdd_pct": 12.9,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        750,
+        {
+          "final_equity": 50502.96,
+          "total_pnl": 49502.96,
+          "pf": 2.96,
+          "sharpe": 1.85,
+          "mdd_pct": 12.9,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        775,
+        {
+          "final_equity": 52998.04,
+          "total_pnl": 51998.04,
+          "pf": 3.06,
+          "sharpe": 1.82,
+          "mdd_pct": 9.6,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        800,
+        {
+          "final_equity": 50584.75,
+          "total_pnl": 49584.75,
+          "pf": 2.97,
+          "sharpe": 1.86,
+          "mdd_pct": 10.7,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        825,
+        {
+          "final_equity": 50584.75,
+          "total_pnl": 49584.75,
+          "pf": 2.97,
+          "sharpe": 1.86,
+          "mdd_pct": 10.7,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        850,
+        {
+          "final_equity": 50584.75,
+          "total_pnl": 49584.75,
+          "pf": 2.97,
+          "sharpe": 1.86,
+          "mdd_pct": 10.7,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        875,
+        {
+          "final_equity": 50584.75,
+          "total_pnl": 49584.75,
+          "pf": 2.97,
+          "sharpe": 1.86,
+          "mdd_pct": 10.7,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        900,
+        {
+          "final_equity": 50624.32,
+          "total_pnl": 49624.32,
+          "pf": 2.97,
+          "sharpe": 1.86,
+          "mdd_pct": 10.7,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        925,
+        {
+          "final_equity": 50624.32,
+          "total_pnl": 49624.32,
+          "pf": 2.97,
+          "sharpe": 1.86,
+          "mdd_pct": 10.7,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        950,
+        {
+          "final_equity": 50624.32,
+          "total_pnl": 49624.32,
+          "pf": 2.97,
+          "sharpe": 1.86,
+          "mdd_pct": 10.7,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        975,
+        {
+          "final_equity": 50690.48,
+          "total_pnl": 49690.48,
+          "pf": 2.98,
+          "sharpe": 1.86,
+          "mdd_pct": 10.7,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        1000,
+        {
+          "final_equity": 50690.48,
+          "total_pnl": 49690.48,
+          "pf": 2.98,
+          "sharpe": 1.86,
+          "mdd_pct": 10.7,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        1025,
+        {
+          "final_equity": 49977.72,
+          "total_pnl": 48977.72,
+          "pf": 2.95,
+          "sharpe": 1.86,
+          "mdd_pct": 11.2,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        1050,
+        {
+          "final_equity": 50006.77,
+          "total_pnl": 49006.77,
+          "pf": 2.96,
+          "sharpe": 1.86,
+          "mdd_pct": 11.1,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        1075,
+        {
+          "final_equity": 50046.29,
+          "total_pnl": 49046.29,
+          "pf": 2.96,
+          "sharpe": 1.86,
+          "mdd_pct": 11.1,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        1100,
+        {
+          "final_equity": 50046.29,
+          "total_pnl": 49046.29,
+          "pf": 2.96,
+          "sharpe": 1.86,
+          "mdd_pct": 11.1,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        1125,
+        {
+          "final_equity": 50046.29,
+          "total_pnl": 49046.29,
+          "pf": 2.96,
+          "sharpe": 1.86,
+          "mdd_pct": 11.1,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        1150,
+        {
+          "final_equity": 50046.29,
+          "total_pnl": 49046.29,
+          "pf": 2.96,
+          "sharpe": 1.86,
+          "mdd_pct": 11.1,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 63,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        1175,
+        {
+          "final_equity": 50171.29,
+          "total_pnl": 49171.29,
+          "pf": 2.98,
+          "sharpe": 1.85,
+          "mdd_pct": 11.0,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 62,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        1200,
+        {
+          "final_equity": 50171.29,
+          "total_pnl": 49171.29,
+          "pf": 2.98,
+          "sharpe": 1.85,
+          "mdd_pct": 11.0,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 62,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        1225,
+        {
+          "final_equity": 50171.29,
+          "total_pnl": 49171.29,
+          "pf": 2.98,
+          "sharpe": 1.85,
+          "mdd_pct": 11.0,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 62,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        1250,
+        {
+          "final_equity": 50171.29,
+          "total_pnl": 49171.29,
+          "pf": 2.98,
+          "sharpe": 1.85,
+          "mdd_pct": 11.0,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 62,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        1275,
+        {
+          "final_equity": 50171.29,
+          "total_pnl": 49171.29,
+          "pf": 2.98,
+          "sharpe": 1.85,
+          "mdd_pct": 11.0,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 62,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        1300,
+        {
+          "final_equity": 50171.29,
+          "total_pnl": 49171.29,
+          "pf": 2.98,
+          "sharpe": 1.85,
+          "mdd_pct": 11.0,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 62,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        1325,
+        {
+          "final_equity": 50171.29,
+          "total_pnl": 49171.29,
+          "pf": 2.98,
+          "sharpe": 1.85,
+          "mdd_pct": 11.0,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 62,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        1350,
+        {
+          "final_equity": 50171.29,
+          "total_pnl": 49171.29,
+          "pf": 2.98,
+          "sharpe": 1.85,
+          "mdd_pct": 11.0,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 62,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        1375,
+        {
+          "final_equity": 48665.1,
+          "total_pnl": 47665.1,
+          "pf": 2.92,
+          "sharpe": 1.84,
+          "mdd_pct": 12.2,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 61,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        1400,
+        {
+          "final_equity": 48648.48,
+          "total_pnl": 47648.48,
+          "pf": 2.92,
+          "sharpe": 1.84,
+          "mdd_pct": 12.2,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 60,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        1425,
+        {
+          "final_equity": 48615.53,
+          "total_pnl": 47615.53,
+          "pf": 2.92,
+          "sharpe": 1.84,
+          "mdd_pct": 12.2,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 60,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        1450,
+        {
+          "final_equity": 48503.92,
+          "total_pnl": 47503.92,
+          "pf": 2.91,
+          "sharpe": 1.83,
+          "mdd_pct": 12.3,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 60,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        1475,
+        {
+          "final_equity": 48503.92,
+          "total_pnl": 47503.92,
+          "pf": 2.91,
+          "sharpe": 1.83,
+          "mdd_pct": 12.3,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 60,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ],
+      [
+        1500,
+        {
+          "final_equity": 48403.99,
+          "total_pnl": 47403.99,
+          "pf": 2.91,
+          "sharpe": 1.83,
+          "mdd_pct": 12.4,
+          "mdd_dollar": 1776.65,
+          "peak_n": 4,
+          "months_at_cap": 60,
+          "trades": 596,
+          "skipped": 0,
+          "new_liqs": 0,
+          "ruin": false
+        }
+      ]
+    ]
+  },
+  "final": {
+    "optimal_by_equity": {
+      "1000": {
+        "delta": 1000,
+        "sharpe": 1.86,
+        "pnl": 49690.48,
+        "mdd_pct": 10.7,
+        "ruin": 0.0
+      },
+      "5000": {
+        "delta": 1000,
+        "sharpe": 1.86,
+        "pnl": 49690.48,
+        "mdd_pct": 8.6,
+        "ruin": 0.0
+      },
+      "10000": {
+        "delta": 1000,
+        "sharpe": 1.86,
+        "pnl": 49690.48,
+        "mdd_pct": 6.9,
+        "ruin": 0.0
+      },
+      "25000": {
+        "delta": 1000,
+        "sharpe": 1.86,
+        "pnl": 49690.48,
+        "mdd_pct": 4.4,
+        "ruin": 0.0
+      }
+    },
+    "fine_optimal_delta": 800,
+    "fine_optimal_sharpe": 1.86,
+    "surface_smooth": true,
+    "delta_depends_on_equity": false,
+    "runtime": 16.5
+  }
+}
