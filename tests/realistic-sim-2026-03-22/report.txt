@@ -1,0 +1,302 @@
+================================================================================
+  PRODUCTION-GRADE REALISTIC SIMULATION ENGINE — VALIDATION REPORT
+  Generated: 2026-03-22 18:13:03 UTC
+================================================================================
+
+[1/7] Loading bar data...
+  BTC: 217672 (15m), 108839 (30m)
+  ETH: 217672 (15m), 108839 (30m)
+  SOL: 196299 (15m), 98152 (30m)
+
+[2/7] Validation 10D — backward compatibility (full dataset)...
+  BTC: 211 trades (expected 211) [PASS]
+  ETH: 191 trades (expected 191) [PASS]
+  SOL: 194 trades (expected 194) [PASS]
+  Full run PF=3.08, Sharpe=1.79, P&L=$17,018.04
+  VALIDATION 10D: PASS
+
+[3/7] Running engine — our system training & holdout...
+  Training: 464 trades, PF=3.25, Sharpe=1.8
+  Holdout:  132 trades, PF=2.26, Sharpe=2.4
+
+[4/7] Running engine — v10 (30m)...
+  Training: 227 trades, PF=1.76, Sharpe=1.08
+  Holdout:  43 trades, PF=0.76, Sharpe=-0.71
+
+================================================================================
+  VALIDATION 10A — SANITY CHECK ($100K, 50%, 7x)
+================================================================================
+========================================================================
+REALISTIC SIMULATION — Our System — Training
+========================================================================
+
+  Configuration:
+    Initial equity: $100,000 | Equity fraction: 50% | Leverage: 7x
+    Per-trade notional at start: $350,000
+    Per-trade notional at peak:  $1,098,384,039
+
+  Performance:
+    Final equity: $21,708,983.27 | Return: 21,609.0%
+    PF: 1.02 | Sharpe: 2.45 | MDD: 96.9% ($221,657,483)
+    Trades: 464 | Win rate: 28.0%
+
+  P&L Waterfall:
+    Ideal P&L (zero friction): $1,262,434,260.89
+    − Market impact/slippage:  $1,146,004,864.66 (90.8%)
+    = Gross P&L (after slip):   $116,429,396.23
+    − Trading fees:             $ 42,304,713.47 (3.4%)
+    − Funding costs:            $ 52,016,480.74 (4.1%)
+    − Liquidation fees:         $    500,000.00
+    ────────────────────────────────────────────────────
+    = Net P&L:                  $ 21,608,983.27
+    Total friction:             $1,240,826,058.87 (98.3% of ideal)
+
+  Risk Events:
+    Liquidations: 2 (margin lost: $14,285,714)
+    Order splits required: 449
+    Trades >10% bar volume: 464
+    Position limit hits: 216
+    Peak notional: $500,000,000 (100.0% of limit)
+
+  Annual Friction Budget (at starting equity):
+    Notional per trade: $350,000
+    Trades/year: 100
+    Fees: 24.4% | Funding: 38.3% | Impact: 7.0% | Total: 69.7%
+    Breakeven gross return required: 69.7%
+
+  Year-by-Year:
+  Year           Start           End           P&L  Return Trades  Liqs      Fees   Funding  Slippage
+  2020         100,000     7,832,168     7,732,168 7732.2%     15     0    27,227   116,752   150,873
+  2021       7,832,168    71,012,008    63,179,840  806.7%     82     210,255,70916,150,839344,191,671
+  2022      71,012,008    22,039,178   -48,972,830  -69.0%    139     0 9,518,600 3,530,751153,609,452
+  2023      22,039,178   100,911,788    78,872,611  357.9%     87     0 6,058,41612,304,279127,344,323
+  2024     100,911,788    69,908,011   -31,003,778  -30.7%    107     013,433,63318,449,406470,500,431
+  2025      69,908,011    21,708,983   -48,199,028  -68.9%     34     0 3,011,129 1,464,45450,208,115
+  Final equity < $1T: PASS
+  Final equity > starting: PASS
+  MDD > 10% (leveraged): PASS
+  Total friction > 0: PASS
+  Funding > 0: PASS
+  Slippage > 0: PASS
+  Net P&L < Ideal P&L: PASS
+  VALIDATION 10A: PASS
+
+================================================================================
+  VALIDATION 10B — SMALL ACCOUNT ($1K, 50%, 7x)
+================================================================================
+========================================================================
+REALISTIC SIMULATION — $1K Small Account
+========================================================================
+
+  Configuration:
+    Initial equity: $1,000 | Equity fraction: 50% | Leverage: 7x
+    Per-trade notional at start: $3,500
+    Per-trade notional at peak:  $1,043,192,409
+
+  Performance:
+    Final equity: $21,557,011.58 | Return: 2,155,601.2%
+    PF: 1.03 | Sharpe: 3.12 | MDD: 94.6% ($5,808,638)
+    Trades: 464 | Win rate: 30.2%
+
+  P&L Waterfall:
+    Ideal P&L (zero friction): $729,010,451.16
+    − Market impact/slippage:  $647,578,186.02 (88.8%)
+    = Gross P&L (after slip):   $ 81,432,265.14
+    − Trading fees:             $ 26,832,518.73 (3.7%)
+    − Funding costs:            $ 32,930,517.61 (4.5%)
+    − Liquidation fees:         $    113,431.70
+    ────────────────────────────────────────────────────
+    = Net P&L:                  $ 21,556,011.58
+    Total friction:             $707,454,654.06 (97.0% of ideal)
+
+  Risk Events:
+    Liquidations: 2 (margin lost: $3,240,906)
+    Order splits required: 386
+    Trades >10% bar volume: 422
+    Position limit hits: 144
+    Peak notional: $500,000,000 (100.0% of limit)
+
+  Annual Friction Budget (at starting equity):
+    Notional per trade: $3,500
+    Trades/year: 100
+    Fees: 24.4% | Funding: 38.3% | Impact: 7.0% | Total: 69.7%
+    Breakeven gross return required: 69.7%
+  Early trade slippage: 4.8% of ideal P&L
+  First 30 trades: slippage < 20% of ideal: PASS
+  No position limits in first 30 trades: PASS
+  No order splits in first 30 trades: PASS
+  VALIDATION 10B: PASS
+
+================================================================================
+  VALIDATION 10C — EXTREME TEST ($100M, 50%, 7x)
+================================================================================
+========================================================================
+REALISTIC SIMULATION — $100M Extreme
+========================================================================
+
+  Configuration:
+    Initial equity: $100,000,000 | Equity fraction: 50% | Leverage: 7x
+    Per-trade notional at start: $350,000,000
+    Per-trade notional at peak:  $4,524,269,449
+
+  Performance:
+    Final equity: $22,069,494.10 | Return: -77.9%
+    PF: 0.97 | Sharpe: 0.91 | MDD: 99.2% ($1,282,875,435)
+    Trades: 464 | Win rate: 24.8%
+
+  P&L Waterfall:
+    Ideal P&L (zero friction): $2,887,572,328.92
+    − Market impact/slippage:  $2,808,764,896.80 (97.3%)
+    = Gross P&L (after slip):   $ 78,807,432.13
+    − Trading fees:             $ 67,458,845.91 (2.3%)
+    − Funding costs:            $ 88,779,873.37 (3.1%)
+    − Liquidation fees:         $    500,000.00
+    ────────────────────────────────────────────────────
+    = Net P&L:                  $-77,930,505.90
+    Total friction:             $2,965,503,616.08 (102.7% of ideal)
+
+  Risk Events:
+    Liquidations: 2 (margin lost: $14,285,714)
+    Order splits required: 464
+    Trades >10% bar volume: 464
+    Position limit hits: 342
+    Peak notional: $500,000,000 (100.0% of limit)
+
+  Annual Friction Budget (at starting equity):
+    Notional per trade: $350,000,000
+    Trades/year: 100
+    Fees: 24.4% | Funding: 38.3% | Impact: 7.0% | Total: 69.7%
+    Breakeven gross return required: 69.7%
+  Position limit hits > 0: PASS
+  Friction % higher than $100K: PASS
+  Return % lower than $100K: PASS
+  VALIDATION 10C: PASS
+
+================================================================================
+  VALIDATION 10E — V10 RETEST (REALISTIC)
+================================================================================
+========================================================================
+REALISTIC SIMULATION — His v10 — Training
+========================================================================
+
+  Configuration:
+    Initial equity: $100,000 | Equity fraction: 50% | Leverage: 7x
+    Per-trade notional at start: $350,000
+    Per-trade notional at peak:  $38,372,774
+
+  Performance:
+    Final equity: $3,430,961.62 | Return: 3,331.0%
+    PF: 1.08 | Sharpe: 2.44 | MDD: 95.3% ($6,635,258)
+    Trades: 227 | Win rate: 41.9%
+
+  P&L Waterfall:
+    Ideal P&L (zero friction): $ 11,596,670.34
+    − Market impact/slippage:  $  5,303,872.97 (45.7%)
+    = Gross P&L (after slip):   $  6,292,797.37
+    − Trading fees:             $  1,499,981.02 (12.9%)
+    − Funding costs:            $  1,394,226.48 (12.0%)
+    − Liquidation fees:         $     67,712.89
+    ────────────────────────────────────────────────────
+    = Net P&L:                  $  3,330,961.62
+    Total friction:             $  8,265,793.36 (71.3% of ideal)
+
+  Risk Events:
+    Liquidations: 1 (margin lost: $1,934,654)
+    Order splits required: 87
+    Trades >10% bar volume: 151
+    Position limit hits: 0
+    Peak notional: $38,372,774 (7.7% of limit)
+
+  Annual Friction Budget (at starting equity):
+    Notional per trade: $350,000
+    Trades/year: 44
+    Fees: 10.7% | Funding: 38.3% | Impact: 3.1% | Total: 52.1%
+    Breakeven gross return required: 52.1%
+
+  Year-by-Year:
+  Year           Start           End           P&L  Return Trades  Liqs      Fees   Funding  Slippage
+  2020         100,000       182,688        82,688   82.7%     30     0     5,672     5,074    45,213
+  2021         182,688       405,585       222,896  122.0%     47     1   228,665   230,579 2,279,497
+  2022         405,585     1,665,220     1,259,635  310.6%     43     0    70,599    58,488   448,445
+  2023       1,665,220     6,927,453     5,262,233  316.0%     61     0   733,441   699,533 1,686,481
+  2024       6,927,453     3,134,330    -3,793,123  -54.8%     39     0   415,962   352,118   691,995
+  2025       3,134,330     3,430,962       296,632    9.5%      7     0    45,642    48,435   152,243
+
+  V10 RETEST — FULL REALISTIC COMPARISON:
+                           PF  Sharpe        Final Eq    Return    MDD%    Friction  Liqs
+  ─────────────────────────────────────────────────────────────────────────────────────────
+  v10 Training           1.08    2.44$     3,430,962     3331%   95.3%$ 8,265,793     1
+  Ours Training          1.02    2.45$    21,708,983    21609%   96.9%$1,240,826,059     2
+  v10 Holdout            0.58   -1.06$        25,877      -74%   76.4%$    40,137     0
+  Ours Holdout           1.27    1.81$       988,752      889%   55.0%$ 1,234,370     0
+
+  Flat $125 comparison (pure strategy quality):
+    v10:  Sharpe=1.08, PF=1.76, P&L=$4,133.07
+    Ours: Sharpe=1.8, PF=3.25, P&L=$15,233.98
+
+[5/7] Running capacity analysis...
+
+==========================================================================================
+CAPACITY ANALYSIS — Our System
+==========================================================================================
+     Starting Eq |         Final Eq |   Return | Sharpe |  Slip% |  Fric% | Limits | Liqs
+  ───────────────┼──────────────────┼──────────┼────────┼────────┼────────┼────────┼─────
+  $      10,000 | $    21,708,236 |  216982% |   2.79 |  89.8% |  97.9% |    196 |    2
+  $      50,000 | $    21,708,821 |   43318% |   2.56 |  90.6% |  98.2% |    209 |    2
+  $     100,000 | $    21,708,983 |   21609% |   2.45 |  90.8% |  98.3% |    216 |    2
+  $     250,000 | $    21,709,296 |    8584% |   2.31 |  91.3% |  98.5% |    224 |    2
+  $     500,000 | $    21,709,780 |    4242% |   2.20 |  91.7% |  98.6% |    237 |    2
+  $   1,000,000 | $    21,712,248 |    2071% |   2.06 |  92.3% |  98.8% |    251 |    2
+  $   5,000,000 | $    21,788,440 |     336% |   1.68 |  93.3% |  99.2% |    287 |    2
+  $  10,000,000 | $    21,825,554 |     118% |   1.54 |  93.8% |  99.5% |    298 |    2
+  $  50,000,000 | $    21,928,630 |     -56% |   1.14 |  95.6% | 101.0% |    324 |    2
+  $ 100,000,000 | $    22,069,494 |     -78% |   0.91 |  97.3% | 102.7% |    342 |    2
+
+  CAPACITY CEILING: $1,000,000 (Sharpe degrades >25% beyond this point)
+
+==========================================================================================
+CAPACITY ANALYSIS — v10 System
+==========================================================================================
+     Starting Eq |         Final Eq |   Return | Sharpe |  Slip% |  Fric% | Limits | Liqs
+  ───────────────┼──────────────────┼──────────┼────────┼────────┼────────┼────────┼─────
+  $      10,000 | $        71,661 |     617% |   2.09 |  69.6% |  89.1% |      0 |    1
+  $      50,000 | $     1,213,033 |    2326% |   2.37 |  50.8% |  75.9% |      0 |    1
+  $     100,000 | $     3,430,962 |    3331% |   2.44 |  45.7% |  71.3% |      0 |    1
+  $     250,000 | $     6,327,172 |    2431% |   2.37 |  62.5% |  82.5% |      9 |    1
+  $     500,000 | $    10,898,985 |    2080% |   2.29 |  75.1% |  89.5% |     30 |    1
+  $   1,000,000 | $    12,027,622 |    1103% |   2.11 |  82.0% |  93.7% |     54 |    1
+  $   5,000,000 | $    13,022,541 |     160% |   1.64 |  88.1% |  97.5% |     78 |    1
+  $  10,000,000 | $    13,047,418 |      30% |   1.47 |  89.7% |  99.1% |     81 |    2
+  $  50,000,000 | $    13,094,690 |     -74% |   1.04 | 100.9% | 110.5% |     88 |    2
+  $ 100,000,000 | $    13,078,494 |     -87% |   0.91 | 115.5% | 125.7% |     88 |    2
+
+  CAPACITY CEILING: $10,000,000 (Sharpe degrades >25% beyond this point)
+
+================================================================================
+  SUMMARY
+================================================================================
+
+  Key findings:
+    Our system ($100K realistic): $21,708,983 (21,609% return)
+    v10 ($100K realistic):        $3,430,962 (3,331% return)
+    Our capacity ceiling:         $1,000,000
+    v10 capacity ceiling:         $10,000,000
+    Friction (ours): $1,240,826,059 (98.3% of ideal P&L)
+    Friction (v10):  $8,265,793 (71.3% of ideal P&L)
+    Liquidations (ours): 2
+    Liquidations (v10):  1
+
+  Previous $10M-cap results vs new realistic simulation:
+    OLD v10 training:  $18.4M (flat $10M cap)
+    NEW v10 training:  $3,430,962 (full impact/liq model)
+    OLD ours training: $105M (flat $10M cap)
+    NEW ours training: $21,708,983 (full impact/liq model)
+
+  Runtime: 30.8s
+
+  VALIDATION SUMMARY:
+    10A Sanity:     PASS
+    10B Small:      PASS
+    10C Extreme:    PASS
+    10D Compat:     PASS
+    ALL: PASS

@@ -1,0 +1,384 @@
+{
+  "engine": "realistic_simulation_v2",
+  "generated": "2026-03-22 18:13:34 UTC",
+  "runtime_seconds": 30.8,
+  "model": {
+    "market_impact": "square-root law (Donier & Bonart 2015)",
+    "funding": "0.01% per 8h on notional, accrued per bar",
+    "fees": "3.5 bps taker per side",
+    "liquidation": "bar-by-bar check against isolated margin liq price",
+    "position_limits": "BTC $500M, ETH $200M, SOL $50M"
+  },
+  "validations": {
+    "10A_sanity": true,
+    "10B_small_account": true,
+    "10C_extreme": true,
+    "10D_backward_compat": true
+  },
+  "flat_125": {
+    "v10": {
+      "trades": 227,
+      "pnl": 4133.07,
+      "pf": 1.76,
+      "sharpe": 1.08,
+      "mdd_pct": 29.7
+    },
+    "ours": {
+      "trades": 464,
+      "pnl": 15233.98,
+      "pf": 3.25,
+      "sharpe": 1.8,
+      "mdd_pct": 14.1
+    }
+  },
+  "realistic_100k": {
+    "ours_training": {
+      "final_equity": 21708983.27,
+      "return_pct": 21609.0,
+      "sharpe": 2.45,
+      "pf": 1.02,
+      "mdd_pct": 96.9,
+      "ideal_pnl": 1262434260.89,
+      "total_slippage": 1146004864.66,
+      "total_fees": 42304713.47,
+      "total_funding": 52016480.74,
+      "total_friction": 1240826058.87,
+      "friction_pct_of_ideal": 98.3,
+      "liquidations": 2,
+      "position_limit_hits": 216,
+      "peak_notional": 500000000.0,
+      "annual_friction_budget": {
+        "notional_per_trade": 350000.0,
+        "trades_per_year": 99.8,
+        "annual_fees": 24438.86,
+        "annual_fees_pct": 24.4,
+        "annual_funding": 38325.0,
+        "annual_funding_pct": 38.3,
+        "annual_impact": 6982.53,
+        "annual_impact_pct": 7.0,
+        "total_annual_friction": 69746.39,
+        "total_annual_pct": 69.7,
+        "breakeven_gross_return_pct": 69.7
+      }
+    },
+    "v10_training": {
+      "final_equity": 3430961.62,
+      "return_pct": 3331.0,
+      "sharpe": 2.44,
+      "pf": 1.08,
+      "mdd_pct": 95.3,
+      "ideal_pnl": 11596670.34,
+      "total_slippage": 5303872.97,
+      "total_fees": 1499981.02,
+      "total_funding": 1394226.48,
+      "total_friction": 8265793.36,
+      "friction_pct_of_ideal": 71.3,
+      "liquidations": 1,
+      "position_limit_hits": 0,
+      "peak_notional": 38372774.0,
+      "annual_friction_budget": {
+        "notional_per_trade": 350000.0,
+        "trades_per_year": 43.9,
+        "annual_fees": 10747.82,
+        "annual_fees_pct": 10.7,
+        "annual_funding": 38325.0,
+        "annual_funding_pct": 38.3,
+        "annual_impact": 3070.81,
+        "annual_impact_pct": 3.1,
+        "total_annual_friction": 52143.62,
+        "total_annual_pct": 52.1,
+        "breakeven_gross_return_pct": 52.1
+      }
+    },
+    "ours_holdout": {
+      "final_equity": 988751.87,
+      "return_pct": 888.8,
+      "sharpe": 1.81,
+      "pf": 1.27,
+      "mdd_pct": 55.0,
+      "ideal_pnl": 2123122.26,
+      "total_slippage": 909442.06,
+      "total_fees": 215787.73,
+      "total_funding": 109140.6,
+      "total_friction": 1234370.38,
+      "friction_pct_of_ideal": 58.1,
+      "liquidations": 0,
+      "position_limit_hits": 0,
+      "peak_notional": 5006268.0,
+      "annual_friction_budget": {
+        "notional_per_trade": 350000.0,
+        "trades_per_year": 135.4,
+        "annual_fees": 33180.29,
+        "annual_fees_pct": 33.2,
+        "annual_funding": 38325.0,
+        "annual_funding_pct": 38.3,
+        "annual_impact": 9480.08,
+        "annual_impact_pct": 9.5,
+        "total_annual_friction": 80985.38,
+        "total_annual_pct": 81.0,
+        "breakeven_gross_return_pct": 81.0
+      }
+    },
+    "v10_holdout": {
+      "final_equity": 25877.44,
+      "return_pct": -74.1,
+      "sharpe": -1.06,
+      "pf": 0.58,
+      "mdd_pct": 76.4,
+      "ideal_pnl": -33985.82,
+      "total_slippage": 28814.45,
+      "total_fees": 6238.34,
+      "total_funding": 5083.96,
+      "total_friction": 40136.74,
+      "friction_pct_of_ideal": 118.1,
+      "liquidations": 0,
+      "position_limit_hits": 0,
+      "peak_notional": 350000.0,
+      "annual_friction_budget": {
+        "notional_per_trade": 350000.0,
+        "trades_per_year": 44.5,
+        "annual_fees": 10900.59,
+        "annual_fees_pct": 10.9,
+        "annual_funding": 38325.0,
+        "annual_funding_pct": 38.3,
+        "annual_impact": 3114.45,
+        "annual_impact_pct": 3.1,
+        "total_annual_friction": 52340.05,
+        "total_annual_pct": 52.3,
+        "breakeven_gross_return_pct": 52.3
+      }
+    }
+  },
+  "capacity": {
+    "ours": {
+      "results": [
+        {
+          "starting_equity": 10000,
+          "final_equity": 21708236.148028787,
+          "return_pct": 216982.36148028786,
+          "sharpe": 2.79,
+          "slippage_pct": 89.84046202003539,
+          "limit_hits": 196,
+          "liquidations": 2,
+          "mdd_pct": 94.53024440550976,
+          "friction_pct": 97.89387689984065
+        },
+        {
+          "starting_equity": 50000,
+          "final_equity": 21708820.56053923,
+          "return_pct": 43317.641121078464,
+          "sharpe": 2.56,
+          "slippage_pct": 90.58345471367016,
+          "limit_hits": 209,
+          "liquidations": 2,
+          "mdd_pct": 96.2271367198263,
+          "friction_pct": 98.1942367386266
+        },
+        {
+          "starting_equity": 100000,
+          "final_equity": 21708983.26844249,
+          "return_pct": 21608.98326844249,
+          "sharpe": 2.45,
+          "slippage_pct": 90.77738937869458,
+          "limit_hits": 216,
+          "liquidations": 2,
+          "mdd_pct": 96.87092102887463,
+          "friction_pct": 98.2883701205028
+        },
+        {
+          "starting_equity": 250000,
+          "final_equity": 21709295.97213646,
+          "return_pct": 8583.718388854584,
+          "sharpe": 2.31,
+          "slippage_pct": 91.25604514645055,
+          "limit_hits": 224,
+          "liquidations": 2,
+          "mdd_pct": 97.58561733004339,
+          "friction_pct": 98.46461859877715
+        },
+        {
+          "starting_equity": 500000,
+          "final_equity": 21709779.725118596,
+          "return_pct": 4241.955945023719,
+          "sharpe": 2.2,
+          "slippage_pct": 91.74530339500807,
+          "limit_hits": 237,
+          "liquidations": 2,
+          "mdd_pct": 98.13693663729529,
+          "friction_pct": 98.61976368894061
+        },
+        {
+          "starting_equity": 1000000,
+          "final_equity": 21712248.488299247,
+          "return_pct": 2071.2248488299247,
+          "sharpe": 2.06,
+          "slippage_pct": 92.29237701351876,
+          "limit_hits": 251,
+          "liquidations": 2,
+          "mdd_pct": 98.63560802474115,
+          "friction_pct": 98.78691561871211
+        },
+        {
+          "starting_equity": 5000000,
+          "final_equity": 21788439.869132895,
+          "return_pct": 335.7687973826579,
+          "sharpe": 1.68,
+          "slippage_pct": 93.3191049891022,
+          "limit_hits": 287,
+          "liquidations": 2,
+          "mdd_pct": 99.03175838438551,
+          "friction_pct": 99.21948439726532
+        },
+        {
+          "starting_equity": 10000000,
+          "final_equity": 21825554.173715495,
+          "return_pct": 118.25554173715496,
+          "sharpe": 1.54,
+          "slippage_pct": 93.76043025745419,
+          "limit_hits": 298,
+          "liquidations": 2,
+          "mdd_pct": 99.1343456392217,
+          "friction_pct": 99.49205400895057
+        },
+        {
+          "starting_equity": 50000000,
+          "final_equity": 21928629.918216553,
+          "return_pct": -56.1427401635669,
+          "sharpe": 1.14,
+          "slippage_pct": 95.57508159052325,
+          "limit_hits": 324,
+          "liquidations": 2,
+          "mdd_pct": 99.26644688332318,
+          "friction_pct": 101.03408656737538
+        },
+        {
+          "starting_equity": 100000000,
+          "final_equity": 22069494.095883407,
+          "return_pct": -77.93050590411659,
+          "sharpe": 0.91,
+          "slippage_pct": 97.27080664478852,
+          "limit_hits": 342,
+          "liquidations": 2,
+          "mdd_pct": 99.24395694912049,
+          "friction_pct": 102.69885143216979
+        }
+      ],
+      "ceiling": 1000000
+    },
+    "v10": {
+      "results": [
+        {
+          "starting_equity": 10000,
+          "final_equity": 71660.83830465702,
+          "return_pct": 616.6083830465702,
+          "sharpe": 2.09,
+          "slippage_pct": 69.64024325561138,
+          "limit_hits": 0,
+          "liquidations": 1,
+          "mdd_pct": 96.23260119183904,
+          "friction_pct": 89.12969258827152
+        },
+        {
+          "starting_equity": 50000,
+          "final_equity": 1213032.5715725115,
+          "return_pct": 2326.065143145023,
+          "sharpe": 2.37,
+          "slippage_pct": 50.83786904017222,
+          "limit_hits": 0,
+          "liquidations": 1,
+          "mdd_pct": 95.60651500145666,
+          "friction_pct": 75.88611197335132
+        },
+        {
+          "starting_equity": 100000,
+          "final_equity": 3430961.6210357947,
+          "return_pct": 3330.9616210357945,
+          "sharpe": 2.44,
+          "slippage_pct": 45.736170910703564,
+          "limit_hits": 0,
+          "liquidations": 1,
+          "mdd_pct": 95.26731219243848,
+          "friction_pct": 71.277298723235
+        },
+        {
+          "starting_equity": 250000,
+          "final_equity": 6327172.280669871,
+          "return_pct": 2430.868912267948,
+          "sharpe": 2.37,
+          "slippage_pct": 62.476838020738256,
+          "limit_hits": 9,
+          "liquidations": 1,
+          "mdd_pct": 94.12203863753017,
+          "friction_pct": 82.5159778921983
+        },
+        {
+          "starting_equity": 500000,
+          "final_equity": 10898984.948416196,
+          "return_pct": 2079.796989683239,
+          "sharpe": 2.29,
+          "slippage_pct": 75.07811380029062,
+          "limit_hits": 30,
+          "liquidations": 1,
+          "mdd_pct": 89.537956849336,
+          "friction_pct": 89.5332409432888
+        },
+        {
+          "starting_equity": 1000000,
+          "final_equity": 12027622.026642278,
+          "return_pct": 1102.762202664228,
+          "sharpe": 2.11,
+          "slippage_pct": 82.02654811176546,
+          "limit_hits": 54,
+          "liquidations": 1,
+          "mdd_pct": 89.72792765479578,
+          "friction_pct": 93.67150152887073
+        },
+        {
+          "starting_equity": 5000000,
+          "final_equity": 13022540.99925628,
+          "return_pct": 160.4508199851256,
+          "sharpe": 1.64,
+          "slippage_pct": 88.12833899386743,
+          "limit_hits": 78,
+          "liquidations": 1,
+          "mdd_pct": 91.76403958064915,
+          "friction_pct": 97.47677807094529
+        },
+        {
+          "starting_equity": 10000000,
+          "final_equity": 13047417.559830543,
+          "return_pct": 30.47417559830543,
+          "sharpe": 1.47,
+          "slippage_pct": 89.72724449986463,
+          "limit_hits": 81,
+          "liquidations": 2,
+          "mdd_pct": 91.84232660076202,
+          "friction_pct": 99.07261456540448
+        },
+        {
+          "starting_equity": 50000000,
+          "final_equity": 13094689.725224264,
+          "return_pct": -73.81062054955147,
+          "sharpe": 1.04,
+          "slippage_pct": 100.91610555530704,
+          "limit_hits": 88,
+          "liquidations": 2,
+          "mdd_pct": 96.21599429600828,
+          "friction_pct": 110.4814267240275
+        },
+        {
+          "starting_equity": 100000000,
+          "final_equity": 13078494.153990334,
+          "return_pct": -86.92150584600967,
+          "sharpe": 0.91,
+          "slippage_pct": 115.49965550722614,
+          "limit_hits": 88,
+          "liquidations": 2,
+          "mdd_pct": 98.1728023430903,
+          "friction_pct": 125.74032425065683
+        }
+      ],
+      "ceiling": 10000000
+    }
+  }
+}
