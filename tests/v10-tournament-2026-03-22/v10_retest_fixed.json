@@ -1,0 +1,56 @@
+{
+  "fix_description": "Added $10M max notional cap per trade to pct_equity_sim. Also fixed engine funding calculation for non-15m timeframes.",
+  "flat_125": {
+    "v10": {
+      "trades": 227,
+      "pnl": 4133.07,
+      "pf": 1.76,
+      "sharpe": 1.08,
+      "mdd_pct": 29.7
+    },
+    "ours": {
+      "trades": 464,
+      "pnl": 15233.98,
+      "pf": 3.25,
+      "sharpe": 1.8,
+      "mdd_pct": 14.1
+    }
+  },
+  "pct_equity_corrected_10M_cap": {
+    "v10_training": {
+      "final_equity": 18376860.912740774,
+      "mdd_pct": 65.33010261070864,
+      "liquidations": 0
+    },
+    "ours_training": {
+      "final_equity": 105015864.64262879,
+      "mdd_pct": 42.19373446930458,
+      "liquidations": 0
+    },
+    "v10_holdout": {
+      "final_equity": 37065.17912261051,
+      "mdd_pct": 76.07891648874757
+    },
+    "ours_holdout": {
+      "final_equity": 3453057.195660838,
+      "mdd_pct": 40.32734734192688
+    }
+  },
+  "holdout_flat": {
+    "v10": {
+      "trades": 43,
+      "pnl": -221.06,
+      "pf": 0.76,
+      "sharpe": -0.71,
+      "mdd_pct": 29.4
+    },
+    "ours": {
+      "trades": 132,
+      "pnl": 1784.05,
+      "pf": 2.26,
+      "sharpe": 2.4,
+      "mdd_pct": 18.5
+    }
+  },
+  "runtime": 2.202223539352417
+}
