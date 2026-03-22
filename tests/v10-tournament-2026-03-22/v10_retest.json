@@ -1,0 +1,96 @@
+{
+  "step0": {
+    "trade_count_full": 88,
+    "trade_count_his_range": 85,
+    "jan_feb_trades": 3
+  },
+  "step1": {
+    "btc_his_sizing": {
+      "final_equity": 403005.52902728476,
+      "mdd_pct": 65.0344646814064
+    },
+    "yearly": {
+      "2020": {
+        "pnl": -42934.24955616796,
+        "trades": 12
+      },
+      "2021": {
+        "pnl": 56403.88415273077,
+        "trades": 11
+      },
+      "2022": {
+        "pnl": 112236.02121178697,
+        "trades": 12
+      },
+      "2023": {
+        "pnl": 137226.51106611345,
+        "trades": 22
+      },
+      "2024": {
+        "pnl": 1616.3932347026093,
+        "trades": 14
+      },
+      "2025": {
+        "pnl": 49798.52969105308,
+        "trades": 13
+      },
+      "2026": {
+        "pnl": -11341.560772934004,
+        "trades": 4
+      }
+    }
+  },
+  "step2": {
+    "v10_flat": {
+      "trades": 227,
+      "pnl": 4227.77,
+      "pf": 1.79,
+      "sharpe": 1.1,
+      "mdd_pct": 29.6
+    },
+    "ours_flat": {
+      "trades": 464,
+      "pnl": 15233.98,
+      "pf": 3.25,
+      "sharpe": 1.8,
+      "mdd_pct": 14.1
+    },
+    "v10_his_sizing": {
+      "final_equity": 8919136.673252797,
+      "mdd_pct": 96.56977554511656
+    },
+    "ours_his_sizing": {
+      "final_equity": 183778945524211.6,
+      "mdd_pct": 81.41903453315994
+    }
+  },
+  "step3": {
+    "profitable_windows": 12,
+    "total_windows": 17,
+    "train_sharpe": 1.1,
+    "avg_test_sharpe": -0.12470588235294126
+  },
+  "step4": {
+    "v10_holdout_flat": {
+      "trades": 43,
+      "pnl": -205.52,
+      "pf": 0.77,
+      "sharpe": -0.66,
+      "mdd_pct": 29.0
+    },
+    "ours_holdout_flat": {
+      "trades": 132,
+      "pnl": 1784.05,
+      "pf": 2.26,
+      "sharpe": 2.4,
+      "mdd_pct": 18.5
+    },
+    "v10_holdout_his_sizing": {
+      "final_equity": 38659.382777646584
+    },
+    "ours_holdout_his_sizing": {
+      "final_equity": 2933506.786796503
+    }
+  },
+  "runtime": 12.50642728805542
+}
