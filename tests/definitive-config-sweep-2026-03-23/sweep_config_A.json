@@ -1,0 +1,16 @@
+{
+  "assets": ["BTC", "ETH", "SOL"],
+  "data_dir": "/opt/hypertrader/addons/backtest-data",
+  "mode": "baseline",
+  "params": {
+    "ema200_period": 200, "ema50_period": 50, "ema50_rising_lookback": 5,
+    "st_4h_atr_period": 10, "st_4h_multiplier": 3.0,
+    "st_15m_atr_period": 10, "st_15m_multiplier": 2.0,
+    "near_band_pct": 0.005, "rsi_period": 14, "rsi_threshold": 45.0,
+    "rsi_lookback": 2, "ema_fast": 21, "ema_slow": 55,
+    "vol_mult": 2.0, "vol_sma_period": 20, "warmup": 300
+  },
+  "sizing": {"type": "flat", "margin": 125.0, "leverage": 10.0, "starting_equity": 500.0},
+  "fees": {"maker_rate": 0.00045, "slippage": 0.0005, "funding_rate_per_8h": 0.0001},
+  "output_path": "/tmp/discovery/sweep_tradelog_A.json"
+}
