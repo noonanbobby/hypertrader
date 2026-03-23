@@ -1,0 +1,275 @@
+═══════════════════════════════════════════════════════════════════════
+  REALISTIC SIMULATOR — FORENSIC AUDIT REPORT
+  Generated: 2026-03-23
+═══════════════════════════════════════════════════════════════════════
+
+
+  BUGS FOUND:
+  ═══════════
+
+  1. CRITICAL — SIGMOID DISCONTINUITY CREATES INVERTED IMPACT CURVE
+     Location: realistic_sim.py lines 150-155 (calculate_market_impact)
+     Severity: CATASTROPHIC — root cause of the fantasy results
+
+     The sigmoid adjustment adds a HUGE volatility-based floor for
+     trades with participation < 0.5% of daily volume, then DROPS
+     TO ZERO for trades between 0.5% and 20%. This creates a 27x
+     cliff at the 0.5% threshold:
+
+       $14.97M notional (0.499% partic): 15.57 bps impact
+       $15.03M notional (0.501% partic):  0.57 bps impact
+       ← Adding $60K to your order REDUCES impact by 96%
+
+     Result: The model charges LESS for a $500M order (2.1 bps) than
+     for a $1.25M order (15.3 bps). Impact is INVERTED above $15M.
+
+     Impact table at typical BTC conditions (3% daily vol, $3B daily volume):
+       $1.25M:   15.3 bps  (sigmoid ON:  vol*500 = 15 bps floor)
+       $12.5M:   15.5 bps  (sigmoid ON:  still under 0.5% threshold)
+       $15M:     15.6 bps  (sigmoid ON:  just below cliff)
+       $20M:      0.6 bps  (sigmoid OFF: 27x cheaper than $15M!)
+       $50M:      0.8 bps  (sigmoid OFF)
+       $125M:     1.2 bps  (sigmoid OFF)
+       $500M:     2.1 bps  (sigmoid OFF: cheaper than $1.25M!)
+
+     The sigmoid was likely intended to add a minimum spread floor for
+     tiny orders, but the threshold (0.5% of daily volume = $15M on BTC)
+     is set so that ALL medium-to-large orders fall in the gap.
+
+
+  2. CRITICAL — PHYSICAL IMPACT COEFFICIENT k=150 IS 100-1000x TOO LOW
+     Location: realistic_sim.py line 34 (ASSET_PARAMS k values)
+     Severity: CRITICAL — even without the sigmoid bug, impact is too low
+
+     At $500M notional on BTC (16.7% of daily volume):
+       Model charges:   2.1 bps = 0.021% = $104,500
+       Reality:         500-1500 bps = 5-15% = $25M-$75M
+       Under-charge:    240x to 718x
+
+     The physical impact formula is: k * daily_vol * sqrt(participation)
+     At 16.7% participation: 150 * 0.03 * sqrt(0.167) = 1.84 bps
+
+     This square-root model was calibrated for institutional equity
+     markets with deep order books. Crypto perp markets on Hyperliquid
+     have fraction of that depth. k should be 10,000-50,000 for crypto,
+     not 150.
+
+
+  3. CRITICAL — POSITION LIMITS 10-50x TOO HIGH
+     Location: realistic_sim.py lines 33-39 (ASSET_PARAMS max_position)
+     Severity: CRITICAL — allows impossibly large positions
+
+     Simulator limits vs Hyperliquid reality:
+       BTC: $500M vs ~$10-20M actual (25-50x too high)
+       ETH: $200M vs ~$5-10M actual  (20-40x too high)
+       SOL: $50M  vs ~$2-5M actual   (10-25x too high)
+
+     $500M would be 17-50% of BTC's total open interest on Hyperliquid.
+     No single trader can accumulate this. Exchange risk limits would
+     prevent it. The market would move away from you long before you
+     reached this size.
+
+     This is the MAIN knob that determines the final result magnitude:
+       $500M cap → $1.6 billion final equity
+       $50M cap  → $374 million
+       $20M cap  → $144 million
+       $10M cap  → $79 million
+       $5M cap   → $36 million
+       $2M cap   → $18.5 million
+
+
+  4. MODERATE — NO CONCURRENT POSITION TRACKING
+     Location: realistic_sim.py lines 315-481 (main simulation loop)
+     Severity: MODERATE — inflates results ~40% based on Phase 0 audit
+
+     The simulator processes each trade from entry to exit before
+     starting the next trade, even when trades overlap in time. This
+     means BTC's result compounds into equity before ETH sizes its
+     concurrent position. With max 7 concurrent positions observed
+     in the data, actual deployment can silently exceed 100% of equity.
+
+
+  5. MODERATE — FUNDING RATE IS 3-10x TOO LOW
+     Location: realistic_sim.py line 46 (DEFAULT_FUNDING_PER_8H)
+     Severity: MODERATE — undercharges by ~$15-20M/month at peak sizes
+
+     Uses flat 0.01% per 8 hours regardless of market conditions.
+     Reality: during trending markets (which is precisely when this
+     long-only system has positions open), funding rates are typically
+     0.03-0.10% per 8h. Longs pay shorts during bull markets.
+
+     At $500M notional:
+       Model charges: $150K/day ($4.5M/month)
+       Realistic:     $750K-$2.5M/day ($22.5M-$75M/month)
+
+
+  6. MINOR — ORDER SPLIT PENALTY IS NEGLIGIBLE
+     Location: realistic_sim.py lines 167-173 (get_order_split_penalty)
+     Severity: MINOR — penalty is 2 bps per $5M excess, far too low
+
+     A $500M order exceeding the $15M max market order gets:
+       (500M - 15M) / 5M * 2 bps = 194 bps additional
+     This is actually one of the few things trying to add cost at
+     large sizes, but it's still ~5x too low for real execution.
+
+
+  UNREALISTIC ASSUMPTIONS:
+  ════════════════════════
+
+  1. SINGLE-BAR EXECUTION
+     A $500M position enters and exits in a single 15-minute bar.
+     In reality, a $500M position would take hours or days to build
+     using TWAP algorithms. During this time, the market would move
+     adversely (information leakage, price impact persistence).
+
+  2. NO MARKET FEEDBACK / OBSERVER EFFECT
+     Signals are computed once at $125 flat sizing, then applied at
+     $500M. A $500M position would itself move the market, changing
+     the very signals that triggered the entry. The strategy's edge
+     may disappear at large sizes because YOU become the market.
+
+  3. STATIC LIQUIDITY
+     The model uses rolling 20-bar average volume to estimate daily
+     volume. But volume is not constant — it's lower during your
+     exit (when you're a forced seller) and higher during panic
+     events. The model doesn't account for liquidity withdrawal.
+
+  4. NO COUNTERPARTY RISK
+     At $500M notional, the exchange itself becomes a risk. Auto-
+     deleveraging, socialized losses, insurance fund depletion — none
+     are modeled.
+
+  5. CONSTANT VOLATILITY IN IMPACT
+     The impact model uses spot volatility at entry time. But your
+     large order itself increases volatility, which should increase
+     your own impact (feedback loop).
+
+
+  ROOT CAUSE OF $1.6B RESULT:
+  ═══════════════════════════
+
+  Three bugs compound multiplicatively:
+
+  1. The sigmoid bug (#1) means that once positions exceed $15M
+     (which happens after ~15-20 winning trades from $25K), the
+     market impact DROPS from ~15 bps to ~1 bps. From that point
+     on, each trade gets nearly the FULL price return with almost
+     zero impact cost.
+
+  2. The position limit (#3) allows the account to deploy $500M
+     per trade. At 50% equity / 10x leverage, this cap is reached
+     when equity hits $100M (BTC) or $40M (ETH) or $10M (SOL).
+     Beyond this, growth becomes linear at ~$500M notional per
+     BTC trade.
+
+  3. With 155 winning trades at 7.25% average return on notional,
+     and impact of only 2 bps per trade, the net return per trade
+     at $500M is: 7.25% - 0.04% - 0.07% - 0.94% ≈ 6.2% of
+     $500M = $31M per trade. Over ~80 trades at cap, that's $2.5B
+     in gross P&L. Even with losses, reaching $1.6B is expected.
+
+  The sigmoid bug is the SMOKING GUN. Without it, the impact model
+  would at least charge 15 bps on every trade (still too low, but
+  10x better). With the bug, trades above $15M pay essentially
+  nothing in impact.
+
+  Estimated error magnitude by source:
+    Sigmoid bug:         ~5-10x overstatement
+    Position limits:     ~10-50x overstatement
+    Funding undercharge: ~1.5-3x overstatement
+    Concurrent bug:      ~1.4x overstatement
+    Combined:            ~100-2000x overstatement
+
+
+  WHAT THE CORRECT RESULT SHOULD APPROXIMATELY BE:
+  ════════════════════════════════════════════════
+
+  Flat $125 sizing baseline (long-only): $14,046 P&L on $25K over 5.2 years
+  This is 56% total return = ~9% CAGR with ZERO compounding.
+
+  With compounding at various realism levels from $25K:
+    Bugged simulator ($500M caps, inverted impact):  $1,614,750,000
+    Fixed impact only, still $500M caps:             $1,981,000,000
+    $10M cap, 0.3% RT impact, 0.03%/8h funding:     $78,882,000
+    $5M cap, 0.5% RT impact, 0.05%/8h funding:      $35,884,000
+    $2M cap, 0.5% RT impact, 0.05%/8h funding:      $18,503,000
+
+  BEST ESTIMATE (conservative-realistic):
+    Position cap: $5M per asset (generous for Hyperliquid)
+    Round-trip impact: 0.3-0.5% at $5M
+    Funding: 0.03%/8h average
+    Result: ~$10M-$35M from $25K over 5.2 years
+    CAGR: ~250-300%
+
+  This is STILL extremely aggressive (250-300% CAGR) because:
+  - The backtest has survivorship bias (BTC/ETH/SOL are 3 of the
+    most successful assets in crypto history)
+  - The strategy was fit to historical data
+  - Real-world execution would be worse than even our "conservative"
+    estimates
+  - Drawdowns would likely force position reduction that isn't modeled
+
+  A truly realistic range for this strategy from $25K:
+    Optimistic:   $500K-$2M  (80-120% CAGR)
+    Base case:    $100K-$500K (30-80% CAGR)
+    Conservative: $40K-$100K (10-30% CAGR)
+
+
+  FIXES REQUIRED (priority order):
+  ════════════════════════════════
+
+  1. FIX SIGMOID DISCONTINUITY (Critical)
+     Remove or fix the sigmoid adjustment. Options:
+     a) Remove sigmoid entirely — use only physical impact + spread
+     b) Replace with smooth function: min_impact = max(physical, floor)
+     c) Add convex penalty for large orders instead of concave gap
+
+  2. REDUCE POSITION LIMITS TO HYPERLIQUID REALITY (Critical)
+     BTC: $10M max (aggressive) or $5M (conservative)
+     ETH: $5M max (aggressive) or $2M (conservative)
+     SOL: $2M max (aggressive) or $1M (conservative)
+
+  3. INCREASE k PARAMETER OR ADD ORDER-BOOK-DEPTH MODEL (Critical)
+     Either:
+     a) Increase k to 5,000-10,000 for crypto
+     b) Add order book depth constraint: if notional > 2x book_depth,
+        cap fill rate and spread impact over multiple bars
+     c) Add hard impact floor: impact >= 0.1% for any trade > $1M
+
+  4. ADD CONCURRENT POSITION TRACKING (Moderate)
+     Track open positions and cap total deployment at max_deploy%
+     of equity. Skip trades that would exceed the cap.
+
+  5. USE DYNAMIC FUNDING RATES (Moderate)
+     Apply higher funding during trending periods. Use the actual
+     historical funding rate time series from Hyperliquid if available.
+     At minimum, use 3x the baseline (0.03%/8h) as a floor.
+
+  6. ADD EXECUTION TIME MODEL (Enhancement)
+     Large orders should take multiple bars to fill. Spread the entry
+     over N bars where N = ceil(notional / max_market_order). Each
+     partial fill has its own impact.
+
+
+  AFTER FIXING — VERIFICATION CONFIGS:
+  ════════════════════════════════════
+
+  Config                              Expected Range    Verification Criteria
+  ──────────────────────────────────  ────────────────  ─────────────────────
+  FR_d1K / 10/10/5 / $25K            ~$40K-$60K        Position sizes never exceed $5K
+  PropFR / 10/10/5 / $25K            ~$100K-$300K       Might push against caps
+  PctEq_10 / 10/10/5 / $25K          ~$200K-$1M        Should hit caps frequently
+  PctEq_25 / 10/10/5 / $25K          ~$500K-$3M        Always at cap after month 6
+  PctEq_50 / 7x / $25K               ~$500K-$3M        Same (cap is binding)
+
+  VERIFICATION CRITERIA:
+    ✗ No config from $25K should exceed $50M over 5 years
+    ✗ CAGR should not exceed 200% for any config
+    ✗ Market impact at $1M+ notional should be >0.1% (10 bps)
+    ✗ Market impact at $10M+ notional should be >1% (100 bps)
+    ✗ Market impact at $100M+ notional should make trade unprofitable
+    ✗ Impact curve must be MONOTONICALLY INCREASING with position size
+    ✗ No 27x discontinuities in the impact function
+    ✗ Position sizes that exceed 5% of daily volume should be blocked
+
+═══════════════════════════════════════════════════════════════════════
